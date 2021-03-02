@@ -12,12 +12,12 @@ apply from: "https://raw.githubusercontent.com/toolarium/common-gradle-build/mas
  ****************************************************************************************/
 dependencies {
     // see https://docs.gradle.org/current/userguide/java_library_plugin.html
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.1'
 
     // utilities
-    //implementation "net.sf.jptools:jptools:1.7.6"
-    //implementation "net.sf.jptools:jptools:1.7.6:slf4j-redirect"
-
-    // logging
-    //implementation 'org.slf4j:slf4j-api:1.7.30'
-    //testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
+    testImplementation 'com.google.guava:guava:0.30-jre'
+    testImplementation 'com.google.truth:truth:1.1.2'
+    testImplementation 'com.google.testing.compile:compile-testing:0.19'
+    testRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
 }

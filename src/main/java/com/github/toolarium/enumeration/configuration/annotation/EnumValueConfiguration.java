@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Documented
 public @interface EnumValueConfiguration {
-
+    
     /**
      * Defines the description of the enumeration configuration.
      * 
@@ -42,7 +42,16 @@ public @interface EnumValueConfiguration {
 
     
     /**
-     * Defines if the configuration value is confidential. In case of persistence it has to be secured.
+     * Determines whether the configuration is optional. If the default value is empty, no configuration value is available. 
+     * An empty configuration value with non-optional parameter marks a configuration value that must be defined.
+     * 
+     * @return Define if the value is confidential.
+     */
+    boolean isOptional() default false;
+
+    
+    /**
+     * Determines whether the configuration value is confidential. In case of persistence it has to be secured.
      * 
      * @return Define if the value is confidential.
      */

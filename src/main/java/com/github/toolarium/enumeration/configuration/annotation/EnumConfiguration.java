@@ -19,12 +19,33 @@ import java.lang.annotation.Target;
  * @author Patrick Meier
  * @version $Revision:  $
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
 public @interface EnumConfiguration {
 
+    /**
+     * Defines the enumeration configuration category. 
+     */
+    enum Category {
+        SYSTEM,
+        PRODUCT,
+        USER,
+        EVENT,
+        PERMISSION,
+        METRICS
+    }
+
+    
+    /**
+     * Defines the category of the enumeration configuration.
+     * 
+     * @return The category of the enumeration configuration.
+     */
+    Category category();
+    
+    
     /**
      * Defines the description of the enumeration configuration.
      * 
