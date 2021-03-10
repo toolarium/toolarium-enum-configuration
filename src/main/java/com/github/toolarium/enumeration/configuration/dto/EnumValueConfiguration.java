@@ -1,5 +1,5 @@
 /*
- * EnumConfigurationContent.java
+ * EnumValueConfiguration.java
  * 
  * Copyright by toolarium, all rights reserved.
  */
@@ -7,12 +7,12 @@ package com.github.toolarium.enumeration.configuration.dto;
 
 
 /**
- * Defines the enum value configuration content 
+ * Defines the enum value configuration  
  * 
  * @author Meier Patrick
  * @version $Revision:  $
  */
-public class EnumValueConfigurationContent extends AbstractEnumConfigurationContent {
+public class EnumValueConfiguration extends AbstractEnumConfiguration {
     
     private static final long serialVersionUID = -7293637675260240900L;
     private String key;
@@ -154,7 +154,7 @@ public class EnumValueConfigurationContent extends AbstractEnumConfigurationCont
             return false;
         }
         
-        EnumValueConfigurationContent other = (EnumValueConfigurationContent)obj;
+        EnumValueConfiguration other = (EnumValueConfiguration)obj;
         if (key == null) {
             if (other.key != null) {
                 return false;
@@ -188,7 +188,7 @@ public class EnumValueConfigurationContent extends AbstractEnumConfigurationCont
      */
     @Override
     public String toString() {
-        return "EnumValueConfigurationContent [key=" + key
+        return "EnumValueConfiguration [key=" + key
                + ", description=" + getDescription() 
                + ", defaultValue=" + defaultValue 
                + ", isOptional=" + isOptional

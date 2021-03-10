@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * @version $Revision:  $
  */
 @Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 @Inherited
 @Documented
 public @interface EnumValueConfiguration {

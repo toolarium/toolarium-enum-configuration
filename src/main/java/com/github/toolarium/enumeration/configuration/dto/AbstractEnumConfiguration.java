@@ -1,5 +1,5 @@
 /*
- * AbstractEnumConfigurationContent.java
+ * AbstractEnumConfiguration.java
  *
  * Copyright by toolarium, all rights reserved.
  */
@@ -10,12 +10,12 @@ import java.time.Instant;
 
 
 /**
- * Defines the abstract enum configuration content
+ * Defines the abstract enum configuration
  *
  * @author Meier Patrick
  * @version $Revision:  $
  */
-public abstract class AbstractEnumConfigurationContent implements Serializable {
+public abstract class AbstractEnumConfiguration implements Serializable {
     private static final long serialVersionUID = -5674883381430545491L;
 
     private String description;
@@ -127,7 +127,7 @@ public abstract class AbstractEnumConfigurationContent implements Serializable {
             return false;
         }
 
-        AbstractEnumConfigurationContent other = (AbstractEnumConfigurationContent)obj;
+        AbstractEnumConfiguration other = (AbstractEnumConfiguration)obj;
         if (description == null) {
             if (other.description != null) {
                 return false;

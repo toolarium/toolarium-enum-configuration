@@ -17,6 +17,10 @@ import javax.lang.model.element.ExecutableElement;
  * @version $Revision:  $
  */
 public final class AnnotationConvertUtil {
+    public static final String MAX_TIMESTAMP_STRING = "9999-12-31T12:00:00.000Z";
+    public static final Instant MAX_TIMESTAMP = AnnotationConvertUtil.getInstance().parseDate(MAX_TIMESTAMP_STRING);
+
+    
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      *
