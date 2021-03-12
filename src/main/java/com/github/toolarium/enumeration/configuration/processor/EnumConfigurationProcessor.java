@@ -38,6 +38,12 @@ import javax.tools.StandardLocation;
  * 
  * @author Patrick Meier
  * @version $Revision:  $
+ * 
+ * @link https://hauchee.blogspot.com/2015/12/compile-time-annotation-processing-getting-class-value.html
+ * @link https://medium.com/swlh/all-about-annotations-and-annotation-processors-4af47159f29d
+ * @link https://iammert.medium.com/annotation-processing-dont-repeat-yourself-generate-your-code-8425e60c6657
+ * @link https://maxexplode.medium.com/creating-annotation-processor-to-generate-getters-and-setters-7b7964c72b3e
+ * @link https://github.com/sockeqwe/annotationprocessing101/blob/master/factory/processor/src/main/java/com/hannesdorfmann/annotationprocessing101/factory/processor/FactoryProcessor.java
  */
 public class EnumConfigurationProcessor extends AbstractProcessor {
     private List<Class<? extends Annotation>> annoationClassList;
