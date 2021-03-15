@@ -72,5 +72,5 @@ public @interface EnumValueConfiguration {
      * 
      * @return The valid till information
      */
-    String validTill() default "9999-12-31T12:00:00:00Z";
+    String validTill() default "9999-12-31T12:00:00.000Z";
 }

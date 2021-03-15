@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * @version $Revision:  $
  */
 @Target({ElementType.TYPE})
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
 public @interface EnumConfiguration {
@@ -46,5 +46,5 @@ public @interface EnumConfiguration {
      * 
      * @return The valid till information
      */
-    String validTill() default "9999-12-31T12:00:00:00Z";
+    String validTill() default "9999-12-31T12:00:00.000Z";
 }
