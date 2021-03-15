@@ -5,6 +5,9 @@
  */
 package com.github.toolarium.enumeration.configuration.util;
 
+import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
+import java.lang.reflect.Field;
 import java.time.Instant;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
@@ -63,6 +66,108 @@ public final class AnnotationConvertUtil {
         return Instant.parse(input);
     }
     
+    
+    /**
+     * Read the enum
+     *
+     * @param <T> the generic type
+     * @param e the enumeration value
+     * @return the parsed content
+     * @throws IllegalArgumentException In case the annotation could not be resolved
+     */
+    public <T extends Enum<T>> EnumValueConfiguration getAnnotationInformation(T e) throws IllegalArgumentException {
+        if (e == null) {
+            return null;
+        }
+        
+        try {
+            Field field = e.getClass().getField(e.name());
+            EnumValueConfiguration enumValueConfiguration = convert(field.getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration.class));
+            if (enumValueConfiguration == null) {
+                return null;
+            }
+
+            enumValueConfiguration.setKey(e.name());
+
+            EnumConfiguration enumConfiguration = convert(e.getClass().getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration.class));
+            if (enumConfiguration != null) {
+                enumValueConfiguration = enumConfiguration.addEnumValueConfiguration(enumValueConfiguration);
+            }
+            
+            return enumValueConfiguration;
+            
+        } catch (Exception ex) {
+            // NOP
+            IllegalArgumentException ie = new IllegalArgumentException("Could not find annotation: " + ex.getMessage());
+            ie.setStackTrace(ex.getStackTrace());
+            throw ie;
+        } 
+    }
+
+    
+    /**
+     * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration} into a
+     * {@link EnumConfiguration}.
+     *
+     * @param enumConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration}.
+     * @return the {@link EnumConfiguration}.
+     */
+    public EnumConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration enumConfigurationAnnotation) {
+        if (enumConfigurationAnnotation == null) {
+            return null;            
+        }
+        
+        EnumConfiguration enumConfiguration = new EnumConfiguration();
+        enumConfiguration.setDescription(enumConfigurationAnnotation.description());
+        enumConfiguration.setValidFrom(Instant.now());
+        enumConfiguration.setValidTill(AnnotationConvertUtil.MAX_TIMESTAMP);
+
+        if (enumConfigurationAnnotation.validFrom() != null && !enumConfigurationAnnotation.validFrom().trim().isEmpty()) {
+            enumConfiguration.setValidFrom(AnnotationConvertUtil.getInstance().parseDate(enumConfigurationAnnotation.validFrom()));
+        }
+        
+        if (enumConfigurationAnnotation.validTill() != null && !enumConfigurationAnnotation.validTill().trim().isEmpty()) {
+            enumConfiguration.setValidTill(AnnotationConvertUtil.getInstance().parseDate(enumConfigurationAnnotation.validTill()));
+        }
+        
+        return enumConfiguration;
+    }
+
+
+    /**
+     * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration} into a
+     * {@link EnumValueConfiguration}.
+     *
+     * @param enumValueConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration}.
+     * @return the {@link EnumValueConfiguration}.
+     */
+    public EnumValueConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration enumValueConfigurationAnnotation) {
+        if (enumValueConfigurationAnnotation == null) {
+            return null;            
+        }
+
+        EnumValueConfiguration enumValueConfiguration = null;
+        enumValueConfiguration = new EnumValueConfiguration();
+        enumValueConfiguration.setValidFrom(Instant.now());
+        enumValueConfiguration.setValidTill(AnnotationConvertUtil.MAX_TIMESTAMP);
+         
+        enumValueConfiguration.setDescription(enumValueConfigurationAnnotation.description());
+        enumValueConfiguration.setDefaultValue(enumValueConfigurationAnnotation.defaultValue());
+        enumValueConfiguration.setOptional(enumValueConfigurationAnnotation.isOptional());
+        enumValueConfiguration.setConfidential(enumValueConfigurationAnnotation.isConfidential());
+        
+        if (enumValueConfigurationAnnotation.validFrom() != null && !enumValueConfigurationAnnotation.validFrom().trim().isEmpty()) {
+            enumValueConfiguration.setValidFrom(AnnotationConvertUtil.getInstance().parseDate(enumValueConfigurationAnnotation.validFrom()));
+        }
+        
+        if (enumValueConfigurationAnnotation.validTill() != null && !enumValueConfigurationAnnotation.validTill().trim().isEmpty()) {
+            enumValueConfiguration.setValidTill(AnnotationConvertUtil.getInstance().parseDate(enumValueConfigurationAnnotation.validTill()));
+        }
+        return enumValueConfiguration;
+    }
+
+
+
     
     /**
      * Get the name 
