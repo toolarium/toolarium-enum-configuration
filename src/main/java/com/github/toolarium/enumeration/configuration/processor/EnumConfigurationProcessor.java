@@ -155,6 +155,12 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                 } catch (Exception ex) {
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ex.getMessage());
                 }
+            } else {
+                try {
+                    enumConfiguration.getInterfaceList().add(((DeclaredType)tm).asElement().toString());
+                } catch (Exception ex) {
+                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ex.getMessage());
+                }
             }
         }
         

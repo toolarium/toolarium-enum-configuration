@@ -18,6 +18,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     private static final long serialVersionUID = -5016414165364299512L;
     private String name;
     private List<EnumValueConfiguration> keyList;
+    private List<String> interfaceList;
     private List<String> markerInterfaceList;
 
     
@@ -37,6 +38,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      */
     public EnumConfiguration() {
         keyList = new ArrayList<EnumValueConfiguration>();
+        interfaceList = new ArrayList<String>();
         markerInterfaceList = new ArrayList<String>();
     }
 
@@ -82,6 +84,26 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
 
     
     /**
+     * Set the interface list
+     * 
+     * @param interfaceList the interface list
+     */
+    public void setInterfaceList(List<String> interfaceList) {
+        this.interfaceList = interfaceList;
+    }
+
+    
+    /**
+     * Get the interface list
+     * 
+     * @return the interface list
+     */
+    public List<String> getInterfaceList() {
+        return interfaceList;
+    }
+
+    
+    /**
      * Set the marker interface list
      * 
      * @param markerInterfaceList the marker interface list
@@ -102,11 +124,12 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
 
     
     /**
-     * Add a enumeration value configuration
+     * Add a enumeration value configuration and corrects validFrom / validTill in case it's not consistent regarding the parent element.
      * 
      * @param enumValueConfiguration the enumeration value configuration
+     * @return the added enum value configuration
      */
-    public void addEnumValueConfiguration(EnumValueConfiguration enumValueConfiguration) {
+    public EnumValueConfiguration addEnumValueConfiguration(EnumValueConfiguration enumValueConfiguration) {
         
         if (enumValueConfiguration.getValidFrom() == null || getValidFrom().isAfter(enumValueConfiguration.getValidFrom())) {
             enumValueConfiguration.setValidFrom(getValidFrom());
@@ -117,6 +140,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
         }
 
         this.keyList.add(enumValueConfiguration);
+        return enumValueConfiguration;
     }
 
     
@@ -136,6 +160,11 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
         result = prime * result;
         if (keyList != null) {
             result += keyList.hashCode();
+        }
+
+        result = prime * result;
+        if (interfaceList != null) {
+            result += interfaceList.hashCode();
         }
 
         result = prime * result;
@@ -181,6 +210,14 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
             return false;
         }
 
+        if (interfaceList == null) {
+            if (other.interfaceList != null) {
+                return false;
+            }
+        } else if (!interfaceList.equals(other.interfaceList)) {
+            return false;
+        }
+
         if (markerInterfaceList == null) {
             if (other.markerInterfaceList != null) {
                 return false;
@@ -203,6 +240,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
                + ", validFrom=" + getValidFrom() 
                + ", validTill=" + getValidTill() 
                + ", keyList=" + keyList
+               + ", interfaceList=" + interfaceList
                + ", markerInterfaceList=" + markerInterfaceList
                + "]";
     }
