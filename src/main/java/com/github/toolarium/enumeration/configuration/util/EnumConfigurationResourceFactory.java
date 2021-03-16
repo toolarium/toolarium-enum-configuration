@@ -116,6 +116,8 @@ public final class EnumConfigurationResourceFactory {
             objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+            objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         }
         return objectMapper;
     }
