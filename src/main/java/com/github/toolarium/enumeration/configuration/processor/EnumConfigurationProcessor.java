@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.processor;
 
+import com.github.toolarium.enumeration.configuration.Version;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
@@ -94,6 +95,8 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         }
 
         EnumConfigurations enumConfigurations = new EnumConfigurations();
+        enumConfigurations.setName(Version.PROJECT_NAME);
+        enumConfigurations.setVersion(Version.VERSION);
         for (Element element : roundEnv.getElementsAnnotatedWith(EnumConfiguration.class)) {
             enumConfigurations.add(processEnumConfigurationElement((TypeElement)element));
         }
