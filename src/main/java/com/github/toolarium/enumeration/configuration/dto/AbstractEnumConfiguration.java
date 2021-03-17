@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -12,8 +13,7 @@ import java.time.Instant;
 /**
  * Defines the abstract enum configuration
  *
- * @author Meier Patrick
- * @version $Revision:  $
+ * @author patrick
  */
 public abstract class AbstractEnumConfiguration implements Serializable {
     private static final long serialVersionUID = -5674883381430545491L;
@@ -22,7 +22,21 @@ public abstract class AbstractEnumConfiguration implements Serializable {
     private Instant validFrom;
     private Instant validTill;
 
+    
+    /**
+     * Constructor for AbstractEnumConfiguration
+     */
+    public AbstractEnumConfiguration() {
+        //String description();
+        //String validFrom() default "";
+        //String validTill() default "9999-12-31T12:00:00.000Z";
 
+        description = null;
+        validFrom = null;
+        validTill = AnnotationConvertUtil.MAX_TIMESTAMP;
+    }
+
+    
     /**
      * Get the configuration description
      *

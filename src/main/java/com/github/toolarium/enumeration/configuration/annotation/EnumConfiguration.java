@@ -16,8 +16,7 @@ import java.lang.annotation.Target;
 /**
  * Defines the enumeration as a simple configuration as a set.
  * 
- * @author Patrick Meier
- * @version $Revision:  $
+ * @author patrick
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

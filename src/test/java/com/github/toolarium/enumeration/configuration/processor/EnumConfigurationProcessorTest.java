@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test the {@link EnumConfigurationProcessor}.
  * 
- * @author Patrick Meier
+ * @author patrick
  */
 public class EnumConfigurationProcessorTest {
     

@@ -19,8 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test the AnnotationConvertUtil
  * 
- * @author Meier Patrick
- * @version $Revision:  $
+ * @author patrick
  */
 public class AnnotationConvertUtilTest {
     
