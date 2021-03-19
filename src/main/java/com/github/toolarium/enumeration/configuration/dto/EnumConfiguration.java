@@ -5,21 +5,37 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines the enum configuration
  *
- * @author Meier Patrick
- * @version $Revision:  $
+ * @author patrick
  */
 public class EnumConfiguration extends AbstractEnumConfiguration {
+    /** Defines the max timestamp */
+    public static final String MAX_TIMESTAMP_STRING = "9999-12-31T12:00:00.000Z";
+
     private static final long serialVersionUID = -5016414165364299512L;
     private String name;
-    private List<EnumValueConfiguration> keyList;
-    private List<String> interfaceList;
-    private List<String> markerInterfaceList;
+    private Map<String, EnumValueConfiguration> keyList;
+    private Set<String> interfaceList;
+    private Set<String> markerInterfaceList;
+
+    
+    /**
+     * Constructor
+     */
+    public EnumConfiguration() {
+        super();
+        name = null;
+        keyList = new LinkedHashMap<String, EnumValueConfiguration>();
+        interfaceList = new LinkedHashSet<String>();
+        markerInterfaceList = new LinkedHashSet<String>();
+    }
 
     
     /**
@@ -31,17 +47,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
         this();
         setName(name);
     }
-
     
-    /**
-     * Constructor
-     */
-    public EnumConfiguration() {
-        keyList = new ArrayList<EnumValueConfiguration>();
-        interfaceList = new ArrayList<String>();
-        markerInterfaceList = new ArrayList<String>();
-    }
-
     
     /**
      * Get the configuration name
@@ -66,10 +72,16 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     /**
      * Set the key list
      * 
-     * @param keyList the key list
+     * @param keyList the key list.
      */
-    public void setKeyList(List<EnumValueConfiguration> keyList) {
-        this.keyList = keyList;
+    public void setKeyList(Set<EnumValueConfiguration> keyList) {
+        this.keyList = new LinkedHashMap<String, EnumValueConfiguration>();
+        
+        if (keyList != null) {
+            for (EnumValueConfiguration e : keyList) {
+                add(e);
+            }
+        }
     }
 
     
@@ -78,8 +90,13 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the key list
      */
-    public List<EnumValueConfiguration> getKeyList() {
-        return keyList;
+    public Set<EnumValueConfiguration> getKeyList() {
+        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
+        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
+            result.add(e.getValue());
+        }
+        
+        return result;
     }
 
     
@@ -88,7 +105,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @param interfaceList the interface list
      */
-    public void setInterfaceList(List<String> interfaceList) {
+    public void setInterfaceList(Set<String> interfaceList) {
         this.interfaceList = interfaceList;
     }
 
@@ -98,7 +115,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the interface list
      */
-    public List<String> getInterfaceList() {
+    public Set<String> getInterfaceList() {
         return interfaceList;
     }
 
@@ -108,7 +125,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @param markerInterfaceList the marker interface list
      */
-    public void setMarkerInterfaceList(List<String> markerInterfaceList) {
+    public void setMarkerInterfaceList(Set<String> markerInterfaceList) {
         this.markerInterfaceList = markerInterfaceList;
     }
 
@@ -118,18 +135,23 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the marker interface list
      */
-    public List<String> getMarkerInterfaceList() {
+    public Set<String> getMarkerInterfaceList() {
         return markerInterfaceList;
     }
 
     
     /**
-     * Add a enumeration value configuration and corrects validFrom / validTill in case it's not consistent regarding the parent element.
+     * Adds an {@link EnumValueConfiguration} and corrects validFrom / validTill in case it's not consistent regarding the parent element.
      * 
-     * @param enumValueConfiguration the enumeration value configuration
+     * @param enumValueConfiguration the {@link EnumValueConfiguration}
      * @return the added enum value configuration
+     * @throws IllegalArgumentException In case the key doesn't exist
      */
-    public EnumValueConfiguration addEnumValueConfiguration(EnumValueConfiguration enumValueConfiguration) {
+    public EnumValueConfiguration add(EnumValueConfiguration enumValueConfiguration) {
+        
+        if (enumValueConfiguration == null || enumValueConfiguration.getKey() == null || enumValueConfiguration.getKey().trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid enum value configuration:" + enumValueConfiguration);
+        }
         
         if (enumValueConfiguration.getValidFrom() == null || getValidFrom().isAfter(enumValueConfiguration.getValidFrom())) {
             enumValueConfiguration.setValidFrom(getValidFrom());
@@ -139,8 +161,30 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
             enumValueConfiguration.setValidTill(getValidTill());
         }
 
-        this.keyList.add(enumValueConfiguration);
-        return enumValueConfiguration;
+        String key = enumValueConfiguration.getKey().trim();
+        if (!keyList.containsKey(key)) {
+            this.keyList.put(key, enumValueConfiguration);
+            return enumValueConfiguration;
+        }
+        
+        return null;
+    }
+
+
+    /**
+     * Returns a list of mandatory {@link EnumValueConfiguration}.
+     *
+     * @return the list of mandatory {@link EnumValueConfiguration}.
+     */
+    public Set<EnumValueConfiguration> selectMandatoryEnumValueConfigurationList() {
+        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
+        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
+            if (e.getValue().isMandatory()) {
+                result.add(e.getValue());
+            }
+        }
+        
+        return result;
     }
 
     
@@ -239,9 +283,9 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
                + ", description=" + getDescription()
                + ", validFrom=" + getValidFrom() 
                + ", validTill=" + getValidTill() 
-               + ", keyList=" + keyList
-               + ", interfaceList=" + interfaceList
-               + ", markerInterfaceList=" + markerInterfaceList
+               + ", keyList=" + getKeyList()
+               + ", interfaceList=" + getInterfaceList()
+               + ", markerInterfaceList=" + getMarkerInterfaceList()
                + "]";
     }
 }

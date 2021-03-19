@@ -6,10 +6,10 @@
 package com.github.toolarium.enumeration.configuration.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -30,7 +30,7 @@ public class EnumConfigurations implements Serializable {
     public EnumConfigurations() {
         name = "";
         version = "";
-        enumConfigurationContentMap = new HashMap<>();
+        enumConfigurationContentMap = new LinkedHashMap<>();
     }
 
     
@@ -75,18 +75,6 @@ public class EnumConfigurations implements Serializable {
 
     
     /**
-     * Adds a {@link EnumConfiguration}.
-     * 
-     * @param e the {@link EnumConfiguration}.
-     */
-    public void add(EnumConfiguration e) {
-        if (e != null && e.getName() != null && !e.getName().trim().isEmpty()) {
-            enumConfigurationContentMap.put(e.getName(), e);
-        }
-    }
-
-    
-    /**
      * Get a {@link EnumConfiguration}.
      * @param name the name
      * @return the {@link EnumConfiguration}.
@@ -96,7 +84,7 @@ public class EnumConfigurations implements Serializable {
             return null;
         }
         
-        return enumConfigurationContentMap.get(name);
+        return enumConfigurationContentMap.get(name.trim());
     }
     
     
@@ -105,8 +93,13 @@ public class EnumConfigurations implements Serializable {
      * 
      * @return true if it is empty
      */
-    public List<EnumConfiguration> getEnumConfigurationList() {
-        return new ArrayList<>(enumConfigurationContentMap.values());
+    public Set<EnumConfiguration> getEnumConfigurationList() {
+        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
+        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
+            result.add(e.getValue());
+        }
+        
+        return result;
     }
     
     
@@ -115,10 +108,63 @@ public class EnumConfigurations implements Serializable {
      * 
      * @param list the enumeration configuration content list
      */
-    public void setEnumConfigurationList(List<EnumConfiguration> list) {
+    public void setEnumConfigurationList(Set<EnumConfiguration> list) {
+        enumConfigurationContentMap = new LinkedHashMap<String, EnumConfiguration>();
+        
         for (EnumConfiguration e : list) {
-            enumConfigurationContentMap.put(e.getName(), e);
+            add(e);
         }
+    }
+
+    
+    /**
+     * Adds an {@link EnumConfiguration}.
+     * 
+     * @param enumConfiguration the {@link EnumConfiguration}
+     * @return the added {@link EnumConfiguration}
+     * @throws IllegalArgumentException In case the name doesn't exist
+     */
+    public EnumConfiguration add(EnumConfiguration enumConfiguration) {
+        
+        if (enumConfiguration == null || enumConfiguration.getName() == null || enumConfiguration.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid enum configuration:" + enumConfiguration);
+        }
+
+        String name = enumConfiguration.getName().trim();
+        if (!enumConfigurationContentMap.containsKey(name)) {
+            this.enumConfigurationContentMap.put(name, enumConfiguration);
+            return enumConfiguration;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Returns a list of mandatory configuration entries.
+     *
+     * @return the list of mandatory configuration entries.
+     */
+    public Set<EnumConfiguration> selectMandatoryConfigurationList() {
+        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
+        
+        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
+            Set<EnumValueConfiguration> enumValueConfigurationList = e.getValue().selectMandatoryEnumValueConfigurationList();
+            
+            if (enumValueConfigurationList != null && !enumValueConfigurationList.isEmpty()) {
+                EnumConfiguration enumConfigurationToAdd = new EnumConfiguration();
+                enumConfigurationToAdd.setDescription(e.getValue().getDescription());
+                enumConfigurationToAdd.setValidFrom(e.getValue().getValidFrom());
+                enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
+                enumConfigurationToAdd.setName(e.getValue().getName());
+                enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
+                enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
+                enumConfigurationToAdd.setKeyList(enumValueConfigurationList);
+                result.add(enumConfigurationToAdd);
+            }
+        }
+        
+        return result;
     }
 
 
@@ -202,6 +248,6 @@ public class EnumConfigurations implements Serializable {
     public String toString() {
         return "EnumConfigurations [name=" + name 
                 + ", version=" + version 
-                + ", enumConfigurationContentMap=" + enumConfigurationContentMap + "]";
+                + ", enumConfigurationList=" + getEnumConfigurationList() + "]";
     }
 }

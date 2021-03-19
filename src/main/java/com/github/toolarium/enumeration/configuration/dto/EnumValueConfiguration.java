@@ -5,22 +5,42 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Defines the enum value configuration  
  * 
- * @author Meier Patrick
- * @version $Revision:  $
+ * @author patrick
  */
 public class EnumValueConfiguration extends AbstractEnumConfiguration {
     
     private static final long serialVersionUID = -7293637675260240900L;
     private String key;
+    private EnumValueConfigurationDataType dataType;
     private String defaultValue;
+    private String exampleValue;
+    private EnumValueConfigurationSizing valueSize;
+    private EnumValueConfigurationSizing cardinality;
     private boolean isOptional;
     private boolean isConfidential;
-      
+
+  
+    /**
+     * Constructor for EnumValueConfiguration
+     */
+    public EnumValueConfiguration() {
+        super();
+        key = null;
+        dataType = EnumValueConfigurationDataType.STRING;
+        defaultValue = "";
+        exampleValue = "";
+        valueSize = null;
+        cardinality = null;
+        isOptional = false;
+        isConfidential = false;
+    }
     
+        
     /**
      * Get the configuration key
      * 
@@ -39,7 +59,27 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     public void setKey(String key) {
         this.key = key;
     }
+
     
+    /**
+     * Get the configuration value data type
+     * 
+     * @return the configuration value data type
+     */
+    public EnumValueConfigurationDataType getDataType() {
+        return dataType;
+    }
+    
+    
+    /**
+     * Set the configuration value data type
+     * 
+     * @param dataType the configuration value data type
+     */
+    public void setDataType(EnumValueConfigurationDataType dataType) {
+        this.dataType = dataType;
+    }
+
     
     /**
      * Get the default value
@@ -59,8 +99,68 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
+
     
+    /**
+     * Get the example value
+     * 
+     * @return the example value
+     */
+    public String getExampleValue() {
+        return exampleValue;
+    }
     
+        
+    /**
+     * Set the example
+     * 
+     * @param exampleValue the example value
+     */
+    public void setExampleValue(String exampleValue) {
+        this.exampleValue = exampleValue;
+    }
+
+    
+    /**
+     * Get the value size
+     * 
+     * @return the value size
+     */
+    public EnumValueConfigurationSizing getValueSize() {
+        return valueSize;
+    }
+    
+        
+    /**
+     * Set the value size
+     * 
+     * @param valueSize the value size
+     */
+    public void setValueSize(EnumValueConfigurationSizing valueSize) {
+        this.valueSize = valueSize;
+    }
+
+    
+    /**
+     * Get the cardinality
+     * 
+     * @return the cardinality
+     */
+    public EnumValueConfigurationSizing getCardinality() {
+        return cardinality;
+    }
+    
+        
+    /**
+     * Set the cardinality
+     * 
+     * @param cardinality the cardinality
+     */
+    public void setCardinality(EnumValueConfigurationSizing cardinality) {
+        this.cardinality = cardinality;
+    }
+
+
     /**
      * Define if the value is optional or not
      * 
@@ -100,6 +200,21 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
         this.isConfidential = isConfidential;
     }
 
+
+    /**
+     * An {@link EnumValueConfiguration} is mandatory in case it's not optional and has no default value.
+     *
+     * @return true if it is not optinal and has no default value.
+     */
+    @JsonIgnore
+    public boolean isMandatory() {
+        if (isOptional) {
+            return false;
+        }
+        
+        return (defaultValue == null || defaultValue.isEmpty());
+    }
+    
     
     /**
      * @see java.lang.Object#hashCode()
@@ -115,8 +230,28 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
         }
 
         result = prime * result;
+        if (dataType != null) {
+            result += dataType.hashCode();
+        }
+        
+        result = prime * result;
         if (defaultValue != null) {
             result += defaultValue.hashCode();
+        }
+
+        result = prime * result;
+        if (exampleValue != null) {
+            result += exampleValue.hashCode();
+        }
+
+        result = prime * result;
+        if (valueSize != null) {
+            result += valueSize.hashCode();
+        }
+
+        result = prime * result;
+        if (cardinality != null) {
+            result += cardinality.hashCode();
         }
 
         result = prime * result;
@@ -163,6 +298,14 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
             return false;
         }
 
+        if (dataType == null) {
+            if (other.dataType != null) {
+                return false;
+            }
+        } else if (!dataType.equals(other.dataType)) {
+            return false;
+        }
+        
         if (defaultValue == null) {
             if (other.defaultValue != null) {
                 return false;
@@ -170,7 +313,31 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
         } else if (!defaultValue.equals(other.defaultValue)) {
             return false;
         }
-        
+
+        if (exampleValue == null) {
+            if (other.exampleValue != null) {
+                return false;
+            }
+        } else if (!exampleValue.equals(other.exampleValue)) {
+            return false;
+        }
+
+        if (valueSize == null) {
+            if (other.valueSize != null) {
+                return false;
+            }
+        } else if (!valueSize.equals(other.valueSize)) {
+            return false;
+        }
+
+        if (cardinality == null) {
+            if (other.cardinality != null) {
+                return false;
+            }
+        } else if (!cardinality.equals(other.cardinality)) {
+            return false;
+        }
+
         if (isOptional != other.isOptional) {
             return false;
         }
@@ -189,8 +356,12 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     @Override
     public String toString() {
         return "EnumValueConfiguration [key=" + key
+               + ", dataType=" + getDataType()
                + ", description=" + getDescription() 
                + ", defaultValue=" + defaultValue 
+               + ", exampleValue=" + getExampleValue() 
+               + ", valueSize=" + getValueSize() 
+               + ", cardinality=" + getCardinality() 
                + ", isOptional=" + isOptional
                + ", isConfidential=" + isConfidential
                + ", validFrom=" + getValidFrom() 

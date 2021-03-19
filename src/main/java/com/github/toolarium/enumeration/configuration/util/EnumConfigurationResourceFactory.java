@@ -26,9 +26,7 @@ public final class EnumConfigurationResourceFactory {
     private ObjectMapper objectMapper;
     
     /**
-     * Private class, the only instance of the singelton which will be created by accessing the holder class.
-     *
-     * @author patrick
+     * Private class, the only instance of the singleton which will be created by accessing the holder class.
      */
     private static class HOLDER {
         static final EnumConfigurationResourceFactory INSTANCE = new EnumConfigurationResourceFactory();
@@ -51,7 +49,6 @@ public final class EnumConfigurationResourceFactory {
     public static EnumConfigurationResourceFactory getInstance() {
         return HOLDER.INSTANCE;
     }
-
     
     
     /**

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
@@ -34,20 +35,19 @@ public class EnumConfigurationResourceFactoryTest {
     public void writeEmptyEnumConfigurations() throws IOException {
         Assert.assertNull(writeAndRead(null));
         
-        EnumConfigurations e = new EnumConfigurations();
-        Assert.assertNull(writeAndRead(e));
+        Assert.assertNull(writeAndRead(new EnumConfigurations()));
 
-        e = new EnumConfigurations();
-        e.add(new EnumConfiguration(null));
-        Assert.assertNull(writeAndRead(e));
-        
-        e = new EnumConfigurations();
-        e.add(new EnumConfiguration(""));
-        Assert.assertNull(writeAndRead(e));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new EnumConfigurations().add(null);
+        });
 
-        e = new EnumConfigurations();
-        e.add(new EnumConfiguration("  "));
-        Assert.assertNull(writeAndRead(e));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new EnumConfigurations().add(new EnumConfiguration(""));
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new EnumConfigurations().add(new EnumConfiguration("  "));
+        });
     }
 
     
@@ -65,7 +65,7 @@ public class EnumConfigurationResourceFactoryTest {
         e = new EnumConfigurations();
         EnumConfiguration ec = new EnumConfiguration("myName");
         ec.setValidFrom(Instant.now());
-        ec.setValidTill(AnnotationConvertUtil.MAX_TIMESTAMP);
+        ec.setValidTill(DateUtil.MAX_TIMESTAMP);
         ec.setDescription("My description");
         
         EnumValueConfiguration enumValueConfiguration1 = new EnumValueConfiguration();
@@ -76,7 +76,7 @@ public class EnumConfigurationResourceFactoryTest {
         enumValueConfiguration1.setOptional(false);
         enumValueConfiguration1.setValidFrom(null);
         enumValueConfiguration1.setValidTill(null);
-        ec.addEnumValueConfiguration(enumValueConfiguration1);
+        ec.add(enumValueConfiguration1);
         
         EnumValueConfiguration enumValueConfiguration2 = new EnumValueConfiguration();
         enumValueConfiguration2.setKey("myKey2");
@@ -85,8 +85,8 @@ public class EnumConfigurationResourceFactoryTest {
         enumValueConfiguration2.setDefaultValue("default value 2");
         enumValueConfiguration2.setOptional(true);
         enumValueConfiguration2.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
-        enumValueConfiguration2.setValidTill(AnnotationConvertUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
-        ec.addEnumValueConfiguration(enumValueConfiguration2);
+        enumValueConfiguration2.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec.add(enumValueConfiguration2);
 
         EnumValueConfiguration enumValueConfiguration3 = new EnumValueConfiguration();
         enumValueConfiguration3.setKey("myKey3");
@@ -95,8 +95,8 @@ public class EnumConfigurationResourceFactoryTest {
         enumValueConfiguration3.setDefaultValue("default value 3");
         enumValueConfiguration3.setOptional(true);
         enumValueConfiguration3.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
-        enumValueConfiguration3.setValidTill(AnnotationConvertUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
-        ec.addEnumValueConfiguration(enumValueConfiguration3);
+        enumValueConfiguration3.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec.add(enumValueConfiguration3);
 
         e.add(ec);
         Assert.assertEquals(e, writeAndRead(e));

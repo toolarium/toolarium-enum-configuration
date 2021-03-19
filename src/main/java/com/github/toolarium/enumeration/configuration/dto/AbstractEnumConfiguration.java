@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
-import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
+import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -33,7 +33,7 @@ public abstract class AbstractEnumConfiguration implements Serializable {
 
         description = null;
         validFrom = null;
-        validTill = AnnotationConvertUtil.MAX_TIMESTAMP;
+        validTill = DateUtil.MAX_TIMESTAMP;
     }
 
     
