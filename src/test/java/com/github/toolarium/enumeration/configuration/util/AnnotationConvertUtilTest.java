@@ -118,10 +118,10 @@ public class AnnotationConvertUtilTest {
     
     @EnumConfiguration(description = "The description")
     public enum MyConfigTest implements IEnumConfiguration {
-        @EnumValueConfiguration(description =  "First", defaultValue = "11")
+        @EnumValueConfiguration(description =  "First", defaultValue = "11", exampleValue = "42")
         FIRST,
         
-        @EnumValueConfiguration(description =  "Second", defaultValue = "22")
+        @EnumValueConfiguration(description =  "Second", defaultValue = "22", exampleValue = "42")
         SECOND;
     }
 }

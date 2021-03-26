@@ -43,6 +43,6 @@ public class RegexpValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue("^.*[a-b]*$", "^.*[a-b]*$");
-        assertException(IllegalArgumentException.class, "Illegal character range near index 3\n[b-", "[b-");
+        assertException("Illegal character range near index 3\n[b-", "[b-");
     }
 }

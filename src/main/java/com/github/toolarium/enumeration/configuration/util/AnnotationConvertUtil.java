@@ -9,7 +9,6 @@ import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
-import java.time.Instant;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 
@@ -62,8 +61,6 @@ public final class AnnotationConvertUtil {
         
         EnumConfiguration enumConfiguration = new EnumConfiguration();
         enumConfiguration.setDescription(enumConfigurationAnnotation.description());
-        enumConfiguration.setValidFrom(Instant.now());
-        enumConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
 
         if (enumConfigurationAnnotation.validFrom() != null && !enumConfigurationAnnotation.validFrom().trim().isEmpty()) {
             enumConfiguration.setValidFrom(DateUtil.getInstance().parseDate(enumConfigurationAnnotation.validFrom()));
@@ -91,9 +88,6 @@ public final class AnnotationConvertUtil {
 
         EnumValueConfiguration enumValueConfiguration = null;
         enumValueConfiguration = new EnumValueConfiguration();
-        enumValueConfiguration.setValidFrom(Instant.now());
-        enumValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
-         
         enumValueConfiguration.setDescription(enumValueConfigurationAnnotation.description());
         enumValueConfiguration.setDataType(EnumUtil.getInstance().mapEnum(EnumValueConfigurationDataType.class, enumValueConfigurationAnnotation.dataType()));
         enumValueConfiguration.setDefaultValue(enumValueConfigurationAnnotation.defaultValue());
@@ -114,6 +108,7 @@ public final class AnnotationConvertUtil {
         return enumValueConfiguration;
     }
 
+    
 
     /**
      * Prepare value size

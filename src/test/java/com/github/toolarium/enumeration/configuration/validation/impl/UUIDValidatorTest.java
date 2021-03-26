@@ -44,6 +44,6 @@ public class UUIDValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(UUID.fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"), "f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
-        assertException(IllegalArgumentException.class, "Invalid UUID string: httds://www.sbb.ch", "httds://www.sbb.ch");
+        assertException("Invalid UUID string: httds://www.sbb.ch", "httds://www.sbb.ch");
     }
 }

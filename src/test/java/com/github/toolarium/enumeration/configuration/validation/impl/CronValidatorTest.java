@@ -46,6 +46,6 @@ public class CronValidatorTest extends AbstractValidatorTest {
         assertValue("* * * * *", "  * * * * *  ");
         assertValue("* * * * *", "  * * * * *  ");
         assertValue("1/2 * * * *", "  1/2 * * * *  ");
-        assertException(IllegalArgumentException.class, "Invalid cron entry [* * * *]!", "* * * *");
+        assertException("Invalid cron entry [* * * *]!", "* * * *");
     }
 }

@@ -46,6 +46,6 @@ public class TimestampValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(Instant.parse("2021-03-15T12:34:55Z"), "2021-03-15T12:34:55Z");
-        assertException(IllegalArgumentException.class, "Text '2021-33-35T12:34:55Z' could not be parsed at index 0", "2021-33-35T12:34:55Z");
+        assertException("Text '2021-33-35T12:34:55Z' could not be parsed at index 0", "2021-33-35T12:34:55Z");
     }
 }

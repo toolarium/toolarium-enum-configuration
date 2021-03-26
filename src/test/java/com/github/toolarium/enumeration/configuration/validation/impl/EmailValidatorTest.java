@@ -43,6 +43,6 @@ public class EmailValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue("my@mail", "my@mail");
-        assertException(IllegalArgumentException.class, "Invalid value: [mymail].", "mymail");
+        assertException("Invalid value: [mymail].", "mymail");
     }
 }

@@ -25,7 +25,7 @@ public class EnumValueConfigurationsTest {
     public void testEmptyEnumValueConfiguration() {
         EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
         Assert.assertNull(enumValueConfiguration.getDescription());
-        Assert.assertNull(enumValueConfiguration.getValidFrom());
+        Assert.assertNotNull(enumValueConfiguration.getValidFrom());
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
@@ -42,7 +42,7 @@ public class EnumValueConfigurationsTest {
         EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
         enumValueConfiguration.setOptional(true);
         Assert.assertNull(enumValueConfiguration.getDescription());
-        Assert.assertNull(enumValueConfiguration.getValidFrom());
+        Assert.assertNotNull(enumValueConfiguration.getValidFrom());
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
@@ -52,7 +52,7 @@ public class EnumValueConfigurationsTest {
         enumValueConfiguration = new EnumValueConfiguration();
         enumValueConfiguration.setDefaultValue("20");
         Assert.assertNull(enumValueConfiguration.getDescription());
-        Assert.assertNull(enumValueConfiguration.getValidFrom());
+        Assert.assertNotNull(enumValueConfiguration.getValidFrom());
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("20", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
@@ -68,7 +68,7 @@ public class EnumValueConfigurationsTest {
     public void testEmptyEnumConfiguration() {
         EnumConfiguration enumConfiguration = new EnumConfiguration();
         Assert.assertNull(enumConfiguration.getDescription());
-        Assert.assertNull(enumConfiguration.getValidFrom());
+        Assert.assertNotNull(enumConfiguration.getValidFrom());
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumConfiguration.getValidTill());
         Assert.assertNull(enumConfiguration.getName());
         Assert.assertTrue(enumConfiguration.getKeyList().isEmpty());

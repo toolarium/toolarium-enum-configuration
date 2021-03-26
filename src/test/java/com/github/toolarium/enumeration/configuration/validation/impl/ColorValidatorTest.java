@@ -43,6 +43,6 @@ public class ColorValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue("#12B356", "#12B356");
-        assertException(IllegalArgumentException.class, "Invalid value: [#KFB356].", "#KFB356");
+        assertException("Invalid value: [#KFB356].", "#KFB356");
     }
 }

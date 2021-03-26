@@ -45,6 +45,6 @@ public class NumberValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(12345678901234L, "12345678901234");
-        assertException(IllegalArgumentException.class, "For input string: \"123'45678901234\"", "123'45678901234");
+        assertException("For input string: \"123'45678901234\"", "123'45678901234");
     }
 }

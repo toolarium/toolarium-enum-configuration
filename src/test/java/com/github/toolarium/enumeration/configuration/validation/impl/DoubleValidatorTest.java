@@ -43,6 +43,6 @@ public class DoubleValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(12.34567d, "12.34567");
-        assertException(IllegalArgumentException.class, "For input string: \"1A2.34567\"", "1A2.34567");
+        assertException("For input string: \"1A2.34567\"", "1A2.34567");
     }
 }

@@ -44,6 +44,6 @@ public class CertificateValidatorTest extends AbstractValidatorTest {
     public void testConvert() {
         assertValue("-- my certificate --", "-- my certificate --");
 
-        assertException(IllegalArgumentException.class, "Invalid value: [123].", "123");
+        assertException("Invalid value: [123].", "123");
     }
 }

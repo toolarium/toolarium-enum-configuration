@@ -34,7 +34,7 @@ public class CIDRValidatorTest extends AbstractValidatorTest {
         isValid("FF00::/8");
         isValid("  10.2.0.0/16  ");
         isValid("  FF00::/8   ");
-        //isInValid("");
+        isInValid("10.2.0.0");
     }
 
 
@@ -44,7 +44,7 @@ public class CIDRValidatorTest extends AbstractValidatorTest {
     @Override
     @Test
     public void testConvert() {
-        assertValue("10.2.0.0/16", "10.2.0.0/16");
-        //assertException(IllegalArgumentException.class, "unknown protocol: httds", "httds://www.sbb.ch");
+        assertValue("10.2.0.0/16", "10.2.0.0/16");        
+        assertException("Invalid value: [10.2.0.0].", "10.2.0.0");
     }
 }

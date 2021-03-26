@@ -64,8 +64,6 @@ public class EnumConfigurationResourceFactoryTest {
 
         e = new EnumConfigurations();
         EnumConfiguration ec = new EnumConfiguration("myName");
-        ec.setValidFrom(Instant.now());
-        ec.setValidTill(DateUtil.MAX_TIMESTAMP);
         ec.setDescription("My description");
         
         EnumValueConfiguration enumValueConfiguration1 = new EnumValueConfiguration();

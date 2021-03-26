@@ -8,6 +8,7 @@ package com.github.toolarium.enumeration.configuration.dto;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 
 /**
@@ -27,12 +28,8 @@ public abstract class AbstractEnumConfiguration implements Serializable {
      * Constructor for AbstractEnumConfiguration
      */
     public AbstractEnumConfiguration() {
-        //String description();
-        //String validFrom() default "";
-        //String validTill() default "9999-12-31T12:00:00.000Z";
-
         description = null;
-        validFrom = null;
+        validFrom = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         validTill = DateUtil.MAX_TIMESTAMP;
     }
 

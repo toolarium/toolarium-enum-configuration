@@ -5,8 +5,11 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
+import static org.junit.Assert.fail;
+
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.validation.EnumValueConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 
@@ -46,8 +49,11 @@ public abstract class AbstractValidatorTest {
      * @param input the input to check
      */
     protected void isValid(String input) {
-        String comment = EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, input).getComment();
-        Assert.assertTrue(comment, EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, input).isValid());
+        try {
+            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, null, null, true, input);
+        } catch (ValidationException ex) {
+            fail(ex.getMessage());
+        }
     }
 
     
@@ -57,7 +63,12 @@ public abstract class AbstractValidatorTest {
      * @param input the input to check
      */
     protected void isInValid(String input) {
-        Assert.assertFalse(EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, input).isValid());
+        try {
+            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, null, null, true, input);
+            fail();
+        } catch (ValidationException ex) {
+            // NOP
+        }
     }
     
 
@@ -68,8 +79,12 @@ public abstract class AbstractValidatorTest {
      * @param expectedValue the expected value
      * @param input the input
      */
-    protected <T> void assertValue(T expectedValue, String input) {
-        Assert.assertEquals(expectedValue, EnumValueConfigurationValidatorFactory.getInstance().getValidator().convert(enumValueConfigurationDataType, input));
+    protected <T> void assertValue(T expectedValue, String input)  {
+        try {
+            Assert.assertEquals(expectedValue, EnumValueConfigurationValidatorFactory.getInstance().getValidator().convert(enumValueConfigurationDataType, input));
+        } catch (ValidationException ve) {
+            fail(ve.getMessage());
+        }
     }
     
     
@@ -91,12 +106,11 @@ public abstract class AbstractValidatorTest {
      * Assert exception
      *
      * @param <T> the generic type
-     * @param clazz the expected exception
      * @param exceptionMessage the exception message 
      * @param input the input
      */
-    protected <T extends Throwable> void assertException(Class<T> clazz, String exceptionMessage, String input) {
-        Throwable exception = Assertions.assertThrows(clazz, () -> {
+    protected <T extends Throwable> void assertException(String exceptionMessage, String input) {
+        Throwable exception = Assertions.assertThrows(ValidationException.class, () -> {
             EnumValueConfigurationValidatorFactory.getInstance().getValidator().convert(enumValueConfigurationDataType, input);
         });
         

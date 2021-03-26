@@ -51,6 +51,6 @@ public class URIValidatorTest extends AbstractValidatorTest {
         } catch (URISyntaxException e) {
             Assert.fail();
         }
-        assertException(IllegalArgumentException.class, "Illegal character in authority at index 8: httds://www.sbb.ch\\d", "httds://www.sbb.ch\\d");
+        assertException("Illegal character in authority at index 8: httds://www.sbb.ch\\d", "httds://www.sbb.ch\\d");
     }
 }

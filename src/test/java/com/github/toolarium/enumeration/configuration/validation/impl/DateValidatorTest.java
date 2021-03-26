@@ -45,6 +45,6 @@ public class DateValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(LocalDate.parse("2021-03-15"), "2021-03-15");
-        assertException(IllegalArgumentException.class, "Text '2021-43-15' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 43", "2021-43-15");
+        assertException("Text '2021-43-15' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 43", "2021-43-15");
     }
 }

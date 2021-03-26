@@ -217,6 +217,50 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     
     
     /**
+     * Initialize a default example value
+     */
+    /*
+    public void initExampleValue() {
+        if (getExampleValue() == null || exampleValue.isEmpty()) {
+            switch (dataType) {
+                case NUMBER:      setExampleValue("1234"); 
+                                  break;
+                case DOUBLE:      setExampleValue("12.34"); 
+                                  break;
+                case BOOLEAN:     setExampleValue("true"); 
+                                  break;
+                case DATE:        setExampleValue("2021-03-15"); 
+                                  break;
+                case TIME:        setExampleValue("12:34:56.789");
+                                  break;
+                case TIMESTAMP:   setExampleValue("2021-03-15T08:59:22.123Z");
+                                  break;
+                case REGEXP:      setExampleValue(".*(jim|joe).*");
+                                  break;
+                case UUID:        setExampleValue("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+                                  break;
+                case URI:         setExampleValue("https://my.url.com");
+                                  break;
+                case CIDR:        setExampleValue("10.2.0.0/16");                
+                                  break;
+                case EMAIL:       setExampleValue("mail@domain.com");
+                                  break;
+                case CRON:        setExampleValue("* * * * *");
+                                  break;
+                case COLOR:       setExampleValue("#40394A");
+                                  break;
+                case BINARY:      setExampleValue("myfile.txt|2021-03-15T08:59:22.123Z|text/plain|VGV4dAo=");
+                                  break;
+                case CERTIFICATE: 
+                case STRING:      
+                default:
+                    setExampleValue("");
+            }
+        }
+    }
+    */
+    
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override

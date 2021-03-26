@@ -55,6 +55,6 @@ public class BinaryValidatorTest extends AbstractValidatorTest {
         assertValue(new EnumValueConfigurationBinaryObject("filename.txt", DateUtil.getInstance().parseDate("2021-03-15T08:59:22.123Z"), null, "  my file content  "), "filename.txt|2021-03-15T08:59:22.123Z|  my file content  ");
         assertValue(new EnumValueConfigurationBinaryObject("filename.txt", DateUtil.getInstance().parseDate("2021-03-15T08:59:22.123Z"), "plain/text", "  my file content  "), "filename.txt|2021-03-15T08:59:22.123Z|plain/text|  my file content  ");
 
-        assertException(IllegalArgumentException.class, "Invalid timestamp [2021-33-15T08:59:22.123Z]!", "filename.txt|2021-33-15T08:59:22.123Z|plain/text|  my file content  ");
+        assertException("Invalid timestamp [2021-33-15T08:59:22.123Z]!", "filename.txt|2021-33-15T08:59:22.123Z|plain/text|  my file content  ");
     }
 }

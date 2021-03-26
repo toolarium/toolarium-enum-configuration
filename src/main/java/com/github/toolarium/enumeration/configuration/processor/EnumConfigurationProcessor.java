@@ -15,10 +15,9 @@ import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import com.github.toolarium.enumeration.configuration.util.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumValueConfigurationValidatorFactory;
-import com.github.toolarium.enumeration.configuration.validation.ValidationResult;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -50,8 +50,11 @@ import javax.tools.StandardLocation;
  * @link https://maxexplode.medium.com/creating-annotation-processor-to-generate-getters-and-setters-7b7964c72b3e
  * @link https://github.com/sockeqwe/annotationprocessing101/blob/master/factory/processor/src/main/java/com/hannesdorfmann/annotationprocessing101/factory/processor/FactoryProcessor.java
  */
+@SupportedOptions(value = "enumconfiguration.validate.strict")
 public class EnumConfigurationProcessor extends AbstractProcessor {
+    private static final String ENUM_CONFIGURATION = "com.github.toolarium.enumeration.configuration.IEnumConfiguration";
     private List<Class<? extends Annotation>> annoationClassList;
+    
     
     /**
      * Constructor for EnumConfigurationProcessor
@@ -98,6 +101,9 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
             return true;
         }
 
+        //String parameter = processingEnv.getOptions().get(VALIDATE_STRICT);
+        
+
         EnumConfigurations enumConfigurations = new EnumConfigurations();
         enumConfigurations.setName(Version.PROJECT_NAME);
         enumConfigurations.setVersion(Version.VERSION);
@@ -105,12 +111,12 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
             enumConfigurations.add(processEnumConfigurationElement((TypeElement)element));
         }
 
-        for (Element typeElement : roundEnv.getElementsAnnotatedWith(EnumValueConfiguration.class)) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(EnumValueConfiguration.class)) {
             //String enumName = "" + typeElement.getSimpleName();
-            String fullQualifiedName = "" + typeElement.getEnclosingElement();
+            String fullQualifiedName = "" + element.getEnclosingElement();
             
             com.github.toolarium.enumeration.configuration.dto.EnumConfiguration enumConfiguration = enumConfigurations.get(fullQualifiedName);
-            com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration enumValueConfiguration = processEnumValueConfigurationElement(typeElement);
+            com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration enumValueConfiguration = processEnumValueConfigurationElement(element);
             if (enumValueConfiguration != null) {
                 enumConfiguration.add(enumValueConfiguration);
             }
@@ -149,11 +155,9 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
     private com.github.toolarium.enumeration.configuration.dto.EnumConfiguration processEnumConfigurationElement(TypeElement typeElement) {
         String fullQualifiedName = typeElement.getQualifiedName().toString();
         com.github.toolarium.enumeration.configuration.dto.EnumConfiguration enumConfiguration = new com.github.toolarium.enumeration.configuration.dto.EnumConfiguration(fullQualifiedName);
-        enumConfiguration.setValidFrom(Instant.now());
-        enumConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
         //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found enum configuration element: " + fullQualifiedName);
-        
-        TypeMirror inheritedEnumConfigurationMarkerInterface = processingEnv.getTypeUtils().erasure(processingEnv.getElementUtils().getTypeElement("com.github.toolarium.enumeration.configuration.IEnumConfiguration").asType());
+                
+        TypeMirror inheritedEnumConfigurationMarkerInterface = processingEnv.getTypeUtils().erasure(processingEnv.getElementUtils().getTypeElement(ENUM_CONFIGURATION).asType());
         for (TypeMirror tm : typeElement.getInterfaces()) {
             boolean hasInheritedEnumConfigurationMarkerInterface = processingEnv.getTypeUtils().isAssignable(tm, inheritedEnumConfigurationMarkerInterface); 
             if (hasInheritedEnumConfigurationMarkerInterface) {
@@ -208,18 +212,16 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
     /**
      * Process the annoation element
      * 
-     * @param typeElement the element
+     * @param element the element
      * @return the created enumeration configuration
      */
-    private com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration processEnumValueConfigurationElement(Element typeElement) {
+    private com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration processEnumValueConfigurationElement(Element element) {
         com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration enumValueConfiguration = new com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration();
-        enumValueConfiguration.setValidFrom(Instant.now());
-        enumValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
         enumValueConfiguration.setDataType(EnumValueConfigurationDataType.STRING);
 
-        String enumName = "" + typeElement.getSimpleName();
-        String fullQualifiedName = typeElement.toString();
-        fullQualifiedName = "" + typeElement.getEnclosingElement();
+        String enumName = "" + element.getSimpleName();
+        String fullQualifiedName = element.toString();
+        fullQualifiedName = "" + element.getEnclosingElement();
         fullQualifiedName += "#" + enumName;
         enumValueConfiguration.setKey(enumName);
         String minValueSize = null;
@@ -227,7 +229,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
 
         //processingEnv.getMessager().printMessage(Diagnostic.Kind.OTHER, "Found enum configuration element: " + fullQualifiedName);
         
-        List<? extends AnnotationMirror> annotationElements = typeElement.getAnnotationMirrors();
+        List<? extends AnnotationMirror> annotationElements = element.getAnnotationMirrors();
         if (annotationElements != null) {
             for (AnnotationMirror a : annotationElements) {
                 //String declaredType = "" + a.getAnnotationType();
@@ -247,7 +249,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 enumValueConfiguration.setDataType(type);
                                 
                                 if (type == null) {
-                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid data type found in [" + fullQualifiedName + "]: " + e.getValue());
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid data type [" +  e.getValue() + "]! Please check the annoataion of " + fullQualifiedName + ".");
                                 }
                                 break;
                             case "defaultValue": 
@@ -266,7 +268,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 try {
                                     enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality(value));
                                 } catch (IllegalArgumentException ex) {
-                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid cardinality found in [" + fullQualifiedName + "]: " + ex.getMessage());
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
                                 }
                                 break;
                             case "isOptional": 
@@ -288,18 +290,19 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                 }
             }
         }
-        
+
         try {
             enumValueConfiguration.setValueSize(AnnotationConvertUtil.getInstance().prepareValueSize(minValueSize, maxValueSize));
         } catch (IllegalArgumentException ex) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid valueSize found in [" + fullQualifiedName + "]: " + ex.getMessage());
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
         }
 
-        ValidationResult validationResult = EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration.getDataType(), enumValueConfiguration.getDefaultValue());
-        if (!validationResult.isValid()) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid default value in " + fullQualifiedName + " [" + enumValueConfiguration.getDefaultValue() + "]: " + validationResult.getComment());
+        try {
+            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
+        } catch (ValidationException ex) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + ex.getMessage());
         }
-
+        
         //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found enum value configuration: " + enumValueConfiguration);
         return enumValueConfiguration;
     }

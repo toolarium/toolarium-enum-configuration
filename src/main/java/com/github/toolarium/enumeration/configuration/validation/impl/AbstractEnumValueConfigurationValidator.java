@@ -5,16 +5,22 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
+import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.CIDRUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
+import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +37,265 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
     protected static final Pattern hexWebColorPattern = Pattern.compile(HEX_WEBCOLOR_PATTERN);
 
     
+    /**
+     * Constructor for AbstractEnumValueConfigurationValidator
+     */
+    protected AbstractEnumValueConfigurationValidator() {
+    }
+    
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration, java.lang.String)
+     */
+    @Override
+    public void validate(EnumValueConfiguration enumValueConfiguration, String input) throws ValidationException {
+        validate(enumValueConfiguration);
+        validate(enumValueConfiguration.getDataType(), enumValueConfiguration.getCardinality(), enumValueConfiguration.getValueSize(), enumValueConfiguration.isOptional(), input);
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration)
+     */
+    @Override
+    public void validate(EnumValueConfiguration enumValueConfiguration) throws ValidationException  {
+        if (enumValueConfiguration == null) {
+            throw new ValidationException("Invalid enumValueConfiguration!");
+        }
+        
+        validateKey(enumValueConfiguration.getKey());
+        validateDescription(enumValueConfiguration.getDescription());
+        validateValidity(enumValueConfiguration.getValidFrom(), enumValueConfiguration.getValidTill());
+        validateDefaultValue(enumValueConfiguration.getDataType(), enumValueConfiguration.getCardinality(), enumValueConfiguration.getValueSize(), enumValueConfiguration.isOptional(), enumValueConfiguration.getDefaultValue());
+        validateExampleValue(enumValueConfiguration.getDataType(), enumValueConfiguration.getCardinality(), enumValueConfiguration.getValueSize(), enumValueConfiguration.isOptional(), enumValueConfiguration.getExampleValue());
+    }
+
+
+    /**
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType,
+     *      com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, boolean, java.lang.String)
+     */
+    @Override
+    public void validate(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String input) 
+            throws ValidationException {
+        validateValue("input", dataType, cardinality, valueSize, isOptional, input);
+    }
+
+
+    /**
+     * Validate description
+     *
+     * @param description the description
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateDescription(String description) throws ValidationException {
+        if (description == null || description.trim().isEmpty()) {
+            throw new ValidationException("Invalid description!");
+        }
+        
+        String[] descriptionSplit = description.split(" ");
+        if (descriptionSplit == null || descriptionSplit.length < 1) {
+            throw new ValidationException("Invalid description, the description is too short!");
+        }
+        
+        if (descriptionSplit[0].toUpperCase().charAt(0) != descriptionSplit[0].charAt(0)) {
+            throw new ValidationException("Invalid description, it must begin with a capital letter!");
+        }
+        
+        char lastCharacter = description.charAt(description.length() - 1);
+        if (lastCharacter != '.' && lastCharacter != '!' && lastCharacter != '?') {
+            throw new ValidationException("Invalid description, it don't ends with a punctuation mark!");
+        }        
+    }
+
+    
+    /**
+     * Validate key
+     *
+     * @param key the key
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateKey(String key) throws ValidationException {
+        if (key == null || key.trim().isEmpty()) {
+            throw new ValidationException("Invalid key!");
+        }
+    }
+
+    
+    /**
+     * Validate validity
+     *
+     * @param validFrom the valid from
+     * @param validTill the valid till
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateValidity(Instant validFrom, Instant validTill) throws ValidationException {
+        if (validFrom == null) {
+            throw new ValidationException("Invalid validFrom date!");
+        }
+        
+        if (validTill == null) {
+            throw new ValidationException("Invalid validTill date!");
+        }
+        
+        if (!validFrom.isBefore(validTill)) {
+            throw new ValidationException("Invalid validFrom / validTill date!");
+        }
+    }
+
+    
+    /**
+     * Validate default value
+     *
+     * @param dataType the data type
+     * @param cardinality the cardinality
+     * @param valueSize the value size
+     * @param isOptional true if it is optional
+     * @param inputDefaultValue the default value
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateDefaultValue(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String inputDefaultValue) 
+            throws ValidationException {
+        String defaultValue = inputDefaultValue;
+        if (defaultValue != null && defaultValue.isEmpty()) {
+            defaultValue = null;
+        }
+        
+        validateValue("defaultValue", dataType, cardinality, valueSize, isOptional || defaultValue == null || defaultValue.isEmpty(), defaultValue);
+    }
+
+    
+    /**
+     * Validate example value
+     *
+     * @param dataType the data type
+     * @param cardinality the cardinality
+     * @param valueSize the value size
+     * @param isOptional true if it is optional
+     * @param inputExampleValue the example value
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateExampleValue(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String inputExampleValue) 
+            throws ValidationException {
+        String exampleValue = inputExampleValue;
+        if (exampleValue != null && exampleValue.isEmpty()) {
+            exampleValue = null;
+        }
+        
+        validateValue("exampleValue", dataType, cardinality, valueSize, isOptional,  exampleValue);
+    }
+
+    
+    /**
+     * Validate example value
+     *
+     * @param inputType the input type
+     * @param dataType the data type
+     * @param cardinality the cardinality
+     * @param valueSize the value size
+     * @param input the default value
+     * @param isOptional true if it is optional; otherwise false
+     * @throws ValidationException In case of a validation violation
+     */
+    protected void validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String input)
+            throws ValidationException {
+        if (dataType == null) {
+            throw new ValidationException("Invalid dataType for [" + inputType + "]! ");
+        }
+
+        if (!isOptional && (input == null || input.isEmpty())) {
+            throw new ValidationException("Missing [" + inputType + "], its not optional!");
+        }
+
+        if (cardinality == null || cardinality.getMaxSize() == null || cardinality.getMaxSize().intValue() <= 1) {
+            // no cardinality
+            
+            if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMaxSize().intValue() < cardinality.getMinSize().intValue()) {
+                throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize [" + cardinality.getMinSize() + "] should be <= then maxSize [" + cardinality.getMaxSize() + "]! ");
+            }
+            
+            if (valueSize == null || valueSize.getMaxSize() == null) {
+                // NOP
+            } else {
+                int inputLength = 0;
+                if (input != null) {
+                    inputLength = input.length();
+                }
+                
+                int min = 0;
+                int max = valueSize.getMaxSize().intValue();
+                if (valueSize.getMinSize() != null) {
+                    min = valueSize.getMinSize().intValue();
+                }
+
+                if (max < min) {
+                    throw new ValidationException("Invalid valueSize of [" + inputType + "], the minValue [" + valueSize.getMinSize() + "] should be <= then maxValue [" + valueSize.getMaxSize() + "]!");
+                }
+                
+                if (min > inputLength) {
+                    throw new ValidationException("Invalid minValue of [" + inputType + "], should be at least [" + valueSize.getMinSize() + "]!");
+                }
+
+                if (inputLength > max) {
+                    throw new ValidationException("Invalid maxValue of [" + inputType + "], should be at least [" + valueSize.getMinSize() + "]!");
+                }
+            }
+            
+            try {
+                convert(dataType, input);
+            } catch (ValidationException ex) {
+                ValidationException e = new ValidationException("Invalid dataType for [" + inputType + "]: " + ex.getMessage());
+                e.setStackTrace(ex.getStackTrace());
+                throw e;
+            }
+        } else {
+            List<String> inputList = JSONUtil.getInstance().convert(input);
+            if (inputList == null || inputList.isEmpty()) {
+                if (!isOptional) {
+                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the [" + input + "], its not optional!");
+                }
+            } else {
+                for (String in : inputList) {
+                    validateValue(inputType, dataType, null, valueSize, isOptional, in);    
+                }
+            }
+        }
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator#convert(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType, java.lang.String)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T convert(EnumValueConfigurationDataType dataType, String inputToTest) throws ValidationException {
+        try {
+            switch (dataType) {
+                case NUMBER:      return (T)getNumber(inputToTest); 
+                case DOUBLE:      return (T)getDouble(inputToTest); 
+                case BOOLEAN:     return (T)getBoolean(inputToTest); 
+                case DATE:        return (T)getDate(inputToTest); 
+                case TIME:        return (T)getTime(inputToTest);
+                case TIMESTAMP:   return (T)getTimestamp(inputToTest);
+                case REGEXP:      return (T)getRegExp(inputToTest);
+                case UUID:        return (T)getUUID(inputToTest);
+                case URI:         return (T)getURI(inputToTest);
+                case CIDR:        return (T)getCIDR(inputToTest);                
+                case EMAIL:       return (T)getEmail(inputToTest);
+                case CRON:        return (T)getCron(inputToTest);
+                case COLOR:       return (T)getColor(inputToTest);
+                case CERTIFICATE: return (T)getCertificate(inputToTest);
+                case BINARY:      return (T)getBinary(inputToTest);
+                case STRING:
+                default:
+                    return (T) inputToTest;
+            }
+        } catch (Exception e) {
+            throw new ValidationException(e.getMessage()); 
+        }
+    }
+
+        
     /**
      * Check if the given value is a number or not
      * 
@@ -209,7 +474,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             return null;
         }
         
-        return new URI(input);
+        return new URI(value);
     }
 
 

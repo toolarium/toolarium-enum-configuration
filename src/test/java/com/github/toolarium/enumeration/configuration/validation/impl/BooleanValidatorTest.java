@@ -80,7 +80,7 @@ public class BooleanValidatorTest extends AbstractValidatorTest {
         assertValue(Boolean.FALSE, "  False  ");
         assertValue(Boolean.FALSE, "  No  ");
         
-        assertException(IllegalArgumentException.class, "Invalid value: [trus].", "trus");
-        assertException(IllegalArgumentException.class, "Invalid value: [ja].", "ja");
+        assertException("Invalid value: [trus].", "trus");
+        assertException("Invalid value: [ja].", "ja");
     }
 }

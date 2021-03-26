@@ -44,6 +44,6 @@ public class TimeValidatorTest extends AbstractValidatorTest {
     @Test
     public void testConvert() {
         assertValue(LocalTime.parse("13:15:18.009"), "13:15:18.009");
-        assertException(IllegalArgumentException.class, "Text '33:15:18.009' could not be parsed: Invalid value for HourOfDay (valid values 0 - 23): 33", "33:15:18.009");
+        assertException("Text '33:15:18.009' could not be parsed: Invalid value for HourOfDay (valid values 0 - 23): 33", "33:15:18.009");
     }
 }
