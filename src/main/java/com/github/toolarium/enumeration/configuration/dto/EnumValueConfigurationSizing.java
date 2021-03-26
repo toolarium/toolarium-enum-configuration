@@ -22,8 +22,8 @@ public class EnumValueConfigurationSizing implements Serializable {
      * Constructor for EnumValueConfigurationSizing
      */
     public EnumValueConfigurationSizing() {
-        this.minSize = 0;
-        this.maxSize = 1;
+        this.minSize = null;
+        this.maxSize = null;
     }
 
     

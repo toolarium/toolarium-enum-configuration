@@ -94,7 +94,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
         }
         
         String[] descriptionSplit = description.split(" ");
-        if (descriptionSplit == null || descriptionSplit.length < 1) {
+        if (descriptionSplit == null || descriptionSplit.length <= 1) {
             throw new ValidationException("Invalid description, the description is too short!");
         }
         
@@ -102,10 +102,12 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             throw new ValidationException("Invalid description, it must begin with a capital letter!");
         }
         
-        char lastCharacter = description.charAt(description.length() - 1);
-        if (lastCharacter != '.' && lastCharacter != '!' && lastCharacter != '?') {
-            throw new ValidationException("Invalid description, it don't ends with a punctuation mark!");
-        }        
+        if (descriptionSplit.length > 2) {
+            char lastCharacter = description.charAt(description.length() - 1);
+            if (lastCharacter != '.' && lastCharacter != '!' && lastCharacter != '?') {
+                throw new ValidationException("Invalid description, it don't ends with a punctuation mark!");
+            }
+        }
     }
 
     
@@ -200,7 +202,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
     protected void validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String input)
             throws ValidationException {
         if (dataType == null) {
-            throw new ValidationException("Invalid dataType for [" + inputType + "]! ");
+            throw new ValidationException("Invalid dataType in [" + inputType + "]! ");
         }
 
         if (!isOptional && (input == null || input.isEmpty())) {
@@ -214,7 +216,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                 throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize [" + cardinality.getMinSize() + "] should be <= then maxSize [" + cardinality.getMaxSize() + "]! ");
             }
             
-            if (valueSize == null || valueSize.getMaxSize() == null) {
+            if (valueSize == null) {
                 // NOP
             } else {
                 int inputLength = 0;
@@ -222,42 +224,50 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                     inputLength = input.length();
                 }
                 
+                int max = Integer.MAX_VALUE;
+                if (valueSize.getMaxSize() != null) {
+                    max = valueSize.getMaxSize().intValue();
+                }
+                
                 int min = 0;
-                int max = valueSize.getMaxSize().intValue();
                 if (valueSize.getMinSize() != null) {
                     min = valueSize.getMinSize().intValue();
                 }
 
                 if (max < min) {
-                    throw new ValidationException("Invalid valueSize of [" + inputType + "], the minValue [" + valueSize.getMinSize() + "] should be <= then maxValue [" + valueSize.getMaxSize() + "]!");
+                    throw new ValidationException("Invalid maxValue / minValue of [" + inputType + "], the minValue [" + min + "] should be <= then maxValue [" + max + "]!");
                 }
                 
                 if (min > inputLength) {
-                    throw new ValidationException("Invalid minValue of [" + inputType + "], should be at least [" + valueSize.getMinSize() + "]!");
+                    throw new ValidationException("Too short: invalid length of [" + inputType + "], should be at least [" + min + "] (now " + inputLength + ")!");
                 }
 
                 if (inputLength > max) {
-                    throw new ValidationException("Invalid maxValue of [" + inputType + "], should be at least [" + valueSize.getMinSize() + "]!");
+                    throw new ValidationException("Too long: invalid length of [" + inputType + "], should be in range of [" + min + ".." + max + "] (now " + inputLength + ")!");
                 }
             }
             
             try {
                 convert(dataType, input);
             } catch (ValidationException ex) {
-                ValidationException e = new ValidationException("Invalid dataType for [" + inputType + "]: " + ex.getMessage());
+                ValidationException e = new ValidationException("Invalid data type of [" + inputType + "] for [" + input + "]: " + ex.getMessage());
                 e.setStackTrace(ex.getStackTrace());
                 throw e;
             }
         } else {
-            List<String> inputList = JSONUtil.getInstance().convert(input);
-            if (inputList == null || inputList.isEmpty()) {
-                if (!isOptional) {
-                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the [" + input + "], its not optional!");
+            try {
+                List<String> inputList = JSONUtil.getInstance().convert(input);
+                if (inputList == null || inputList.isEmpty()) {
+                    if (!isOptional) {
+                        throw new ValidationException("Invalid cardinality of [" + inputType + "] for [" + input + "], its not optional!");
+                    }
+                } else {
+                    for (String in : inputList) {
+                        validateValue(inputType, dataType, null, valueSize, isOptional, in);    
+                    }
                 }
-            } else {
-                for (String in : inputList) {
-                    validateValue(inputType, dataType, null, valueSize, isOptional, in);    
-                }
+            } catch (IllegalArgumentException e) {
+                throw new ValidationException("Invalid cardinality of [" + inputType + "] for intput [" + input + "]. Expected a JSON array: " + e.getMessage());
             }
         }
     }

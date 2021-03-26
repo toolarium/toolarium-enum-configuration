@@ -79,10 +79,10 @@ public class AnnotationConvertUtilTest {
         assertNull(AnnotationConvertUtil.getInstance().prepareValueSize(null, null));
         assertNull(AnnotationConvertUtil.getInstance().prepareValueSize("", ""));
         assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().prepareValueSize("0", "1"));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().prepareValueSize("", "  1  "));
+        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().prepareValueSize("", "  1  "));
         assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().prepareValueSize("  0 ", " 1  "));
         assertEquals(new EnumValueConfigurationSizing(1, 2), AnnotationConvertUtil.getInstance().prepareValueSize("  1", " 2  "));
-        assertEquals(new EnumValueConfigurationSizing(0, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().prepareValueSize("", "*"));
+        assertEquals(new EnumValueConfigurationSizing(null, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().prepareValueSize("", "*"));
         assertEquals(new EnumValueConfigurationSizing(1, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().prepareValueSize("1", "*"));
       
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -98,11 +98,11 @@ public class AnnotationConvertUtilTest {
     public void testParseCardinality() {
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(null));
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(""));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().parseCardinality("1"));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
+        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().parseCardinality("1"));
+        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
         assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().parseCardinality("  0..1  "));
         assertEquals(new EnumValueConfigurationSizing(1, 2), AnnotationConvertUtil.getInstance().parseCardinality("  1   .. 2  "));
-        assertEquals(new EnumValueConfigurationSizing(0, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
+        assertEquals(new EnumValueConfigurationSizing(null, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
         assertEquals(new EnumValueConfigurationSizing(1, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("1..*"));
         
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
