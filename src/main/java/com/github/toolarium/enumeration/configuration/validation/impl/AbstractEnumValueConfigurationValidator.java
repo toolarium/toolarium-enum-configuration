@@ -184,7 +184,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             exampleValue = null;
         }
         
-        validateValue("exampleValue", dataType, cardinality, valueSize, isOptional,  exampleValue);
+        validateValue("exampleValue", dataType, cardinality, valueSize, isOptional || exampleValue == null || exampleValue.isEmpty(),  exampleValue);
     }
 
     

@@ -131,7 +131,7 @@ public @interface EnumValueConfiguration {
      *
      * @return An example value.
      */
-    String exampleValue();
+    String exampleValue() default "";
 
     
     /**

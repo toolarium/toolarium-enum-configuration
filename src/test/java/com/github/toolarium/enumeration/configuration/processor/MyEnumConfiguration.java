@@ -19,7 +19,7 @@ import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfig
 @EnumConfiguration(description = "The system configuration.")
 public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfiguration {
 
-    @EnumValueConfiguration(description = "The hostname", dataType = DataType.STRING, defaultValue = "true", exampleValue = "myHost", minValue = "1", maxValue = "10")
+    @EnumValueConfiguration(description = "The hostname", dataType = DataType.STRING, defaultValue = "true", minValue = "0", maxValue = "10")
     HOSTNAME,
 
     @EnumValueConfiguration(description = "The port.", isOptional = true, exampleValue = "8080")
