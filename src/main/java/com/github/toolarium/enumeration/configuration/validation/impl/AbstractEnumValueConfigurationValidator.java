@@ -75,10 +75,6 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
     }
 
 
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType,
-     *      com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, boolean, java.lang.String)
-     */
     @Override
     public void validate(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<?> valueSize, String input) throws ValidationException {
         validateValue("input", dataType, cardinality, valueSize, input);

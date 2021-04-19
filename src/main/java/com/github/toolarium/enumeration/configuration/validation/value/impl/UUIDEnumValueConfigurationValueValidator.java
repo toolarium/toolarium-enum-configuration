@@ -52,16 +52,16 @@ public class UUIDEnumValueConfigurationValueValidator extends AbstractEnumValueC
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
      */
     @Override
     public EnumValueConfigurationSizing<Long> createEnumValueConfigurationSizing() {
         return new EnumValueConfigurationSizing<Long>();
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
      */
     @Override
     public Long getMinSize() {
@@ -70,7 +70,7 @@ public class UUIDEnumValueConfigurationValueValidator extends AbstractEnumValueC
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
      */
     @Override
     public Long getMaxSize() {

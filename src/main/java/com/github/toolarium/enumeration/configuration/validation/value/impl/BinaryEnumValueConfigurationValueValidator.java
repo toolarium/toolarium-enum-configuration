@@ -9,11 +9,12 @@ import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 import java.util.Base64;
 
 
 /**
- * Defines the binary {@link IEnumValueConfigurationDataType}.
+ * Defines the binary {@link IEnumValueConfigurationValueValidator}.
  * 
  * @author patrick
  */
@@ -30,7 +31,7 @@ public class BinaryEnumValueConfigurationValueValidator extends AbstractEnumValu
     
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.datatype.impl.StringEnumValueConfigurationDataType#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
+     * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
     public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws ValidationException {

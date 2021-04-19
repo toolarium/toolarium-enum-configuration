@@ -8,10 +8,11 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 
 
 /**
- * Defines the double {@link IEnumValueConfigurationDataType}.
+ * Defines the double {@link IEnumValueConfigurationValueValidator}.
  * 
  * @author patrick
  */
@@ -56,18 +57,18 @@ public class DoubleEnumValueConfigurationValueValidator extends AbstractEnumValu
         }
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
      */
     @Override
     public EnumValueConfigurationSizing<Double> createEnumValueConfigurationSizing() {
         return new EnumValueConfigurationSizing<Double>();
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
      */
     @Override
     public Double getMinSize() {
@@ -76,7 +77,7 @@ public class DoubleEnumValueConfigurationValueValidator extends AbstractEnumValu
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
      */
     @Override
     public Double getMaxSize() {

@@ -61,16 +61,16 @@ public class DateEnumValueConfigurationValueValidator extends AbstractEnumValueC
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
      */
     @Override
     public EnumValueConfigurationSizing<LocalDate> createEnumValueConfigurationSizing() {
         return new EnumValueConfigurationSizing<LocalDate>();
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
      */
     @Override
     public LocalDate getMinSize() {
@@ -79,7 +79,7 @@ public class DateEnumValueConfigurationValueValidator extends AbstractEnumValueC
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
      */
     @Override
     public LocalDate getMaxSize() {

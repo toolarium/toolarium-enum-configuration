@@ -9,12 +9,13 @@ import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 
 /**
- * Defines the timestamp {@link IEnumValueConfigurationDataType}.
+ * Defines the timestamp {@link IEnumValueConfigurationValueValidator}.
  * 
  * @author patrick
  */
@@ -60,9 +61,9 @@ public class TimestampEnumValueConfigurationValueValidator extends AbstractEnumV
         }
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#createEnumValueConfigurationSizing()
      */
     @Override
     public EnumValueConfigurationSizing<Instant> createEnumValueConfigurationSizing() {
@@ -71,7 +72,7 @@ public class TimestampEnumValueConfigurationValueValidator extends AbstractEnumV
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMinSize()
      */
     @Override
     public Instant getMinSize() {
@@ -80,7 +81,7 @@ public class TimestampEnumValueConfigurationValueValidator extends AbstractEnumV
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.datatype.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
+     * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator#getMaxSize()
      */
     @Override
     public Instant getMaxSize() {

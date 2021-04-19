@@ -171,7 +171,7 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
 
     
     /**
-     * An {@link EnumValueConfiguration} is mandatory in case the cardinality is defined and the min value is > 0.
+     * An {@link EnumValueConfiguration} is mandatory in case the cardinality is defined and the min value is &gt; 0.
      *
      * @return true if it is not optinal.
      */
