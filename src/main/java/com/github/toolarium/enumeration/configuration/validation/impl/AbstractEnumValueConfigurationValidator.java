@@ -8,6 +8,7 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
@@ -167,8 +168,12 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
         
         EnumValueConfigurationSizing<Integer> defaultValueCardinality = new EnumValueConfigurationSizing<Integer>(0, cardinality.getMaxSize());
         defaultValueCardinality.setMaxSizeAsString(cardinality.getMaxSizeAsString());
-        
-        validateValue("defaultValue", dataType, defaultValueCardinality, valueSize, defaultValue);
+
+        try {
+            validateValue("defaultValue", dataType, defaultValueCardinality, valueSize, defaultValue);
+        } catch (ValidationException ex) {
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[defaultValue] " + ex.getMessage(), ex.getStackTrace());
+        }
     }
 
     
@@ -195,7 +200,11 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             exampleValueCardinality.setMaxSizeAsString(cardinality.getMaxSizeAsString());
         }
         
-        validateValue("exampleValue", dataType, exampleValueCardinality, valueSize, exampleValue);
+        try {
+            validateValue("exampleValue", dataType, exampleValueCardinality, valueSize, exampleValue);
+        } catch (ValidationException ex) {
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[exampleValue] " + ex.getMessage(), ex.getStackTrace());
+        }
     }
 
     
