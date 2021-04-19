@@ -7,7 +7,6 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import java.util.UUID;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test uri validator test
@@ -20,30 +19,23 @@ public class UUIDValidatorTest extends AbstractValidatorTest {
      * Constructor for UUIDValidatorTest
      */
     UUIDValidatorTest() {
-        super(EnumValueConfigurationDataType.UUID);
+        super(EnumValueConfigurationDataType.UUID,
+              null, /* min value */
+              null, /* max value */
+              /* valid values */
+              new String[] {"f81d4fae-7dec-11d0-a765-00a0c91e6bf6", "  f81d4fae-7dec-11d0-a765-00a0c91e6bf6  ", "" + UUID.randomUUID().toString()},
+              /* invalid values */
+              new String[] {"f81d4fae-7dec-11d0-00a0c91e6bf6", "fsdsf", "https://www.google.com"},
+              new String[] {"f81d4fa"}, /* too small values */
+              new String[] {"f81d4fae-7dec-11d0-a765-00a0c91e6bf6-f81d4fae-7dec-11d0-a765-00a0c91e6bf6"} /* too big values */);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
-        isValid("  f81d4fae-7dec-11d0-a765-00a0c91e6bf6  ");
-        isInValid("f81d4fae-7dec-11d0-00a0c91e6bf6");
-        isInValid("fsdsf");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(UUID.fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"), "f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
-        assertException("Invalid UUID string: httds://www.sbb.ch", "httds://www.sbb.ch");
+    protected String createValueContent(String minValueSize) {
+        return UUID.randomUUID().toString();
     }
 }

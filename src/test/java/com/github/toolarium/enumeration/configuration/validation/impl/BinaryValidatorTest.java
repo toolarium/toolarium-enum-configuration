@@ -5,10 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import com.github.toolarium.enumeration.configuration.util.DateUtil;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test binary validator test
@@ -16,45 +13,39 @@ import org.junit.jupiter.api.Test;
  * @author patrick
  */
 public class BinaryValidatorTest extends AbstractValidatorTest {
+    private static final String MESSAGE = "  my file content  "; 
+    private static final String MESSAGE_ENCODED = "ICBteSBmaWxlIGNvbnRlbnQgIA=="; 
+    
 
     /**
      * Constructor for FileValidatorTest
      */
     BinaryValidatorTest() {
-        super(EnumValueConfigurationDataType.BINARY);
+        super(EnumValueConfigurationDataType.BINARY, 
+              null, 
+              "19",
+              /* valid values */
+              new String[] {MESSAGE_ENCODED, 
+                            "  " + MESSAGE_ENCODED + " ", 
+                            "filename.txt|    " + MESSAGE_ENCODED + " ", 
+                            "filename.txt|" + MESSAGE_ENCODED, 
+                            "filename.txt|2021-03-15T08:59:22.123Z|" + MESSAGE_ENCODED,
+                            "filename.txt|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED,
+                            "|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED},
+              /* invalid values */
+              new String[] {"filename.txt|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE, "filename.txt|2021-33-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED},
+              /* too small value */
+              null,        
+              /* too big value */
+              null);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("my file content");
-        isValid("  my file content   ");
-        isValid("filename.txt|my file content");
-        isValid("filename.txt|  my file content  ");
-        isValid("filename.txt|2021-03-15T08:59:22.123Z|  my file content  ");
-        isValid("filename.txt|2021-03-15T08:59:22.123Z|plain/text|  my file content  ");
-        isValid("|2021-03-15T08:59:22.123Z|plain/text|  my file content  ");
-        
-        isInValid("filename.txt|2021-33-15T08:59:22.123Z|plain/text|  my file content  ");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(new EnumValueConfigurationBinaryObject(null, null, null, "my file content"), "my file content");
-        assertValue(new EnumValueConfigurationBinaryObject(null, null, null, "  my file content  "), "  my file content  ");
-        assertValue(new EnumValueConfigurationBinaryObject("filename.txt", null, null, "  my file content  "), "filename.txt|  my file content  ");
-        assertValue(new EnumValueConfigurationBinaryObject("filename.txt", DateUtil.getInstance().parseDate("2021-03-15T08:59:22.123Z"), null, "  my file content  "), "filename.txt|2021-03-15T08:59:22.123Z|  my file content  ");
-        assertValue(new EnumValueConfigurationBinaryObject("filename.txt", DateUtil.getInstance().parseDate("2021-03-15T08:59:22.123Z"), "plain/text", "  my file content  "), "filename.txt|2021-03-15T08:59:22.123Z|plain/text|  my file content  ");
-
-        assertException("Invalid timestamp [2021-33-15T08:59:22.123Z]!", "filename.txt|2021-33-15T08:59:22.123Z|plain/text|  my file content  ");
+    protected String createValueContent(String minValueSize) {
+        return "";
     }
 }

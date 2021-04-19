@@ -29,7 +29,7 @@ public abstract class AbstractEnumConfiguration implements Serializable {
      */
     public AbstractEnumConfiguration() {
         description = null;
-        validFrom = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        validFrom = Instant.now().truncatedTo(ChronoUnit.MILLIS);
         validTill = DateUtil.MAX_TIMESTAMP;
     }
 

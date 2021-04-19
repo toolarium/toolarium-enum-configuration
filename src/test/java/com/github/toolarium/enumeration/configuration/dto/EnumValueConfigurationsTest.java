@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,22 @@ public class EnumValueConfigurationsTest {
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
-        Assert.assertFalse(enumValueConfiguration.isOptional());
+        Assert.assertTrue(enumValueConfiguration.isMandatory());
+    }
+
+    
+    /**
+     * Test empty {@link EnumValueConfiguration}.
+     */
+    @Test
+    public void testMandatoryEnumValueConfiguration() {
+        EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
+        enumValueConfiguration.setCardinality(new EnumValueConfigurationSizing<Integer>(1, 1));
+        Assert.assertNull(enumValueConfiguration.getDescription());
+        Assert.assertNotNull(enumValueConfiguration.getValidFrom());
+        Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
+        Assert.assertEquals("", enumValueConfiguration.getDefaultValue());
+        Assert.assertFalse(enumValueConfiguration.isConfidential());
         Assert.assertTrue(enumValueConfiguration.isMandatory());
     }
 
@@ -40,13 +56,12 @@ public class EnumValueConfigurationsTest {
     @Test
     public void testIsMandatoryEnumValueConfiguration() {
         EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
-        enumValueConfiguration.setOptional(true);
+        enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
         Assert.assertNull(enumValueConfiguration.getDescription());
         Assert.assertNotNull(enumValueConfiguration.getValidFrom());
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
-        Assert.assertTrue(enumValueConfiguration.isOptional());
         Assert.assertFalse(enumValueConfiguration.isMandatory());
         
         enumValueConfiguration = new EnumValueConfiguration();
@@ -56,8 +71,7 @@ public class EnumValueConfigurationsTest {
         Assert.assertEquals(DateUtil.MAX_TIMESTAMP, enumValueConfiguration.getValidTill());
         Assert.assertEquals("20", enumValueConfiguration.getDefaultValue());
         Assert.assertFalse(enumValueConfiguration.isConfidential());
-        Assert.assertFalse(enumValueConfiguration.isOptional());
-        Assert.assertFalse(enumValueConfiguration.isMandatory());        
+        Assert.assertTrue(enumValueConfiguration.isMandatory());        
     }
     
 

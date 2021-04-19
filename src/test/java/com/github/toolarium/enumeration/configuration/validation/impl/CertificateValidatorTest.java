@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -20,30 +19,25 @@ public class CertificateValidatorTest extends AbstractValidatorTest {
      * Constructor for CertificateValidatorTest
      */
     CertificateValidatorTest() {
-        super(EnumValueConfigurationDataType.CERTIFICATE);
+        super(EnumValueConfigurationDataType.CERTIFICATE, 
+              null, 
+              null,
+              /* valid values */
+              new String[] {"-- my certficiate --", "  -- my certificate --   ", "-- your certficiate --"},
+              /* invalid values */
+              new String[] {"123"},
+              /* too small value */
+              null,        
+              /* too big value */
+              null);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("-- my certficiate --");
-        isValid("  -- my certificate --   ");
-        isInValid("123");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue("-- my certificate --", "-- my certificate --");
-
-        assertException("Invalid value: [123].", "123");
+    protected String createValueContent(String minValueSize) {
+        return "-- certificate --";
     }
 }

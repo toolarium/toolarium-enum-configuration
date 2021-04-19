@@ -135,30 +135,22 @@ public @interface EnumValueConfiguration {
 
     
     /**
-     * <p>The cardinality expression for an entry. If there is more than one element, the content of the representation corresponds to a 
+     * <p>The cardinality expression for an entry. If there is more than one element, the content of the representation corresponds to a
      * JSON array, e.g. <code>[ "My string array", "with 3", "elements (cardinality = 3)" ]</code>. This means the cardinality can be 
      * combined with the different data types.</p>
      * 
      * <p>The cardinality is defined as a range: <code>[min]..[max]</code>:
      * <ul> 
-     * <li>If the cardinality is empty (=blank string), it must be interpreted as <code>0..1</code> (min = 0 and max = 1).</li>
-     * <li>The min value is optional and can be ignored, e.g. <code>5</code> (this corresponds to <code>0..5</code>)</li>
-     * <li>If the max has no limit it can be defined as <code>*</code>, e.g. <code>0..*</code></li>
+     * <li>If the cardinality is empty (=blank string), it must be interpreted as <code>1..1</code> (min = 1 and max = 1).</li>
+     * <li>The min value is optional and can be ignored, e.g. <code>5</code> (this corresponds to <code>1..5</code>)</li>
+     * <li>If the max has no limit it can be defined as <code>*</code> or <code>1..*</code></li>
+     * <li>If the max has no limit and its optional it can be defined as <code>0..*</code></li>
      * </ul>
      * </p>
      * @return The cardinality expression.
      */
-    String cardinality() default "0..1";
+    String cardinality() default "1..1";
     
-    
-    /**
-     * Determines whether the configuration is optional. If the default value is empty, no configuration value is available. 
-     * An empty configuration value with non-optional parameter marks a configuration value that must be defined.
-     * 
-     * @return Define if the value is optional.
-     */
-    boolean isOptional() default false;
-
     
     /**
      * Determines whether the configuration value is confidential. In case of persistence it has to be secured.
@@ -170,7 +162,7 @@ public @interface EnumValueConfiguration {
     
     /**
      * Defines the valid from date of the enumeration configuration. By default it's empty which means the current timestamp:
-     * <code>DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS))</code>.
+     * <code>DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.MILLIS))</code>.
      * 
      * @return The valid from information
      */

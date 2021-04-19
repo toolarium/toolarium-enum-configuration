@@ -78,9 +78,9 @@ public class EnumConfigurationProcessorTest {
                + "enum MyEnumConfiguration implements IEnumConfiguration {\n"
                + "@EnumValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
                + "HOSTNAME,\n"
-               + "@EnumValueConfiguration(description = \"The port\", isOptional = true, exampleValue = \"8080\")\n"
+               + "@EnumValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
                + "PORT,\n"
-               + "@EnumValueConfiguration(description = \"The hint\", isOptional = true, exampleValue = \"hint\")\n"
+               + "@EnumValueConfiguration(description = \"The hint\", exampleValue = \"hint\")\n"
                + "HINT;\n"
                + "}"));
         assertThat(compilation).succeeded();

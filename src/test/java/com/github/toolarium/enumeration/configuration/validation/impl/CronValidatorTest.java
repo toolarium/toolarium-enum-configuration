@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test uri validator test
@@ -19,33 +18,25 @@ public class CronValidatorTest extends AbstractValidatorTest {
      * Constructor for CronValidatorTest
      */
     CronValidatorTest() {
-        super(EnumValueConfigurationDataType.CRON);
+        super(EnumValueConfigurationDataType.CRON, 
+              null, 
+              null,
+              /* valid values */
+              new String[] {"* * * * *", "  * * * * *  ", "  1/2 * * * *  "},
+              /* invalid values */
+              new String[] {"* * * *"},
+              /* too small value */
+              null,        
+              /* too big value */
+              null);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("* * * * *");
-        isValid("  * * * * *  ");
-        isValid("  1/2 * * * *  ");
-        isInValid("* * * *");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue("* * * * *", "* * * * *");
-        assertValue("* * * * *", "  * * * * *  ");
-        assertValue("* * * * *", "  * * * * *  ");
-        assertValue("1/2 * * * *", "  1/2 * * * *  ");
-        assertException("Invalid cron entry [* * * *]!", "* * * *");
+    protected String createValueContent(String minValueSize) {
+        return "* * * * *";
     }
 }

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +41,10 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setKey("com.github.toolarium.1");
         enumValueConfiguration.setDescription("This is a description 1.");
         enumValueConfiguration.setExampleValue("example");
+        
+        assertFalse(enumValueConfiguration.hasDefaultValue());
+        assertTrue(enumValueConfiguration.isMandatory());
+        
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         Assertions.assertThrows(ValidationException.class, () -> {
             EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
@@ -62,8 +66,9 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setExampleValue("2021-03-20");
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         
-        // because by default it's not optional and we have to default value
+        assertFalse(enumValueConfiguration.hasDefaultValue());
         assertTrue(enumValueConfiguration.isMandatory());
+
         Assertions.assertThrows(ValidationException.class, () -> {
             EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
         });
@@ -85,9 +90,8 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setDescription("This is a description 2.");
         enumValueConfiguration.setExampleValue("2021-03-21");
 
-        // because by default it's not optional and we have no default value
+        assertFalse(enumValueConfiguration.hasDefaultValue());
         assertTrue(enumValueConfiguration.isMandatory());
-        assertFalse(enumValueConfiguration.isOptional());
 
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-21");
@@ -112,9 +116,8 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setDescription("This is a description 3.");
         enumValueConfiguration.setExampleValue("2021-03-22");
         
-        // because by default it's not optional and we have to default value
-        assertFalse(enumValueConfiguration.isMandatory());
-        assertFalse(enumValueConfiguration.isOptional());
+        assertTrue(enumValueConfiguration.hasDefaultValue());
+        assertTrue(enumValueConfiguration.isMandatory());
         
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-22");
@@ -131,23 +134,21 @@ public class EnumValueConfigurationValidatorFactoryTest {
      * @throws ValidationException In case of a validation exception
      */
     @Test 
-    public void testMandatoryInputValueSetOptionalToFalseWithDefaultValue() throws ValidationException {
+    public void testMandatoryInputValueWithDefaultValue() throws ValidationException {
         EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
         enumValueConfiguration.setDataType(EnumValueConfigurationDataType.DATE);
         enumValueConfiguration.setDefaultValue("2021-03-23 ");
         enumValueConfiguration.setKey("com.github.toolarium.4");
         enumValueConfiguration.setDescription("This is a description 4.");
         enumValueConfiguration.setExampleValue("2021-03-23");
-        enumValueConfiguration.setOptional(false);
-        
+        enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
+
+        assertTrue(enumValueConfiguration.hasDefaultValue());
         assertFalse(enumValueConfiguration.isMandatory());
-        assertFalse(enumValueConfiguration.isOptional());
+
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-23");
-        
-        Assertions.assertThrows(ValidationException.class, () -> {
-            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
-        });
+        EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
     }
 
     
@@ -157,22 +158,20 @@ public class EnumValueConfigurationValidatorFactoryTest {
      * @throws ValidationException In case of a validation exception
      */
     @Test 
-    public void testMandatoryInputValueSetOptionalToFalseWithoutDefaultValue() throws ValidationException {
+    public void testMandatoryInputValueWithoutDefaultValue() throws ValidationException {
         EnumValueConfiguration enumValueConfiguration = new EnumValueConfiguration();
         enumValueConfiguration.setDataType(EnumValueConfigurationDataType.DATE);
         enumValueConfiguration.setKey("com.github.toolarium.5");
         enumValueConfiguration.setDescription("This is a description 5.");
         enumValueConfiguration.setExampleValue("2021-03-24");
-        enumValueConfiguration.setOptional(false);
+        enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
         
-        assertTrue(enumValueConfiguration.isMandatory());
-        assertFalse(enumValueConfiguration.isOptional());
+        assertFalse(enumValueConfiguration.hasDefaultValue());
+        assertFalse(enumValueConfiguration.isMandatory());
+        
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-24");
-        
-        Assertions.assertThrows(ValidationException.class, () -> {
-            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
-        });
+        EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
     }
 
     
@@ -188,10 +187,12 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setDefaultValue("2021-03-22 ");
         enumValueConfiguration.setKey("com.github.toolarium.6");
         enumValueConfiguration.setDescription("This is a description 6.");
-        enumValueConfiguration.setOptional(true);
+        enumValueConfiguration.setExampleValue(" 2001-09-25 ");
+        enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
         
+        assertTrue(enumValueConfiguration.hasDefaultValue());
         assertFalse(enumValueConfiguration.isMandatory());
-        assertTrue(enumValueConfiguration.isOptional());
+        
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-25");
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
@@ -209,10 +210,12 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setDataType(EnumValueConfigurationDataType.DATE);
         enumValueConfiguration.setKey("com.github.toolarium.7");
         enumValueConfiguration.setDescription("This is a description 7.");
-        enumValueConfiguration.setOptional(true);
+        enumValueConfiguration.setExampleValue(" 2001-09-25 ");
+        enumValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
         
+        assertFalse(enumValueConfiguration.hasDefaultValue());
         assertFalse(enumValueConfiguration.isMandatory());
-        assertTrue(enumValueConfiguration.isOptional());
+        
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration);
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "2021-03-26");
         EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfiguration, "");
@@ -235,9 +238,6 @@ public class EnumValueConfigurationValidatorFactoryTest {
         enumValueConfiguration.setDataType(EnumValueConfigurationDataType.DATE);
         enumValueConfiguration.setDefaultValue("2021-03-27");
         enumValueConfiguration.setExampleValue("2021-03-27");
-        enumValueConfiguration.setValueSize(new EnumValueConfigurationSizing(null, null));       
-        enumValueConfiguration.setCardinality(new EnumValueConfigurationSizing(null, null));
-        enumValueConfiguration.setOptional(true);
         enumValueConfiguration.setConfidential(false);
 
         enumValueConfiguration.setExampleValue("2021-03-27");

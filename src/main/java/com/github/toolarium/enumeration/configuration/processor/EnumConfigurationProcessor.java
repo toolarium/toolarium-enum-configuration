@@ -10,12 +10,13 @@ import com.github.toolarium.enumeration.configuration.annotation.EnumConfigurati
 import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
-import com.github.toolarium.enumeration.configuration.util.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumValueConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.EnumValueConfigurationValueValidatorFactory;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -191,10 +192,10 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 enumConfiguration.setDescription(value);
                                 break;
                             case "validFrom": 
-                                enumConfiguration.setValidFrom(DateUtil.getInstance().parseDate(value));
+                                enumConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(value));
                                 break;
                             case "validTill": 
-                                enumConfiguration.setValidTill(DateUtil.getInstance().parseDate(value));
+                                enumConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(value));
                                 break;
                             default: 
                                 //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found unknwon annotation value: " + e.getKey().getClass().getName() + " / " + e.getKey() + "/" + e.getKey().getSimpleName() + "/" + e.getValue());
@@ -246,11 +247,11 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 break;
                             case "dataType": 
                                 EnumValueConfigurationDataType type = EnumUtil.getInstance().valueOf(EnumValueConfigurationDataType.class, value);
-                                enumValueConfiguration.setDataType(type);
-                                
                                 if (type == null) {
                                     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Invalid data type [" +  e.getValue() + "]! Please check the annoataion of " + fullQualifiedName + ".");
                                 }
+                                
+                                enumValueConfiguration.setDataType(type);
                                 break;
                             case "defaultValue": 
                                 enumValueConfiguration.setDefaultValue(value);
@@ -271,17 +272,14 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
                                 }
                                 break;
-                            case "isOptional": 
-                                enumValueConfiguration.setOptional("true".equalsIgnoreCase(("" + value).trim()));
-                                break;
                             case "isConfidential": 
                                 enumValueConfiguration.setConfidential("true".equalsIgnoreCase(("" + value).trim()));
                                 break;
                             case "validFrom": 
-                                enumValueConfiguration.setValidFrom(DateUtil.getInstance().parseDate(value));
+                                enumValueConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(value));
                                 break;
                             case "validTill": 
-                                enumValueConfiguration.setValidTill(DateUtil.getInstance().parseDate(value));
+                                enumValueConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(value));
                                 break;
                             default: 
                                 //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found unknwon annotation value: " + e.getKey().getClass().getName() + "/" + e.getKey() + "/" + e.getKey().getSimpleName() + "/" + e.getValue());
@@ -292,8 +290,8 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         }
 
         try {
-            enumValueConfiguration.setValueSize(AnnotationConvertUtil.getInstance().prepareValueSize(minValueSize, maxValueSize));
-        } catch (IllegalArgumentException ex) {
+            enumValueConfiguration.setValueSize(EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfiguration.getDataType(), minValueSize, maxValueSize));
+        } catch (Exception ex) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
         }
 

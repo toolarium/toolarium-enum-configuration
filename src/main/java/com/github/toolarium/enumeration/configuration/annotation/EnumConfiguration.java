@@ -33,7 +33,7 @@ public @interface EnumConfiguration {
     
     /**
      * Defines the valid from date of the enumeration configuration. By default it's empty which means the current timestamp:
-     * <code>DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS))</code>.
+     * <code>DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.MILLIS))</code>.
      * 
      * @return The valid from information
      */

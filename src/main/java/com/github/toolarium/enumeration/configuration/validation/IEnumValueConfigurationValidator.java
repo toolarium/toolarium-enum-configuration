@@ -24,7 +24,8 @@ public interface IEnumValueConfigurationValidator {
      * @param input the input to validate
      * @throws ValidationException In case of a validation error
      */
-    void validate(EnumValueConfiguration enumValueConfiguration, String input)  throws ValidationException;
+    void validate(EnumValueConfiguration enumValueConfiguration, String input)  
+        throws ValidationException;
 
     
     /**
@@ -33,7 +34,8 @@ public interface IEnumValueConfigurationValidator {
      * @param enumValueConfiguration enum value configuation 
      * @throws ValidationException In case of a validation error
      */
-    void validate(EnumValueConfiguration enumValueConfiguration) throws ValidationException;   
+    void validate(EnumValueConfiguration enumValueConfiguration) 
+        throws ValidationException;   
 
     
     /**
@@ -42,21 +44,9 @@ public interface IEnumValueConfigurationValidator {
      * @param dataType the data type 
      * @param cardinality the cardinality 
      * @param valueSize the value size
-     * @param isOptional true if it is optional
      * @param input the input to validate
      * @throws ValidationException In case of a validation error
      */
-    void validate(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing cardinality, EnumValueConfigurationSizing valueSize, boolean isOptional, String input) throws ValidationException;
-
-    
-    /**
-     * Convert
-     *
-     * @param dataType the data type 
-     * @param input the input to validate
-     * @param <T> the generic type
-     * @return the result
-     * @throws ValidationException In case of a validation error
-     */
-    <T> T convert(EnumValueConfigurationDataType dataType, String input) throws ValidationException;
+    void validate(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<?> valueSize, String input) 
+        throws ValidationException;
 }

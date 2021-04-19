@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
  * @author patrick
  */
 public class AnnotationConvertUtilTest {
-    
+    private static final String ONE_STRING = "1";
+
+
     /**
      * Test the trim quotation marks
      */
@@ -44,8 +46,8 @@ public class AnnotationConvertUtilTest {
     @Test
     public void testParseDate() {
         assertNull(DateUtil.getInstance().parseDate(null));
-        assertNotNull(DateUtil.getInstance().parseDate("9999-12-31T12:00:00.000Z"));
-        assertNotNull(DateUtil.getInstance().parseDate("2020-05-26T12:34:56Z"));
+        assertNotNull(DateUtil.getInstance().parseTimestamp("9999-12-31T12:00:00.000Z"));
+        assertNotNull(DateUtil.getInstance().parseTimestamp("2020-05-26T12:34:56Z"));
     }
     
     
@@ -72,38 +74,18 @@ public class AnnotationConvertUtilTest {
     
 
     /**
-     * Test the prepareValueSize
-     */
-    @Test
-    public void testPrepareValueSize() {
-        assertNull(AnnotationConvertUtil.getInstance().prepareValueSize(null, null));
-        assertNull(AnnotationConvertUtil.getInstance().prepareValueSize("", ""));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().prepareValueSize("0", "1"));
-        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().prepareValueSize("", "  1  "));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().prepareValueSize("  0 ", " 1  "));
-        assertEquals(new EnumValueConfigurationSizing(1, 2), AnnotationConvertUtil.getInstance().prepareValueSize("  1", " 2  "));
-        assertEquals(new EnumValueConfigurationSizing(null, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().prepareValueSize("", "*"));
-        assertEquals(new EnumValueConfigurationSizing(1, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().prepareValueSize("1", "*"));
-      
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            AnnotationConvertUtil.getInstance().prepareValueSize("*", "4");
-        });
-    }
-
-    
-    /**
      * Test the parseCardinality
      */
     @Test
     public void testParseCardinality() {
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(null));
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(""));
-        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().parseCardinality("1"));
-        assertEquals(new EnumValueConfigurationSizing(null, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
-        assertEquals(new EnumValueConfigurationSizing(0, 1), AnnotationConvertUtil.getInstance().parseCardinality("  0..1  "));
-        assertEquals(new EnumValueConfigurationSizing(1, 2), AnnotationConvertUtil.getInstance().parseCardinality("  1   .. 2  "));
-        assertEquals(new EnumValueConfigurationSizing(null, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
-        assertEquals(new EnumValueConfigurationSizing(1, Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("1..*"));
+        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality(ONE_STRING));
+        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
+        assertEquals(new EnumValueConfigurationSizing<Integer>("0", 0, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  0..1  "));
+        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "2", 2), AnnotationConvertUtil.getInstance().parseCardinality("  1   .. 2  "));
+        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
+        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("1..*"));
         
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             AnnotationConvertUtil.getInstance().parseCardinality("*..1");
@@ -114,8 +96,7 @@ public class AnnotationConvertUtilTest {
         });
     }
     
-   
-    
+       
     @EnumConfiguration(description = "The description")
     public enum MyConfigTest implements IEnumConfiguration {
         @EnumValueConfiguration(description =  "First", defaultValue = "11", exampleValue = "42")

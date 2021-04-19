@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -20,67 +19,25 @@ public class BooleanValidatorTest extends AbstractValidatorTest {
      * Constructor for BooleanValidatorTest
      */
     BooleanValidatorTest() {
-        super(EnumValueConfigurationDataType.BOOLEAN);
+        super(EnumValueConfigurationDataType.BOOLEAN, 
+              null, 
+              null,
+              /* valid values */
+              new String[] {"true", "yes", "   true   ", "   yes   ", "True", "Yes", "  True  ", "  Yes  ", "false", "no", "  false  ", "  no  ", "False", "No", "  False  ", " No ", "0", "1", "  0  ", "  1  "},
+              /* invalid values */
+              new String[] {"trus", "ja", "nein", "2"},
+              /* too small value */
+              null,        
+              /* too big value */
+              null);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
-    @Test
-    public void testValidate() {
-        isValid("true");
-        isValid("yes");
-        isValid("  true  ");
-        isValid("  yes  ");
-
-        isValid("True");
-        isValid("Yes");
-        isValid("  True  ");
-        isValid("  Yes  ");
-
-
-        isValid("false");
-        isValid("no");
-        isValid("  false ");
-        isValid(" no ");
-
-        isValid("False");
-        isValid("No");
-        isValid("  False ");
-        isValid(" No ");
-
-        isInValid("trus");
-        isInValid("ja");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Test
-    public void testConvert() {
-        assertValue(Boolean.TRUE, "true");
-        assertValue(Boolean.TRUE, "yes");
-        assertValue(Boolean.TRUE, "  true  ");
-        assertValue(Boolean.TRUE, "  yes  ");
-
-        assertValue(Boolean.TRUE, "True");
-        assertValue(Boolean.TRUE, "Yes");
-        assertValue(Boolean.TRUE, "  True  ");
-        assertValue(Boolean.TRUE, "  Yes  ");
-
-        assertValue(Boolean.FALSE, "false");
-        assertValue(Boolean.FALSE, "no");
-        assertValue(Boolean.FALSE, "  false  ");
-        assertValue(Boolean.FALSE, "  no  ");
-
-        assertValue(Boolean.FALSE, "False");
-        assertValue(Boolean.FALSE, "No");
-        assertValue(Boolean.FALSE, "  False  ");
-        assertValue(Boolean.FALSE, "  No  ");
-        
-        assertException("Invalid value: [trus].", "trus");
-        assertException("Invalid value: [ja].", "ja");
+    @Override
+    protected String createValueContent(String minValueSize) {
+        return "true";
     }
 }

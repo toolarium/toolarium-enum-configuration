@@ -3,10 +3,11 @@
  *
  * Copyright by toolarium, all rights reserved.
  */
-package com.github.toolarium.enumeration.configuration.util;
+package com.github.toolarium.enumeration.configuration.resource;
 
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
+import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

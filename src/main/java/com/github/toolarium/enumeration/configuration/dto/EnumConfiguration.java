@@ -19,6 +19,12 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     /** Defines the max timestamp */
     public static final String MAX_TIMESTAMP_STRING = "9999-12-31T12:00:00.000Z";
 
+    /** Defines the max date */
+    public static final String MAX_DATE_STRING = "9999-12-31";
+
+    /** Defines the max time */
+    public static final String MAX_TIME_STRING = "23:59:59.999";
+
     private static final long serialVersionUID = -5016414165364299512L;
     private String name;
     private Map<String, EnumValueConfiguration> keyList;
@@ -180,6 +186,23 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
         Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
         for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
             if (e.getValue().isMandatory()) {
+                result.add(e.getValue());
+            }
+        }
+        
+        return result;
+    }
+
+    
+    /**
+     * Returns a list of mandatory {@link EnumValueConfiguration} with no default value
+     *
+     * @return the list of mandatory {@link EnumValueConfiguration}.
+     */
+    public Set<EnumValueConfiguration> selectMandatoryEnumValueConfigurationListWithMissingDefaultValue() {
+        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
+        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
+            if (e.getValue().isMandatory() && !e.getValue().hasDefaultValue()) {
                 result.add(e.getValue());
             }
         }

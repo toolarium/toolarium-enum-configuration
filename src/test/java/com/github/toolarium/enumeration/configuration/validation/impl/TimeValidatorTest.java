@@ -7,7 +7,6 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import java.time.LocalTime;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test time validator test
@@ -20,30 +19,25 @@ public class TimeValidatorTest extends AbstractValidatorTest {
      * Constructor for TimeValidatorTest
      */
     TimeValidatorTest() {
-        super(EnumValueConfigurationDataType.TIME);
+        super(EnumValueConfigurationDataType.TIME, 
+              "00:01:00.000", 
+              "23:00:00",
+              /* valid values */
+              new String[] {"13:15:18.009", "  13:15:18.009  ", "23:00"},
+              /* invalid values */
+              new String[] {"33:15:18.009", "2021-03-35T12:34:55Z", "23:00:01"},
+              /* too small value */
+              new String[] {"00:00:00"},        
+              /* too big value */
+              new String[] {"23:10", "23:00:2"});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#isTooSmallValue(java.lang.String, java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("13:15:18.009");
-        isValid("  13:15:18.009  ");
-        isInValid("33:15:18.009");
-        isInValid("2021-03-35T12:34:55Z");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(LocalTime.parse("13:15:18.009"), "13:15:18.009");
-        assertException("Text '33:15:18.009' could not be parsed: Invalid value for HourOfDay (valid values 0 - 23): 33", "33:15:18.009");
+    protected boolean isTooSmallValue(String value1, String value2) {
+        return LocalTime.parse(value1).compareTo(LocalTime.parse(value2)) < 0;
     }
 }

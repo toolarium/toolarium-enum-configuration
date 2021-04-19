@@ -137,7 +137,15 @@ public final class JSONUtil {
      */
     public List<String> convert(String json) throws IllegalArgumentException {
         
+        if (json == null) {
+            return null;
+        }
+        
         try {
+            if (json.indexOf('[') < 0 &&  json.indexOf(']') < 0) {
+                return Arrays.asList(json);
+            }            
+            
             String[] elements = getMapper().readValue(json, String[].class);
             if (elements != null && elements.length > 0) {
                 return Arrays.asList(elements);

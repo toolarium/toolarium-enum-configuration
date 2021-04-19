@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -20,29 +19,14 @@ public class RegexpValidatorTest extends AbstractValidatorTest {
      * Constructor for RegexpValidatorTest
      */
     RegexpValidatorTest() {
-        super(EnumValueConfigurationDataType.REGEXP);
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
-     */
-    @Override
-    @Test
-    public void testValidate() {
-        isValid("^.*[a-b]*$");
-        isValid("  .*[a-b]*  ");
-        isInValid("[b-");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue("^.*[a-b]*$", "^.*[a-b]*$");
-        assertException("Illegal character range near index 3\n[b-", "[b-");
+        super(EnumValueConfigurationDataType.REGEXP,
+              null, /* min value */
+              null, /* max value */
+              /* valid values */
+              new String[] {"^.*[a-b]*$", "  .*[a-b]*  ", "^.*Test$"},
+              /* invalid values */
+              new String[] {"[b-"},
+              null, /* too small values */
+              null  /* too big values */);
     }
 }

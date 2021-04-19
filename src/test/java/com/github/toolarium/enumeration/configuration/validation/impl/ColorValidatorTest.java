@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test color validator test
@@ -19,30 +18,23 @@ public class ColorValidatorTest extends AbstractValidatorTest {
      * Constructor for ColorValidatorTest
      */
     ColorValidatorTest() {
-        super(EnumValueConfigurationDataType.COLOR);
+        super(EnumValueConfigurationDataType.COLOR,
+              null, /* min value */
+              null, /* max value */
+              /* valid values */
+              new String[] {"#12B356", "   #12B356  ", "#A2B356"},
+              /* invalid values */
+              new String[] {"12B356", "KFB356"},
+              null, /* too small values */
+              null  /* too big values */);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("#12B356");
-        isValid("  #12B356  ");
-        isInValid("12B356");
-        isInValid("KFB356");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue("#12B356", "#12B356");
-        assertException("Invalid value: [#KFB356].", "#KFB356");
+    protected String createValueContent(String minValueSize) {
+        return "#000000";
     }
 }

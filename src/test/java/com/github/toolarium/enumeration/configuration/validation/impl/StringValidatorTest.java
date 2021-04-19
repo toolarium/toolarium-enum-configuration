@@ -16,33 +16,94 @@ import org.junit.jupiter.api.Test;
  * @author patrick
  */
 public class StringValidatorTest extends AbstractValidatorTest {
+    private static final String STRING_MAX_CONTENT = "123456789012345678901234567890";
+    private static final String STRING_TOO_LONG_CONTENT = " " + STRING_MAX_CONTENT + " ";
 
+    
     /**
      * Constructor for StringValidatorTest
      */
     StringValidatorTest() {
-        super(EnumValueConfigurationDataType.STRING);
+        super(EnumValueConfigurationDataType.STRING, 
+              "2", 
+              "" + STRING_MAX_CONTENT.length(),
+              /* valid values */
+              new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+              /* invalid values */
+              new String[] {STRING_TOO_LONG_CONTENT},
+              /* too small value */
+              new String[] {"m"},        
+              /* too big value */
+              new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * Test valid and invalid objects.
      */
-    @Override
     @Test
-    public void testValidate() {
-        isValid("My string");
-        isValid("  My string  ");
-        //isInValid("My string");
+    public void testValidateWithValidatorMinSize() {
+        testValidate(getValidatorMinValueSizeAsString(), 
+                     "" + STRING_MAX_CONTENT.length(),
+                     /* valid values */
+                     new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+                     /* invalid values */
+                     new String[] {STRING_TOO_LONG_CONTENT},
+                     /* too small value */
+                     null,        
+                     /* too big value */
+                     new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"});
+    }
+
+    
+    /**
+     * Test object in range.
+     */
+    @Test
+    public void testRangeWithValidatorMinSize() {
+        testRange(getValidatorMinValueSizeAsString(), 
+                  "" + STRING_MAX_CONTENT.length(),
+                  /* valid values */
+                  new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+                  /* invalid values */
+                  new String[] {STRING_TOO_LONG_CONTENT},
+                  /* too small value */
+                  null,        
+                  /* too big value */
+                  new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"});
+    }
+
+    
+    /**
+     * Test object in range.
+     */
+    @Test
+    public void testStringRange() {
+        testRange("4", 
+                  "4",
+                  /* valid values */
+                  new String[] {"1234", "abcd", "    "},
+                  /* invalid values */
+                  new String[] {" 1234 "},
+                  /* too small value */
+                  new String[] {"123"},
+                  /* too big value */
+                  new String[] {"1234 "});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testConvert() {
-        assertValue("My string", "My string");
+    protected String createValueContent(String minValueSize) {
+        
+        String result = "";
+        long size = Long.valueOf(minValueSize);
+        for (int i = 0; i < size; i++) {
+            result += ".";
+        }
+        
+        return result;
     }
 }

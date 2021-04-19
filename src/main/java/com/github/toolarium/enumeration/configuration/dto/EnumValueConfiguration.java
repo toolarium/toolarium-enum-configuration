@@ -19,9 +19,8 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     private EnumValueConfigurationDataType dataType;
     private String defaultValue;
     private String exampleValue;
-    private EnumValueConfigurationSizing valueSize;
-    private EnumValueConfigurationSizing cardinality;
-    private boolean isOptional;
+    private EnumValueConfigurationSizing<?> valueSize;
+    private EnumValueConfigurationSizing<Integer> cardinality;
     private boolean isConfidential;
 
   
@@ -35,8 +34,7 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
         defaultValue = "";
         exampleValue = "";
         valueSize = null;
-        cardinality = null;
-        isOptional = false;
+        cardinality = new EnumValueConfigurationSizing<Integer>(1, 1);
         isConfidential = false;
     }
     
@@ -102,6 +100,17 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
 
     
     /**
+     * Check if a default value exist.
+     *
+     * @return true if a default value exist.
+     */
+    @JsonIgnore
+    public boolean hasDefaultValue() {
+        return (defaultValue != null && !defaultValue.isEmpty());
+    }
+
+    
+    /**
      * Get the example value
      * 
      * @return the example value
@@ -126,7 +135,7 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the value size
      */
-    public EnumValueConfigurationSizing getValueSize() {
+    public EnumValueConfigurationSizing<?> getValueSize() {
         return valueSize;
     }
     
@@ -136,7 +145,7 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
      * 
      * @param valueSize the value size
      */
-    public void setValueSize(EnumValueConfigurationSizing valueSize) {
+    public void setValueSize(EnumValueConfigurationSizing<?> valueSize) {
         this.valueSize = valueSize;
     }
 
@@ -146,7 +155,7 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the cardinality
      */
-    public EnumValueConfigurationSizing getCardinality() {
+    public EnumValueConfigurationSizing<Integer> getCardinality() {
         return cardinality;
     }
     
@@ -156,30 +165,21 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
      * 
      * @param cardinality the cardinality
      */
-    public void setCardinality(EnumValueConfigurationSizing cardinality) {
+    public void setCardinality(EnumValueConfigurationSizing<Integer> cardinality) {
         this.cardinality = cardinality;
-    }
-
-
-    /**
-     * Define if the value is optional or not
-     * 
-     * @return define if the value is optional or not
-     */
-    public boolean isOptional() {
-        return isOptional;
     }
 
     
     /**
-     * Define if the value is optional or not
-     * 
-     * @param isOptional define if the value is optional or not
+     * An {@link EnumValueConfiguration} is mandatory in case the cardinality is defined and the min value is > 0.
+     *
+     * @return true if it is not optinal.
      */
-    public void setOptional(boolean isOptional) {
-        this.isOptional = isOptional;
+    @JsonIgnore
+    public boolean isMandatory() {
+        return (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() > 0);
     }
-
+    
     
     /**
      * Define if the value is confidential or not
@@ -201,21 +201,6 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
     }
 
 
-    /**
-     * An {@link EnumValueConfiguration} is mandatory in case it's not optional and has no default value.
-     *
-     * @return true if it is not optinal and has no default value.
-     */
-    @JsonIgnore
-    public boolean isMandatory() {
-        if (isOptional) {
-            return false;
-        }
-        
-        return (defaultValue == null || defaultValue.isEmpty());
-    }
-    
-    
     /**
      * Initialize a default example value
      */
@@ -299,13 +284,6 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
         }
 
         result = prime * result;
-        if (isOptional) {
-            result += 1231;
-        } else {
-            result += 1237;
-        }
-
-        result = prime * result;
         if (isConfidential) {
             result += 1231;
         } else {
@@ -382,10 +360,6 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
             return false;
         }
 
-        if (isOptional != other.isOptional) {
-            return false;
-        }
-
         if (isConfidential != other.isConfidential) {
             return false;
         }
@@ -406,7 +380,6 @@ public class EnumValueConfiguration extends AbstractEnumConfiguration {
                + ", exampleValue=" + getExampleValue() 
                + ", valueSize=" + getValueSize() 
                + ", cardinality=" + getCardinality() 
-               + ", isOptional=" + isOptional
                + ", isConfidential=" + isConfidential
                + ", validFrom=" + getValidFrom() 
                + ", validTill=" + getValidTill() 

@@ -167,6 +167,34 @@ public class EnumConfigurations implements Serializable {
         return result;
     }
 
+    
+    /**
+     * Returns a list of mandatory configuration entries.
+     *
+     * @return the list of mandatory configuration entries.
+     */
+    public Set<EnumConfiguration> selectMandatoryConfigurationListWithMissingDefaultValue() {
+        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
+        
+        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
+            Set<EnumValueConfiguration> enumValueConfigurationList = e.getValue().selectMandatoryEnumValueConfigurationListWithMissingDefaultValue();
+            
+            if (enumValueConfigurationList != null && !enumValueConfigurationList.isEmpty()) {
+                EnumConfiguration enumConfigurationToAdd = new EnumConfiguration();
+                enumConfigurationToAdd.setDescription(e.getValue().getDescription());
+                enumConfigurationToAdd.setValidFrom(e.getValue().getValidFrom());
+                enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
+                enumConfigurationToAdd.setName(e.getValue().getName());
+                enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
+                enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
+                enumConfigurationToAdd.setKeyList(enumValueConfigurationList);
+                result.add(enumConfigurationToAdd);
+            }
+        }
+        
+        return result;
+    }
+
 
     /**
      * @see java.lang.Object#hashCode()

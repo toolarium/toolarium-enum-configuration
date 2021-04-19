@@ -66,5 +66,5 @@ public enum EnumValueConfigurationDataType implements Serializable {
      * The name, timestamp (as RFC 3339), mimetype are optional, only base64 content is a valid content.,
      * e.g. <code>myfile.txt|2021-03-15T08:59:22.123Z|text/plain|VGV4dAo=</code> or <code>myfile.txt|||VGV4dAo=</code> or <code>VGV4dAo=</code>   
      */
-    BINARY
+    BINARY;
 }

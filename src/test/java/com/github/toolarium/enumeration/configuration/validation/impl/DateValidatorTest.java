@@ -7,7 +7,6 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import java.time.LocalDate;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -21,30 +20,25 @@ public class DateValidatorTest extends AbstractValidatorTest {
      * Constructor for DateValidatorTest
      */
     DateValidatorTest() {
-        super(EnumValueConfigurationDataType.DATE);
+        super(EnumValueConfigurationDataType.DATE, 
+              "1973-01-01", 
+              "2037-05-31",
+              /* valid values */
+              new String[] {"2021-03-15", "  2021-03-15  ", "1973-02-01"},
+              /* invalid values */
+              new String[] {"2021-03-35", "2021-03-35T12:34:55Z"},
+              /* too small value */
+              new String[] {"1972-12-31"},        
+              /* too big value */
+              new String[] {"2037-06-01", "2038-01-01"});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#isTooSmallValue(java.lang.String, java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("2021-03-15");
-        isValid("  2021-03-15  ");
-        isInValid("2021-03-35");
-        isInValid("2021-03-35T12:34:55Z");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(LocalDate.parse("2021-03-15"), "2021-03-15");
-        assertException("Text '2021-43-15' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 43", "2021-43-15");
+    protected boolean isTooSmallValue(String value1, String value2) {
+        return LocalDate.parse(value1).compareTo(LocalDate.parse(value2)) < 0;
     }
 }

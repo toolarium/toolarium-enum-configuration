@@ -7,6 +7,8 @@ package com.github.toolarium.enumeration.configuration.util;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 /**
@@ -15,7 +17,9 @@ import java.time.Instant;
  * @author patrick
  */
 public final class DateUtil {
-    public static final Instant MAX_TIMESTAMP = DateUtil.getInstance().parseDate(EnumConfiguration.MAX_TIMESTAMP_STRING);
+    public static final LocalDate MAX_DATE = DateUtil.getInstance().parseDate(EnumConfiguration.MAX_DATE_STRING);
+    public static final LocalTime MAX_TIME = DateUtil.getInstance().parseTime(EnumConfiguration.MAX_TIME_STRING);
+    public static final Instant MAX_TIMESTAMP = DateUtil.getInstance().parseTimestamp(EnumConfiguration.MAX_TIMESTAMP_STRING);
 
     
     /**
@@ -52,7 +56,37 @@ public final class DateUtil {
      * @param input the input date as string
      * @return the Instant 
      */
-    public Instant parseDate(String input) {
+    public LocalDate parseDate(String input) {
+        if (input == null) {
+            return null;
+        }
+        
+        return LocalDate.parse(input.trim());
+    }
+
+    
+    /**
+     * Parse a date
+     * 
+     * @param input the input date as string
+     * @return the Instant 
+     */
+    public LocalTime parseTime(String input) {
+        if (input == null) {
+            return null;
+        }
+        
+        return LocalTime.parse(input.trim());
+    }
+
+    
+    /**
+     * Parse a date
+     * 
+     * @param input the input date as string
+     * @return the Instant 
+     */
+    public Instant parseTimestamp(String input) {
         if (input == null) {
             return null;
         }

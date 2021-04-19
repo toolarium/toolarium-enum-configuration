@@ -5,10 +5,13 @@
  */
 package com.github.toolarium.enumeration.configuration.util;
 
+import com.github.toolarium.enumeration.configuration.converter.StringTypeConverterFactory;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.EnumValueConfigurationValueValidatorFactory;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 
@@ -19,6 +22,7 @@ import javax.lang.model.element.ExecutableElement;
  * @author patrick
  */
 public final class AnnotationConvertUtil {
+
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      *
@@ -63,11 +67,11 @@ public final class AnnotationConvertUtil {
         enumConfiguration.setDescription(enumConfigurationAnnotation.description());
 
         if (enumConfigurationAnnotation.validFrom() != null && !enumConfigurationAnnotation.validFrom().trim().isEmpty()) {
-            enumConfiguration.setValidFrom(DateUtil.getInstance().parseDate(enumConfigurationAnnotation.validFrom()));
+            enumConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumConfigurationAnnotation.validFrom()));
         }
         
         if (enumConfigurationAnnotation.validTill() != null && !enumConfigurationAnnotation.validTill().trim().isEmpty()) {
-            enumConfiguration.setValidTill(DateUtil.getInstance().parseDate(enumConfigurationAnnotation.validTill()));
+            enumConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(enumConfigurationAnnotation.validTill()));
         }
         
         return enumConfiguration;
@@ -80,8 +84,9 @@ public final class AnnotationConvertUtil {
      *
      * @param enumValueConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration}.
      * @return the {@link EnumValueConfiguration}.
+     * @throws ValidationException In case if a validation error
      */
-    public EnumValueConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration enumValueConfigurationAnnotation) {
+    public EnumValueConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration enumValueConfigurationAnnotation) throws ValidationException {
         if (enumValueConfigurationAnnotation == null) {
             return null;            
         }
@@ -89,53 +94,26 @@ public final class AnnotationConvertUtil {
         EnumValueConfiguration enumValueConfiguration = null;
         enumValueConfiguration = new EnumValueConfiguration();
         enumValueConfiguration.setDescription(enumValueConfigurationAnnotation.description());
-        enumValueConfiguration.setDataType(EnumUtil.getInstance().mapEnum(EnumValueConfigurationDataType.class, enumValueConfigurationAnnotation.dataType()));
+        
+        EnumValueConfigurationDataType type = EnumUtil.getInstance().mapEnum(EnumValueConfigurationDataType.class, enumValueConfigurationAnnotation.dataType());
+        enumValueConfiguration.setDataType(type);
         enumValueConfiguration.setDefaultValue(enumValueConfigurationAnnotation.defaultValue());
-        enumValueConfiguration.setValueSize(prepareValueSize(enumValueConfigurationAnnotation.minValue(), enumValueConfigurationAnnotation.maxValue()));
+        enumValueConfiguration.setValueSize(EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfiguration.getDataType(), 
+                                                                                                                                         enumValueConfigurationAnnotation.minValue(), 
+                                                                                                                                         enumValueConfigurationAnnotation.maxValue()));
         enumValueConfiguration.setExampleValue(enumValueConfigurationAnnotation.exampleValue());
         enumValueConfiguration.setCardinality(parseCardinality(enumValueConfigurationAnnotation.cardinality()));
-        enumValueConfiguration.setOptional(enumValueConfigurationAnnotation.isOptional());
         enumValueConfiguration.setConfidential(enumValueConfigurationAnnotation.isConfidential());
         
         if (enumValueConfigurationAnnotation.validFrom() != null && !enumValueConfigurationAnnotation.validFrom().trim().isEmpty()) {
-            enumValueConfiguration.setValidFrom(DateUtil.getInstance().parseDate(enumValueConfigurationAnnotation.validFrom()));
+            enumValueConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumValueConfigurationAnnotation.validFrom()));
         }
         
         if (enumValueConfigurationAnnotation.validTill() != null && !enumValueConfigurationAnnotation.validTill().trim().isEmpty()) {
-            enumValueConfiguration.setValidTill(DateUtil.getInstance().parseDate(enumValueConfigurationAnnotation.validTill()));
+            enumValueConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(enumValueConfigurationAnnotation.validTill()));
         }
         
         return enumValueConfiguration;
-    }
-
-    
-
-    /**
-     * Prepare value size
-     *
-     * @param minValue the min value
-     * @param maxValue the max value
-     * @return the preapred value
-     */
-    public EnumValueConfigurationSizing prepareValueSize(String minValue, String maxValue) {
-        if ((minValue == null || minValue.trim().isEmpty()) && (maxValue == null || maxValue.trim().isEmpty())) {
-            return null;
-        }
-
-        EnumValueConfigurationSizing result = new EnumValueConfigurationSizing();
-        if (minValue != null && !minValue.trim().isEmpty()) {
-            result.setMinSize(parseSizeValue(minValue.trim()));
-            
-            if (Integer.MAX_VALUE == result.getMinSize().intValue()) {
-                throw new IllegalArgumentException("Invalid min value [" + minValue + "]!");                
-            }
-        }
-
-        if (maxValue != null && !maxValue.trim().isEmpty()) {
-            result.setMaxSize(parseSizeValue(maxValue.trim()));
-        }
-
-        return result;
     }
 
     
@@ -145,60 +123,78 @@ public final class AnnotationConvertUtil {
      * @param inputCardinality the cardinality
      * @return the parsed cardinality
      */
-    public EnumValueConfigurationSizing parseCardinality(String inputCardinality) {
+    public EnumValueConfigurationSizing<Integer> parseCardinality(String inputCardinality) {
 
         if (inputCardinality == null || inputCardinality.trim().isEmpty()) {
             return null;
         }
         
-        EnumValueConfigurationSizing result = new EnumValueConfigurationSizing();
-        String cardinality = inputCardinality.trim();
-        int idx = cardinality.indexOf("..");
+        EnumValueConfigurationSizing<Integer> cardinality = new EnumValueConfigurationSizing<Integer>(1, 1);
+        String cardinalityString = inputCardinality.trim();
+        int idx = cardinalityString.indexOf("..");
         if (idx >= 0) {
             try {
-                result.setMinSize(Integer.valueOf(cardinality.substring(0, idx).trim()));
+                String value = cardinalityString.substring(0, idx).trim();
+                cardinality.setMinSizeAsString(value);
+                cardinality.setMinSize(Integer.valueOf(value));
             } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid min cardinality value [" + cardinality.substring(0, idx) + "], expected [min]..[max]!");                
+                throw new IllegalArgumentException("Invalid min cardinality value [" + cardinalityString.substring(0, idx) + "], expected [min]..[max]!");                
             }
             
-            if (cardinality.length() > (idx + 2)) {
-                String value = cardinality.substring(idx + 2).trim();
+            if (cardinalityString.length() > (idx + 2)) {
+                String value = cardinalityString.substring(idx + 2).trim();
                 try {
-                    result.setMaxSize(parseSizeValue(value));
-                } catch (IllegalArgumentException e) {
+                    cardinality.setMaxSizeAsString(value);
+                    
+                    if (EnumValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
+                        cardinality.setMaxSize(Integer.MAX_VALUE);
+                    } else {
+                        cardinality.setMaxSize(Integer.valueOf(value));
+                    }
+                } catch (Exception e) {
                     throw new IllegalArgumentException("Invalid max cardinality value [" + value + "], expected [min]..[max]!");                
                 }
             }
         } else {
             try {
-                result.setMaxSize(parseSizeValue(cardinality));
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid cardinality value [" + cardinality + "], expected [min]..[max]!");                
+                String value = cardinalityString.trim();
+                cardinality.setMaxSizeAsString(value);
+                
+                if (EnumValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
+                    cardinality.setMaxSize(Integer.MAX_VALUE);
+                } else {
+                    cardinality.setMaxSize(Integer.valueOf(value));
+                }
+                
+                if (cardinality.getMaxSize() < cardinality.getMinSize()) {
+                    cardinality.setMinSize(cardinality.getMaxSize());
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid cardinality value [" + cardinalityString + "], expected [min]..[max]!");                
             }
         }
         
-        return result;
+        return cardinality;
     }
     
 
     /**
      * Parse the size value
      *
+     * @param <T> the generic type
+     * @param dataType the data type
      * @param input the string input, either number or *. In case it's null it will return null 
      * @return the parsed result
      */
-    public Integer parseSizeValue(String input) {
+    public <T> T parseSizeValue(EnumValueConfigurationDataType dataType, String input) {
         if (input == null || input.trim().isEmpty()) {
             return null;
         }
-
+        
         String value = input.trim();
-        if ("*".equals(value)) {
-            return Integer.MAX_VALUE;
-        }
 
         try {
-            return Integer.valueOf(value);
+            return StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(dataType, value);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid size value [" + value + "]!");
         }

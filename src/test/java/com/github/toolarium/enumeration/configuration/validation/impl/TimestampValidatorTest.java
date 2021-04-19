@@ -7,7 +7,6 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import java.time.Instant;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -21,31 +20,25 @@ public class TimestampValidatorTest extends AbstractValidatorTest {
      * Constructor for TimestampValidatorTest
      */
     TimestampValidatorTest() {
-        super(EnumValueConfigurationDataType.TIMESTAMP);
+        super(EnumValueConfigurationDataType.TIMESTAMP, 
+              "1973-01-01T00:00:00.0Z", 
+              "2037-05-31T00:00:00.0Z",
+              /* valid values */
+              new String[] {"2021-03-15T12:34:55.00Z", "  2021-03-15T12:34:55Z  ", "2021-03-10T12:34:55.00Z"},
+              /* invalid values */
+              new String[] {"2021-03-15", "12:34:55Z", "2021-33-35T12:34:55Z"},
+              /* too small value */
+              new String[] {"1972-12-31T00:00:00.0Z"},        
+              /* too big value */
+              new String[] {"2037-06-01T00:00:00.0Z", "2038-01-01T00:00:00.0Z"});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#isTooSmallValue(java.lang.String, java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("2021-03-15T12:34:55.00Z");
-        isValid("  2021-03-15T12:34:55Z  ");
-        isInValid("2021-03-15");
-        isInValid("12:34:55Z");
-        isInValid("2021-33-35T12:34:55Z");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(Instant.parse("2021-03-15T12:34:55Z"), "2021-03-15T12:34:55Z");
-        assertException("Text '2021-33-35T12:34:55Z' could not be parsed at index 0", "2021-33-35T12:34:55Z");
+    protected boolean isTooSmallValue(String value1, String value2) {
+        return Instant.parse(value1).compareTo(Instant.parse(value2)) < 0;
     }
 }

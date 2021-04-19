@@ -7,10 +7,6 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import java.net.URI;
-import java.net.URISyntaxException;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -24,33 +20,23 @@ public class URIValidatorTest extends AbstractValidatorTest {
      * Constructor for URIValidatorTest
      */
     URIValidatorTest() {
-        super(EnumValueConfigurationDataType.URI);
+        super(EnumValueConfigurationDataType.URI,
+              null, /* min value */
+              null, /* max value */
+              /* valid values */
+              new String[] {"https://www.sbb.ch", "  https://www.sbb.ch   ", "https://www.google.com"},
+              /* invalid values */
+              new String[] {"httds://www.sbb.ch\\files"},
+              null, /* too small values */
+              null  /* too big values */);
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#createValueContent(java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("https://www.sbb.ch");
-        isValid("  https://www.sbb.ch  ");
-        isInValid("httds://www.sbb.ch\files");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        try {
-            assertValue(new URI("https://www.sbb.ch"), "https://www.sbb.ch");
-        } catch (URISyntaxException e) {
-            Assert.fail();
-        }
-        assertException("Illegal character in authority at index 8: httds://www.sbb.ch\\d", "httds://www.sbb.ch\\d");
+    protected String createValueContent(String minValueSize) {
+        return "a:b";
     }
 }

@@ -6,7 +6,6 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import org.junit.jupiter.api.Test;
 
 
 /**
@@ -19,30 +18,26 @@ public class DoubleValidatorTest extends AbstractValidatorTest {
     /**
      * Constructor for DoubleValidatorTest
      */
-    DoubleValidatorTest() {
-        super(EnumValueConfigurationDataType.DOUBLE);
+    public DoubleValidatorTest() {
+        super(EnumValueConfigurationDataType.DOUBLE, 
+              "1", 
+              "123",
+              /* valid values */
+              new String[] {"12.34567", "  12.34567  ", "26.51973"},
+              /* invalid values */
+              new String[] {"123'45678901234", "1A2.34567"},
+              /* too small value */
+              new String[] {"0.999"},        
+              /* too big value */
+              new String[] {"123.001", "124.0", "125", "321321321321"});
     }
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testValidate()
+     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#isTooSmallValue(java.lang.String, java.lang.String)
      */
     @Override
-    @Test
-    public void testValidate() {
-        isValid("12.34567");
-        isValid("  12.34567  ");
-        isInValid("1A2.34567");
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.impl.AbstractValidatorTest#testConvert()
-     */
-    @Override
-    @Test
-    public void testConvert() {
-        assertValue(12.34567d, "12.34567");
-        assertException("For input string: \"1A2.34567\"", "1A2.34567");
+    protected boolean isTooSmallValue(String value1, String value2) {
+        return Double.valueOf(value1).compareTo(Double.valueOf(value2)) < 0;
     }
 }
