@@ -18,7 +18,6 @@ import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfig
  */
 @EnumConfiguration(description = "The system configuration.")
 public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfiguration {
-
     @EnumValueConfiguration(description = "The hostname", dataType = DataType.STRING, defaultValue = "hostname", exampleValue = "myhost.com", minValue = "0", maxValue = "10")
     HOSTNAME,
 
@@ -34,6 +33,21 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     @EnumValueConfiguration(description = "An number array example.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\"]")
     ARRAY_SAMPLE, 
 
+    @EnumValueConfiguration(description = "My value B.", dataType = DataType.BINARY, exampleValue = "myfile.txt|||VGV4dAo=")
+    VALUE_B,
+
+    @EnumValueConfiguration(description = "My value C.", dataType = DataType.NUMBER, minValue = "100", exampleValue = "123", cardinality = "0..1")
+    VALUE_C,
+
+    @EnumValueConfiguration(description = "My value F.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\" ]")
+    VALUE_F,
+
+    @EnumValueConfiguration(description = "My value H.", exampleValue = "2", dataType = DataType.NUMBER, cardinality = "2")
+    VALUE_H,
+
+    @EnumValueConfiguration(description = "My value I.", exampleValue = "1",  dataType = DataType.NUMBER, cardinality = "0..1")
+    VALUE_I,
+    
     @EnumValueConfiguration(description = "An number array example.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"2\", \"1\"]", exampleValue = "[\"6\", \"7\"]", maxValue = "8")
     SAMPLE1;
 }
