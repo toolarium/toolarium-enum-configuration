@@ -349,12 +349,14 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
             result.setName(binaryData[0]);
             
             if (binaryData.length > 2) {
-                try {
-                    result.setTimestamp(DateUtil.getInstance().parseTimestamp(binaryData[1]));
-                } catch (Exception ex) {
-                    throw new IllegalArgumentException("Invalid timestamp [" + binaryData[1] + "]!");
+                if (binaryData[1] != null && !binaryData[1].trim().isEmpty()) {
+                    try {
+                        result.setTimestamp(DateUtil.getInstance().parseTimestamp(binaryData[1]));
+                    } catch (Exception ex) {
+                        throw new IllegalArgumentException("Invalid timestamp [" + binaryData[1] + "]!");
+                    }
                 }
-
+                
                 if (binaryData.length > 3) {
                     result.setMimetype(binaryData[2].trim());
                 }
