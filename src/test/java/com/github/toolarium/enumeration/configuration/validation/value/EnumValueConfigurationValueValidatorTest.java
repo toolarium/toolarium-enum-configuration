@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.impl.StringEnumValueConfigurationValueValidator;
 import org.junit.jupiter.api.Assertions;
@@ -21,10 +22,12 @@ public class EnumValueConfigurationValueValidatorTest {
 
     /**
      * Test the prepareValueSize
+     * 
+     * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation error 
      */
     @Test
-    public void testPrepareValueSize() throws ValidationException {
+    public void testPrepareValueSize() throws EmptyValueException, ValidationException {
         
         //EnumValueConfigurationSizing<?> valueSize = EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(EnumValueConfigurationDataType.STRING, null, null);
 

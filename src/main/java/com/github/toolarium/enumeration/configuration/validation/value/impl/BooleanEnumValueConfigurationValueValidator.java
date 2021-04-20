@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 
@@ -32,7 +33,7 @@ public class BooleanEnumValueConfigurationValueValidator extends AbstractEnumVal
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<Boolean> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<Boolean> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         Boolean inputBoolean = parseValue(inputValue);
         MinMaxValue<Boolean> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -41,7 +42,7 @@ public class BooleanEnumValueConfigurationValueValidator extends AbstractEnumVal
         }
 
         if (inputBoolean == null) {
-            throw new ValidationException("Empty value: invalid boolean [" + inputValue + "]!");
+            throw new EmptyValueException("Empty value: invalid boolean [" + inputValue + "]!");
         }
     }
 

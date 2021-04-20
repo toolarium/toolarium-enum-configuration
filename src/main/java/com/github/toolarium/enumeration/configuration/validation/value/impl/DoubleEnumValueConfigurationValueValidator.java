@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 
@@ -32,7 +33,7 @@ public class DoubleEnumValueConfigurationValueValidator extends AbstractEnumValu
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<Double> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<Double> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         Double inputDouble = parseValue(inputValue);
         MinMaxValue<Double> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -45,7 +46,7 @@ public class DoubleEnumValueConfigurationValueValidator extends AbstractEnumValu
                 return;
             }
             
-            throw new ValidationException("Empty value: invalid size, should be at least [" + valueSize.getMinSizeAsString() + "]!");
+            throw new EmptyValueException("Empty value: invalid size, should be at least [" + valueSize.getMinSizeAsString() + "]!");
         }
 
         if (inputDouble.compareTo(minMaxValue.getMin()) < 0) {

@@ -8,6 +8,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 import java.util.Base64;
@@ -34,7 +35,7 @@ public class BinaryEnumValueConfigurationValueValidator extends AbstractEnumValu
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         EnumValueConfigurationBinaryObject inputBinaryObject = parseValue(inputValue);
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -47,7 +48,7 @@ public class BinaryEnumValueConfigurationValueValidator extends AbstractEnumValu
                 return;
             }
             
-            throw new ValidationException("Empty value: invalid binary, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
+            throw new EmptyValueException("Empty value: invalid binary, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
         }
 
         if (inputBinaryObject.getName() != null) {

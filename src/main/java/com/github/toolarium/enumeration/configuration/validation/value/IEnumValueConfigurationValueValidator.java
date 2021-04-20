@@ -6,6 +6,7 @@
 package com.github.toolarium.enumeration.configuration.validation.value;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 
 /**
@@ -31,9 +32,10 @@ public interface IEnumValueConfigurationValueValidator<T> {
      *
      * @param inputValue the input value to validate
      * @param valueSize the value size
-     * @throws ValidationException In case of a valitation error
+     * @throws EmptyValueException In case of an empty value
+     * @throws ValidationException In case of a validation error
      */
-    void validateValue(EnumValueConfigurationSizing<T> valueSize, String inputValue) throws ValidationException;
+    void validateValue(EnumValueConfigurationSizing<T> valueSize, String inputValue) throws EmptyValueException, ValidationException;
     
     
     /**

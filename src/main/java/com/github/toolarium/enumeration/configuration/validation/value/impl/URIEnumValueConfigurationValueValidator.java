@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 import java.net.URI;
@@ -32,7 +33,7 @@ public class URIEnumValueConfigurationValueValidator extends AbstractEnumValueCo
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         URI inputURI = parseValue(inputValue);
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -45,7 +46,7 @@ public class URIEnumValueConfigurationValueValidator extends AbstractEnumValueCo
                 return;
             }
             
-            throw new ValidationException("Empty value: invalid timestamp, should be at least [" + valueSize.getMinSizeAsString() + "]!");
+            throw new EmptyValueException("Empty value: invalid timestamp, should be at least [" + valueSize.getMinSizeAsString() + "]!");
         }
     }
 

@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 
@@ -43,7 +44,7 @@ public class StringEnumValueConfigurationValueValidator extends AbstractEnumValu
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         String inputString = parseValue(inputValue);        
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -56,7 +57,7 @@ public class StringEnumValueConfigurationValueValidator extends AbstractEnumValu
                 return;
             }
             
-            throw new ValidationException("Empty value: invalid string, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
+            throw new EmptyValueException("Empty value: invalid string, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
         }
 
         long inputLength = inputString.length();

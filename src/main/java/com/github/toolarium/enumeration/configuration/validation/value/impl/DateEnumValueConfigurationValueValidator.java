@@ -8,6 +8,7 @@ package com.github.toolarium.enumeration.configuration.validation.value.impl;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator;
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ public class DateEnumValueConfigurationValueValidator extends AbstractEnumValueC
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumValueConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumValueConfigurationSizing<LocalDate> valueSize, String inputValue) throws ValidationException {
+    public void validateValue(EnumValueConfigurationSizing<LocalDate> valueSize, String inputValue) throws EmptyValueException, ValidationException {
 
         LocalDate inputDate = parseValue(inputValue);
         MinMaxValue<LocalDate> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
@@ -47,7 +48,7 @@ public class DateEnumValueConfigurationValueValidator extends AbstractEnumValueC
                 return;
             }
             
-            throw new ValidationException("Empty value: invalid date, should be at least [" + valueSize.getMinSizeAsString() + "]!");
+            throw new EmptyValueException("Empty value: invalid date, should be at least [" + valueSize.getMinSizeAsString() + "]!");
         }
         
         if (inputDate.compareTo(minMaxValue.getMin()) < 0) {
