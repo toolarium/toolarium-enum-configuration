@@ -10,6 +10,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration
 import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
+import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.IEnumValueConfigurationValidator;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumValueConfigurationValueValidatorFactory;
@@ -78,7 +79,11 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
 
     @Override
     public void validate(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<?> valueSize, String input) throws ValidationException {
-        validateValue("input", dataType, cardinality, valueSize, input);
+        try {
+            validateValue("input", dataType, cardinality, valueSize, input);
+        } catch (ValidationException ex) {
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[input] " + ex.getMessage(), ex.getStackTrace());
+        }
     }
 
 
@@ -160,17 +165,14 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
      */
     protected void validateDefaultValue(EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<?> valueSize, String inputDefaultValue) 
             throws ValidationException {
-        
+
         String defaultValue = inputDefaultValue;
         if (defaultValue != null && defaultValue.isEmpty()) {
-            defaultValue = null;
+            return; // in case we have no default value; ignore this check
         }
-        
-        EnumValueConfigurationSizing<Integer> defaultValueCardinality = new EnumValueConfigurationSizing<Integer>(0, cardinality.getMaxSize());
-        defaultValueCardinality.setMaxSizeAsString(cardinality.getMaxSizeAsString());
 
         try {
-            validateValue("defaultValue", dataType, defaultValueCardinality, valueSize, defaultValue);
+            validateValue("defaultValue", dataType, cardinality, valueSize, defaultValue);
         } catch (ValidationException ex) {
             throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[defaultValue] " + ex.getMessage(), ex.getStackTrace());
         }
@@ -199,11 +201,13 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             exampleValueCardinality = new EnumValueConfigurationSizing<Integer>(1, cardinality.getMaxSize());
             exampleValueCardinality.setMaxSizeAsString(cardinality.getMaxSizeAsString());
         }
-        
+
         try {
             validateValue("exampleValue", dataType, exampleValueCardinality, valueSize, exampleValue);
         } catch (ValidationException ex) {
-            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[exampleValue] " + ex.getMessage(), ex.getStackTrace());
+            String msg = ex.getMessage();
+            msg = msg.replace("minSize=1", "minSize=" + cardinality.getMinSizeAsString());
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[exampleValue] " + msg, ex.getStackTrace());
         }
     }
 
@@ -217,10 +221,11 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
      * @param cardinality the cardinality
      * @param valueSize the value size
      * @param input the input value
+     * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation violation
      */
     protected <T> void validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<T> valueSize, String input)
-            throws ValidationException {
+            throws EmptyValueException, ValidationException {
         
         if (dataType == null) {
             throw new ValidationException("Invalid dataType in [" + inputType + "]! ");
@@ -228,7 +233,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
 
         final boolean isMandatory = (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() > 0);
         if ((input == null || input.isEmpty()) && isMandatory) {
-            throw new ValidationException("Missing [" + inputType + "], its mandatory and not optional (cardinality: " + cardinality +  "!");
+            throw new ValidationException("Missing [" + inputType + "], its mandatory and not optional (cardinality: " + cardinality +  ")!");
         }
 
         if (cardinality == null || cardinality.getMaxSize() == null || cardinality.getMaxSize().intValue() <= 1) {
@@ -238,9 +243,15 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                 throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize [" + cardinality.getMinSize() + "] should be <= then maxSize [" + cardinality.getMaxSize() + "]! ");
             }
 
-            @SuppressWarnings("unchecked")
-            IEnumValueConfigurationValueValidator<T> validator = (IEnumValueConfigurationValueValidator<T>) EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationValueValidator(dataType);
-            validator.validateValue(valueSize, input);
+            try {
+                validateValue(inputType, dataType, valueSize, input);
+            } catch (EmptyValueException ex) {
+                if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
+                    // empty value is valid
+                } else {
+                    throw ex;
+                }
+            }
         } else {
             try {
                 int length = 0;
@@ -248,7 +259,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                 if (inputList != null) {
                     length = inputList.size();
                 }
-                
+//System.err.println("====>"+inputType+"|"+dataType+"|"+cardinality+"|"+valueSize+"|"+input);                
                 if (cardinality.getMinSize() != null && length < cardinality.getMinSize().intValue()) {
                     throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize is [" + cardinality.getMinSize() + "]! ");
                 }
@@ -257,12 +268,46 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                     throw new ValidationException("Invalid cardinality of [" + inputType + "], the maxSize is [" + cardinality.getMaxSize() + "]! ");
                 }
                 
-                for (String in : inputList) {
-                    validateValue(inputType, dataType, null, valueSize, in);    
+                if (inputList != null) {
+                    for (String in : inputList) {
+                        try {
+                            validateValue(inputType, dataType, valueSize, in);
+                        } catch (EmptyValueException ex) {
+                            if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
+                                // empty value is valid
+                            } else {
+                                throw ex;
+                            }
+                        }
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 throw new ValidationException("Invalid cardinality of [" + inputType + "] for intput [" + input + "]. Expected a JSON array: " + e.getMessage());
             }
         }
     }
+    
+
+    /**
+     * Validate example value
+     *
+     * @param <T> the generic type
+     * @param inputType the input type
+     * @param dataType the data type
+     * @param valueSize the value size
+     * @param input the input value
+     * @throws EmptyValueException In case of an empty value
+     * @throws ValidationException In case of a validation violation
+     */
+    protected <T> void validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<T> valueSize, String input)
+            throws EmptyValueException, ValidationException {
+        
+        if (dataType == null) {
+            throw new ValidationException("Invalid dataType in [" + inputType + "]! ");
+        }
+
+        @SuppressWarnings("unchecked")
+        IEnumValueConfigurationValueValidator<T> validator = (IEnumValueConfigurationValueValidator<T>) EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationValueValidator(dataType);
+        validator.validateValue(valueSize, input);
+    }    
 }
