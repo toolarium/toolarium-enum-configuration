@@ -259,7 +259,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                 if (inputList != null) {
                     length = inputList.size();
                 }
-//System.err.println("====>"+inputType+"|"+dataType+"|"+cardinality+"|"+valueSize+"|"+input);                
+                
                 if (cardinality.getMinSize() != null && length < cardinality.getMinSize().intValue()) {
                     throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize is [" + cardinality.getMinSize() + "]! ");
                 }
