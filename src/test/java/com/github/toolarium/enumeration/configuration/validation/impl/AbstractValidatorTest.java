@@ -101,16 +101,13 @@ public abstract class AbstractValidatorTest {
         if (allowEmptyValue) {
             // test no value, no cardinality --> min value > than empty string!
             isValid("", null, minValueSize, maxValueSize);
-    
-            // test no value, no cardinality --> min value > than empty string!
-            isValid("", "0..1", minValueSize, maxValueSize);
         } else {
             // test no value, no cardinality --> min value > than empty string!
             isInValid("", null, minValueSize, maxValueSize);
-    
-            // test no value, no cardinality --> min value > than empty string!
-            isInValid("", "0..1", minValueSize, maxValueSize);
         }
+
+        // test no value --> min value > than empty string!
+        isInValid("", "1..1", minValueSize, maxValueSize);
 
         // test valid values, no cardinality
         if (validValues != null) {
@@ -257,16 +254,11 @@ public abstract class AbstractValidatorTest {
         assertTrue(validValues.length > 2);
         
         // test no value
-        boolean allowEmptyValue = allowEmptyValue(minValueSize, maxValueSize);
-        if (allowEmptyValue) {
-            isValid("", "0..1", minValueSize, maxValueSize);
-            isValid("", "0..0", minValueSize, maxValueSize);
-            isValid("", "0", minValueSize, maxValueSize);
-        } else {
-            isInValid("", "0..1", minValueSize, maxValueSize);
-            isInValid("", "0..0", minValueSize, maxValueSize);
-            isInValid("", "0", minValueSize, maxValueSize);
-        }
+        isValid("", "0..1", minValueSize, maxValueSize);
+        isInValid("", "1..1", minValueSize, maxValueSize);
+        isValid("", "0..0", minValueSize, maxValueSize);
+        isValid("", "0", minValueSize, maxValueSize);
+        isInValid("", "1", minValueSize, maxValueSize);
 
         List<String> list = new ArrayList<String>(); 
         for (String validValue : validValues) {
