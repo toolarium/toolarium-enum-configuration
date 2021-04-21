@@ -42,6 +42,9 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     @EnumValueConfiguration(description = "My value F.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\" ]")
     VALUE_F,
 
+    @EnumValueConfiguration(description = "My value F.",  dataType = DataType.STRING, cardinality = "2..3", exampleValue = "[\"A\", \"1\"]")
+    VALUE_G,
+
     @EnumValueConfiguration(description = "My value H.", exampleValue = "2", dataType = DataType.NUMBER, cardinality = "2")
     VALUE_H,
 
