@@ -13,6 +13,8 @@ import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;
+import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration.DataType;
 import com.github.toolarium.enumeration.configuration.util.JavaFileObjectUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.Compilation;
@@ -84,6 +86,26 @@ public class EnumConfigurationProcessorTest {
                + "HINT;\n"
                + "}"));
         assertThat(compilation).succeeded();
+    }
+
+    
+    /**
+     * Test invalid cardinality
+     */
+    @Test
+    public void invalidCardinalityTest() {
+        Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
+               + "import com.github.toolarium.enumeration.configuration.IEnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration.DataType;\n"
+               + ""
+               + "@EnumConfiguration(description = \"The system configuration.\")\n"
+               + "enum MyEnumConfiguration implements IEnumConfiguration {\n"
+               + "    @EnumValueConfiguration(description = \"My value F.\", dataType = DataType.STRING, cardinality = \"2..3\", exampleValue = \"[\\\"A\\\" ]\")\n"
+               + "    VALUE_F;\n"
+               + "}"));
+        assertThat(compilation).hadErrorContaining("Invalid cardinality of [exampleValue], the minSize is [2]");
     }
 
     
