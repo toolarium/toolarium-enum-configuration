@@ -197,7 +197,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
         }
 
         EnumValueConfigurationSizing<Integer> exampleValueCardinality = cardinality;
-        if (exampleValueCardinality.getMaxSize() > 0) {
+        if (exampleValueCardinality.getMinSize() == null || exampleValueCardinality.getMinSize().intValue() < 0) {
             exampleValueCardinality = new EnumValueConfigurationSizing<Integer>(1, cardinality.getMaxSize());
             exampleValueCardinality.setMaxSizeAsString(cardinality.getMaxSizeAsString());
         }
@@ -221,10 +221,11 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
      * @param cardinality the cardinality
      * @param valueSize the value size
      * @param input the input value
+     * @return the number of elements
      * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation violation
      */
-    protected <T> void validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<T> valueSize, String input)
+    protected <T> int validateValue(String inputType, EnumValueConfigurationDataType dataType, EnumValueConfigurationSizing<Integer> cardinality, EnumValueConfigurationSizing<T> valueSize, String input)
             throws EmptyValueException, ValidationException {
         
         if (dataType == null) {
@@ -236,6 +237,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
             throw new ValidationException("Missing [" + inputType + "], its mandatory and not optional (cardinality: " + cardinality +  ")!");
         }
 
+        int numberOfElements = 0;
         if (cardinality == null || cardinality.getMaxSize() == null || cardinality.getMaxSize().intValue() <= 1) {
             // no cardinality
             
@@ -245,6 +247,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
 
             try {
                 validateValue(inputType, dataType, valueSize, input);
+                numberOfElements++;
             } catch (EmptyValueException ex) {
                 if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
                     // empty value is valid
@@ -272,6 +275,7 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                     for (String in : inputList) {
                         try {
                             validateValue(inputType, dataType, valueSize, in);
+                            numberOfElements++;
                         } catch (EmptyValueException ex) {
                             if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
                                 // empty value is valid
@@ -285,6 +289,8 @@ public abstract class AbstractEnumValueConfigurationValidator implements IEnumVa
                 throw new ValidationException("Invalid cardinality of [" + inputType + "] for intput [" + input + "]. Expected a JSON array: " + e.getMessage());
             }
         }
+        
+        return numberOfElements;
     }
     
 
