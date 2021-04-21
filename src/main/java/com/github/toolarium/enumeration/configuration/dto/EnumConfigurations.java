@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.github.toolarium.enumeration.configuration.Version;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -28,8 +29,8 @@ public class EnumConfigurations implements Serializable {
      * Constructor
      */
     public EnumConfigurations() {
-        name = "";
-        version = "";
+        name = Version.PROJECT_NAME;
+        version = Version.VERSION;
         enumConfigurationContentMap = new LinkedHashMap<>();
     }
 
