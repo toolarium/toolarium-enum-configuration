@@ -13,8 +13,6 @@ import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;
-import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration.DataType;
 import com.github.toolarium.enumeration.configuration.util.JavaFileObjectUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.testing.compile.Compilation;
