@@ -9,14 +9,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumValueConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
-import com.github.toolarium.enumeration.configuration.validation.value.EnumValueConfigurationValueValidatorFactory;
-import com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumValueConfigurationValueValidator;
+import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * @author patrick
  */
 public abstract class AbstractValidatorTest {
-    private EnumValueConfigurationDataType enumValueConfigurationDataType;
+    private EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType;
     private String minValueSize;
     private String maxValueSize;
     private String[] validValues; 
@@ -39,7 +39,7 @@ public abstract class AbstractValidatorTest {
     
     /**
      * Constructor for AbstractValidatorTest
-     * @param enumValueConfigurationDataType the data type
+     * @param enumKeyValueConfigurationDataType the data type
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
      * @param validValues the valid values
@@ -47,14 +47,14 @@ public abstract class AbstractValidatorTest {
      * @param tooSmallValues the too small values
      * @param tooBigValues the too big values
      */
-    AbstractValidatorTest(EnumValueConfigurationDataType enumValueConfigurationDataType, 
+    AbstractValidatorTest(EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType, 
                           String minValueSize, 
                           String maxValueSize, 
                           String[] validValues,
                           String[] invalidValues,
                           String[] tooSmallValues, 
                           String[] tooBigValues) {
-        this.enumValueConfigurationDataType = enumValueConfigurationDataType;
+        this.enumKeyValueConfigurationDataType = enumKeyValueConfigurationDataType;
         this.minValueSize = minValueSize;
         this.maxValueSize = maxValueSize;
         this.validValues = validValues;
@@ -318,7 +318,7 @@ public abstract class AbstractValidatorTest {
      */
     protected boolean allowEmptyValue(String minValueSize, String maxValueSize) {        
         try {
-            EnumValueConfigurationSizing<?> size = EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfigurationDataType, minValueSize, maxValueSize);
+            EnumKeyValueConfigurationSizing<?> size = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
 
             if (getValidatorMinValueSize() == null || size == null || size.getMinSize() == null) {
                 return true;
@@ -350,8 +350,8 @@ public abstract class AbstractValidatorTest {
      */
     @SuppressWarnings("unchecked")
     protected <T> T getValidatorMinValueSize() {
-        AbstractEnumValueConfigurationValueValidator<?, T> validator = (AbstractEnumValueConfigurationValueValidator<?, T>) EnumValueConfigurationValueValidatorFactory
-                .getInstance().createEnumValueConfigurationValueValidator(enumValueConfigurationDataType);
+        AbstractEnumKeyValueConfigurationValueValidator<?, T> validator = (AbstractEnumKeyValueConfigurationValueValidator<?, T>) EnumKeyValueConfigurationValueValidatorFactory
+                .getInstance().createEnumKeyValueConfigurationValueValidator(enumKeyValueConfigurationDataType);
         return validator.getMinSize();
     }
 
@@ -399,10 +399,10 @@ public abstract class AbstractValidatorTest {
      */
     protected void isValid(String input, String inputCardinality, String minValueSize, String maxValueSize) {
         try {
-            EnumValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
-            EnumValueConfigurationSizing<?> valueSize = EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfigurationDataType, minValueSize, maxValueSize);
+            EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
+            EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, cardinality, valueSize, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, valueSize, input);
         } catch (ValidationException ex) {
             fail(ExceptionUtil.getInstance().prepareExceptionWithStacktraceInMessage(ex));
         }
@@ -452,10 +452,10 @@ public abstract class AbstractValidatorTest {
      */
     protected void isInValid(String input, String inputCardinality, String minValueSize, String maxValueSize) {
         try {
-            EnumValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
-            EnumValueConfigurationSizing<?> valueSize = EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfigurationDataType, minValueSize, maxValueSize);
+            EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
+            EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumValueConfigurationValidatorFactory.getInstance().getValidator().validate(enumValueConfigurationDataType, cardinality, valueSize, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, valueSize, input);
             fail("Input [" + input + "], cardinality [" + inputCardinality + "], min: " + minValueSize + ", max: " + maxValueSize);
         } catch (ValidationException ex) {
             // NOP

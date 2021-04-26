@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.time.LocalDate;
 
 
@@ -20,7 +20,7 @@ public class DateValidatorTest extends AbstractValidatorTest {
      * Constructor for DateValidatorTest
      */
     DateValidatorTest() {
-        super(EnumValueConfigurationDataType.DATE, 
+        super(EnumKeyValueConfigurationDataType.DATE, 
               "1973-01-01", 
               "2037-05-31",
               /* valid values */

@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.time.Instant;
 
 
@@ -20,7 +20,7 @@ public class TimestampValidatorTest extends AbstractValidatorTest {
      * Constructor for TimestampValidatorTest
      */
     TimestampValidatorTest() {
-        super(EnumValueConfigurationDataType.TIMESTAMP, 
+        super(EnumKeyValueConfigurationDataType.TIMESTAMP, 
               "1973-01-01T00:00:00.0Z", 
               "2037-05-31T00:00:00.0Z",
               /* valid values */

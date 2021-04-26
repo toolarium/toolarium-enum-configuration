@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class TimeConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for TimeValidatorTest
      */
     TimeConverterTest() {
-        super(EnumValueConfigurationDataType.TIME);
+        super(EnumKeyValueConfigurationDataType.TIME);
     }
 
 

@@ -6,7 +6,8 @@
 package com.github.toolarium.enumeration.configuration.util;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
 import java.lang.reflect.Field;
 
 
@@ -43,33 +44,33 @@ public final class EnumUtil {
 
     
     /**
-     * Read the enum
+     * Get the {@link EnumKeyConfiguration} from an enumeration configuration
      *
      * @param <T> the generic type
      * @param e the enumeration value
      * @return the parsed content
      * @throws IllegalArgumentException In case the annotation could not be resolved
      */
-    public <T extends Enum<T>> EnumValueConfiguration getAnnotationInformation(T e) throws IllegalArgumentException {
+    public <T extends Enum<T>> EnumKeyConfiguration getEnumKeyConfigurationAnnotationInformation(T e) throws IllegalArgumentException {
         if (e == null) {
             return null;
         }
         
         try {
             Field field = e.getClass().getField(e.name());
-            EnumValueConfiguration enumValueConfiguration = AnnotationConvertUtil.getInstance().convert(field.getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration.class));
-            if (enumValueConfiguration == null) {
+            EnumKeyConfiguration enumKeyConfiguration = AnnotationConvertUtil.getInstance().convert(field.getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration.class));
+            if (enumKeyConfiguration == null) {
                 return null;
             }
 
-            enumValueConfiguration.setKey(e.name());
+            enumKeyConfiguration.setKey(e.name());
 
-            EnumConfiguration enumConfiguration = AnnotationConvertUtil.getInstance().convert(e.getClass().getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration.class));
+            EnumConfiguration<EnumKeyConfiguration> enumConfiguration = AnnotationConvertUtil.getInstance().convert(e.getClass().getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration.class));
             if (enumConfiguration != null) {
-                enumValueConfiguration = enumConfiguration.add(enumValueConfiguration);
+                enumKeyConfiguration = enumConfiguration.add(enumKeyConfiguration);
             }
             
-            return enumValueConfiguration;
+            return enumKeyConfiguration;
             
         } catch (Exception ex) {
             // NOP
@@ -80,6 +81,44 @@ public final class EnumUtil {
     }
 
     
+    /**
+     * Get the {@link EnumKeyValueConfiguration} from an enumeration configuration
+     *
+     * @param <T> the generic type
+     * @param e the enumeration value
+     * @return the parsed content
+     * @throws IllegalArgumentException In case the annotation could not be resolved
+     */
+    public <T extends Enum<T>> EnumKeyValueConfiguration getEnumKeyValueConfigurationAnnotationInformation(T e) throws IllegalArgumentException {
+        if (e == null) {
+            return null;
+        }
+        
+        try {
+            Field field = e.getClass().getField(e.name());
+            EnumKeyValueConfiguration enumKeyValueConfiguration = AnnotationConvertUtil.getInstance().convert(field.getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.class));
+            if (enumKeyValueConfiguration == null) {
+                return null;
+            }
+
+            enumKeyValueConfiguration.setKey(e.name());
+
+            EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration = AnnotationConvertUtil.getInstance().convert(e.getClass().getAnnotation(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration.class));
+            if (enumConfiguration != null) {
+                enumKeyValueConfiguration = enumConfiguration.add(enumKeyValueConfiguration);
+            }
+            
+            return enumKeyValueConfiguration;
+            
+        } catch (Exception ex) {
+            // NOP
+            IllegalArgumentException ie = new IllegalArgumentException("Could not find annotation: " + ex.getMessage());
+            ie.setStackTrace(ex.getStackTrace());
+            throw ie;
+        } 
+    }
+
+        
     /**
      * Returns the enum constant of the specified enum type with the specified name.  
      * The name must match exactly an identifier used to declare an enum constant in this type.  

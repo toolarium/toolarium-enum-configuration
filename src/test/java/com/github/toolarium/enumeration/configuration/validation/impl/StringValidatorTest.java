@@ -6,7 +6,7 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import org.junit.jupiter.api.Test;
 
 
@@ -24,7 +24,7 @@ public class StringValidatorTest extends AbstractValidatorTest {
      * Constructor for StringValidatorTest
      */
     StringValidatorTest() {
-        super(EnumValueConfigurationDataType.STRING, 
+        super(EnumKeyValueConfigurationDataType.STRING, 
               "2", 
               "" + STRING_MAX_CONTENT.length(),
               /* valid values */

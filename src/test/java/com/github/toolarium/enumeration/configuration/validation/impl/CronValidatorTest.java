@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 /**
  * Test uri validator test
@@ -18,7 +18,7 @@ public class CronValidatorTest extends AbstractValidatorTest {
      * Constructor for CronValidatorTest
      */
     CronValidatorTest() {
-        super(EnumValueConfigurationDataType.CRON, 
+        super(EnumKeyValueConfigurationDataType.CRON, 
               null, 
               null,
               /* valid values */

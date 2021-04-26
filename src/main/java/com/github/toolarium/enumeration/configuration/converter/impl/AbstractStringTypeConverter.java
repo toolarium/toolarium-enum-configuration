@@ -6,7 +6,7 @@
 package com.github.toolarium.enumeration.configuration.converter.impl;
 
 import com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.util.CIDRUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import java.net.URI;
@@ -331,12 +331,12 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
      * @return the file
      * @throws IllegalArgumentException in case its not a file
      */
-    protected EnumValueConfigurationBinaryObject getBinary(String input) throws IllegalArgumentException {
+    protected EnumKeyValueConfigurationBinaryObject getBinary(String input) throws IllegalArgumentException {
         if (checkBase(input) == null) {
             return null;
         }
         
-        EnumValueConfigurationBinaryObject result = new EnumValueConfigurationBinaryObject();
+        EnumKeyValueConfigurationBinaryObject result = new EnumKeyValueConfigurationBinaryObject();
         if (input.indexOf('|') < 0) {
             result.setData(input);
             return result;

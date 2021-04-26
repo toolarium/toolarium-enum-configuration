@@ -7,7 +7,7 @@ package com.github.toolarium.enumeration.configuration.converter;
 
 import static org.junit.Assert.fail;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -19,15 +19,15 @@ import org.junit.jupiter.api.Assertions;
  * @author patrick
  */
 public abstract class AbstractStringTypeConverterTest {
-    private EnumValueConfigurationDataType enumValueConfigurationDataType;
+    private EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType;
     
     
     /**
      * Constructor for AbstractValidatorTest
-     * @param enumValueConfigurationDataType the data type
+     * @param enumKeyValueConfigurationDataType the data type
      */
-    AbstractStringTypeConverterTest(EnumValueConfigurationDataType enumValueConfigurationDataType) {
-        this.enumValueConfigurationDataType = enumValueConfigurationDataType;
+    AbstractStringTypeConverterTest(EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType) {
+        this.enumKeyValueConfigurationDataType = enumKeyValueConfigurationDataType;
     }
 
     
@@ -46,7 +46,7 @@ public abstract class AbstractStringTypeConverterTest {
      */
     protected <T> void assertValue(T expectedValue, String input)  {
         try {
-            Assert.assertEquals(expectedValue, StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumValueConfigurationDataType, input));
+            Assert.assertEquals(expectedValue, StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfigurationDataType, input));
         } catch (ValidationException ve) {
             fail("[" + expectedValue + "] != [" + input + "]" + ve.getMessage());
         }
@@ -62,7 +62,7 @@ public abstract class AbstractStringTypeConverterTest {
      */
     protected <T extends Throwable> void assertException(Class<T> clazz, String input) {
         Assertions.assertThrows(clazz, () -> {
-            StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumValueConfigurationDataType, input);
+            StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfigurationDataType, input);
         });
     }
 
@@ -76,7 +76,7 @@ public abstract class AbstractStringTypeConverterTest {
      */
     protected <T extends Throwable> void assertException(String exceptionMessage, String input) {
         Throwable exception = Assertions.assertThrows(ValidationException.class, () -> {
-            StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumValueConfigurationDataType, input);
+            StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfigurationDataType, input);
         });
         
         Assert.assertEquals(exceptionMessage, exception.getMessage().replace("\r", ""));

@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 /**
  * Test binary validator test
@@ -21,7 +21,7 @@ public class BinaryValidatorTest extends AbstractValidatorTest {
      * Constructor for FileValidatorTest
      */
     BinaryValidatorTest() {
-        super(EnumValueConfigurationDataType.BINARY, 
+        super(EnumKeyValueConfigurationDataType.BINARY, 
               null, 
               "19",
               /* valid values */

@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.time.LocalTime;
 
 /**
@@ -19,7 +19,7 @@ public class TimeValidatorTest extends AbstractValidatorTest {
      * Constructor for TimeValidatorTest
      */
     TimeValidatorTest() {
-        super(EnumValueConfigurationDataType.TIME, 
+        super(EnumKeyValueConfigurationDataType.TIME, 
               "00:01:00.000", 
               "23:00:00",
               /* valid values */

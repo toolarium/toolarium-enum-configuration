@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 
 /**
@@ -19,7 +19,7 @@ public class BooleanValidatorTest extends AbstractValidatorTest {
      * Constructor for BooleanValidatorTest
      */
     BooleanValidatorTest() {
-        super(EnumValueConfigurationDataType.BOOLEAN, 
+        super(EnumKeyValueConfigurationDataType.BOOLEAN, 
               null, 
               null,
               /* valid values */

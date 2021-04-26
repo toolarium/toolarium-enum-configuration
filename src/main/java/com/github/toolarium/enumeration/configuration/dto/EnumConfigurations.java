@@ -22,7 +22,7 @@ public class EnumConfigurations implements Serializable {
     private static final long serialVersionUID = 8595845598162960442L;
     private String name;
     private String version;
-    private Map<String, EnumConfiguration> enumConfigurationContentMap;
+    private Map<String, EnumConfiguration<? extends EnumKeyConfiguration>> enumConfigurationContentMap;
 
     
     /**
@@ -80,7 +80,7 @@ public class EnumConfigurations implements Serializable {
      * @param name the name
      * @return the {@link EnumConfiguration}.
      */    
-    public EnumConfiguration get(String name) {
+    public EnumConfiguration<? extends EnumKeyConfiguration> get(String name) {
         if (name == null) {
             return null;
         }
@@ -94,9 +94,9 @@ public class EnumConfigurations implements Serializable {
      * 
      * @return true if it is empty
      */
-    public Set<EnumConfiguration> getEnumConfigurationList() {
-        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
-        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
+    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> getEnumConfigurationList() {
+        Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<EnumConfiguration<? extends EnumKeyConfiguration>>();
+        for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
             result.add(e.getValue());
         }
         
@@ -109,10 +109,10 @@ public class EnumConfigurations implements Serializable {
      * 
      * @param list the enumeration configuration content list
      */
-    public void setEnumConfigurationList(Set<EnumConfiguration> list) {
-        enumConfigurationContentMap = new LinkedHashMap<String, EnumConfiguration>();
+    public void setEnumConfigurationList(Set<EnumConfiguration<? extends EnumKeyConfiguration>> list) {
+        enumConfigurationContentMap = new LinkedHashMap<String, EnumConfiguration<? extends EnumKeyConfiguration>>();
         
-        for (EnumConfiguration e : list) {
+        for (EnumConfiguration<? extends EnumKeyConfiguration> e : list) {
             add(e);
         }
     }
@@ -125,7 +125,7 @@ public class EnumConfigurations implements Serializable {
      * @return the added {@link EnumConfiguration}
      * @throws IllegalArgumentException In case the name doesn't exist
      */
-    public EnumConfiguration add(EnumConfiguration enumConfiguration) {
+    public EnumConfiguration<? extends EnumKeyConfiguration> add(EnumConfiguration<? extends EnumKeyConfiguration> enumConfiguration) {
         
         if (enumConfiguration == null || enumConfiguration.getName() == null || enumConfiguration.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid enum configuration:" + enumConfiguration);
@@ -146,21 +146,21 @@ public class EnumConfigurations implements Serializable {
      *
      * @return the list of mandatory configuration entries.
      */
-    public Set<EnumConfiguration> selectMandatoryConfigurationList() {
-        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
+    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> selectMandatoryConfigurationList() {
+        Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<>();
         
-        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
-            Set<EnumValueConfiguration> enumValueConfigurationList = e.getValue().selectMandatoryEnumValueConfigurationList();
+        for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
+            Set<? extends EnumKeyConfiguration> enumKeyConfigurationList = e.getValue().selectMandatoryConfigurationList();
             
-            if (enumValueConfigurationList != null && !enumValueConfigurationList.isEmpty()) {
-                EnumConfiguration enumConfigurationToAdd = new EnumConfiguration();
+            if (enumKeyConfigurationList != null && !enumKeyConfigurationList.isEmpty()) {
+                EnumConfiguration<? extends EnumKeyConfiguration> enumConfigurationToAdd = new EnumConfiguration<>();
                 enumConfigurationToAdd.setDescription(e.getValue().getDescription());
                 enumConfigurationToAdd.setValidFrom(e.getValue().getValidFrom());
                 enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
                 enumConfigurationToAdd.setName(e.getValue().getName());
                 enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
                 enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
-                enumConfigurationToAdd.setKeyList(enumValueConfigurationList);
+                enumConfigurationToAdd.setKeyList(enumKeyConfigurationList);
                 result.add(enumConfigurationToAdd);
             }
         }
@@ -174,27 +174,28 @@ public class EnumConfigurations implements Serializable {
      *
      * @return the list of mandatory configuration entries.
      */
-    public Set<EnumConfiguration> selectMandatoryConfigurationListWithMissingDefaultValue() {
-        Set<EnumConfiguration> result = new LinkedHashSet<EnumConfiguration>();
+    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> selectMandatoryConfigurationListWithMissingDefaultValue() {
+        Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<>();
         
-        for (Map.Entry<String, EnumConfiguration> e : enumConfigurationContentMap.entrySet()) {
-            Set<EnumValueConfiguration> enumValueConfigurationList = e.getValue().selectMandatoryEnumValueConfigurationListWithMissingDefaultValue();
+        for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
+            Set<? extends EnumKeyConfiguration> enumKeyConfigurationList = e.getValue().selectMandatoryListWithMissingDefaultValue();
             
-            if (enumValueConfigurationList != null && !enumValueConfigurationList.isEmpty()) {
-                EnumConfiguration enumConfigurationToAdd = new EnumConfiguration();
+            if (enumKeyConfigurationList != null && !enumKeyConfigurationList.isEmpty()) {
+                EnumConfiguration<? extends EnumKeyConfiguration> enumConfigurationToAdd = new EnumConfiguration<>();
                 enumConfigurationToAdd.setDescription(e.getValue().getDescription());
                 enumConfigurationToAdd.setValidFrom(e.getValue().getValidFrom());
                 enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
                 enumConfigurationToAdd.setName(e.getValue().getName());
                 enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
                 enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
-                enumConfigurationToAdd.setKeyList(enumValueConfigurationList);
+                enumConfigurationToAdd.setKeyList(enumKeyConfigurationList);
                 result.add(enumConfigurationToAdd);
             }
         }
         
         return result;
     }
+
 
 
     /**
@@ -241,7 +242,7 @@ public class EnumConfigurations implements Serializable {
             return false;
         }
         
-        EnumConfigurations other = (EnumConfigurations) obj;
+        EnumConfigurations other = (EnumConfigurations)obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

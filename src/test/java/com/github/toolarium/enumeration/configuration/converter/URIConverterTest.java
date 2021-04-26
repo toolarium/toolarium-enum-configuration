@@ -6,7 +6,7 @@
 package com.github.toolarium.enumeration.configuration.converter;
 
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Assert;
@@ -24,7 +24,7 @@ public class URIConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for URIValidatorTest
      */
     URIConverterTest() {
-        super(EnumValueConfigurationDataType.URI);
+        super(EnumKeyValueConfigurationDataType.URI);
     }
 
 

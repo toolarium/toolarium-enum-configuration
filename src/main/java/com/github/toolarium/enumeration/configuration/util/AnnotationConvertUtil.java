@@ -7,11 +7,12 @@ package com.github.toolarium.enumeration.configuration.util;
 
 import com.github.toolarium.enumeration.configuration.converter.StringTypeConverterFactory;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
-import com.github.toolarium.enumeration.configuration.validation.value.EnumValueConfigurationValueValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 
@@ -55,15 +56,16 @@ public final class AnnotationConvertUtil {
      * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration} into a
      * {@link EnumConfiguration}.
      *
+     * @param <T> The generic type
      * @param enumConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration}.
      * @return the {@link EnumConfiguration}.
      */
-    public EnumConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration enumConfigurationAnnotation) {
+    public <T extends EnumKeyConfiguration> EnumConfiguration<T> convert(com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration enumConfigurationAnnotation) {
         if (enumConfigurationAnnotation == null) {
             return null;            
         }
         
-        EnumConfiguration enumConfiguration = new EnumConfiguration();
+        EnumConfiguration<T> enumConfiguration = new EnumConfiguration<T>();
         enumConfiguration.setDescription(enumConfigurationAnnotation.description());
 
         if (enumConfigurationAnnotation.validFrom() != null && !enumConfigurationAnnotation.validFrom().trim().isEmpty()) {
@@ -79,41 +81,71 @@ public final class AnnotationConvertUtil {
 
 
     /**
-     * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration} into a
-     * {@link EnumValueConfiguration}.
+     * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration} into a
+     * {@link EnumKeyValueConfiguration}.
      *
-     * @param enumValueConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration}.
-     * @return the {@link EnumValueConfiguration}.
+     * @param enumKeyConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration}.
+     * @return the {@link EnumKeyValueConfiguration}.
      * @throws ValidationException In case if a validation error
      */
-    public EnumValueConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration enumValueConfigurationAnnotation) throws ValidationException {
-        if (enumValueConfigurationAnnotation == null) {
+    public EnumKeyConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration enumKeyConfigurationAnnotation) throws ValidationException {
+        if (enumKeyConfigurationAnnotation == null) {
             return null;            
         }
 
-        EnumValueConfiguration enumValueConfiguration = null;
-        enumValueConfiguration = new EnumValueConfiguration();
-        enumValueConfiguration.setDescription(enumValueConfigurationAnnotation.description());
+        EnumKeyConfiguration enumKeyConfiguration = null;
+        enumKeyConfiguration = new EnumKeyValueConfiguration();
+        enumKeyConfiguration.setDescription(enumKeyConfigurationAnnotation.description());
+        enumKeyConfiguration.setConfidential(enumKeyConfigurationAnnotation.isConfidential());
         
-        EnumValueConfigurationDataType type = EnumUtil.getInstance().mapEnum(EnumValueConfigurationDataType.class, enumValueConfigurationAnnotation.dataType());
-        enumValueConfiguration.setDataType(type);
-        enumValueConfiguration.setDefaultValue(enumValueConfigurationAnnotation.defaultValue());
-        enumValueConfiguration.setValueSize(EnumValueConfigurationValueValidatorFactory.getInstance().createEnumValueConfigurationSizing(enumValueConfiguration.getDataType(), 
-                                                                                                                                         enumValueConfigurationAnnotation.minValue(), 
-                                                                                                                                         enumValueConfigurationAnnotation.maxValue()));
-        enumValueConfiguration.setExampleValue(enumValueConfigurationAnnotation.exampleValue());
-        enumValueConfiguration.setCardinality(parseCardinality(enumValueConfigurationAnnotation.cardinality()));
-        enumValueConfiguration.setConfidential(enumValueConfigurationAnnotation.isConfidential());
-        
-        if (enumValueConfigurationAnnotation.validFrom() != null && !enumValueConfigurationAnnotation.validFrom().trim().isEmpty()) {
-            enumValueConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumValueConfigurationAnnotation.validFrom()));
+        if (enumKeyConfigurationAnnotation.validFrom() != null && !enumKeyConfigurationAnnotation.validFrom().trim().isEmpty()) {
+            enumKeyConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumKeyConfigurationAnnotation.validFrom()));
         }
         
-        if (enumValueConfigurationAnnotation.validTill() != null && !enumValueConfigurationAnnotation.validTill().trim().isEmpty()) {
-            enumValueConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(enumValueConfigurationAnnotation.validTill()));
+        if (enumKeyConfigurationAnnotation.validTill() != null && !enumKeyConfigurationAnnotation.validTill().trim().isEmpty()) {
+            enumKeyConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(enumKeyConfigurationAnnotation.validTill()));
         }
         
-        return enumValueConfiguration;
+        return enumKeyConfiguration;
+    }
+
+    
+    /**
+     * Convert a {@link com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration} into a
+     * {@link EnumKeyValueConfiguration}.
+     *
+     * @param enumKeyValueConfigurationAnnotation the {@link com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration}.
+     * @return the {@link EnumKeyValueConfiguration}.
+     * @throws ValidationException In case if a validation error
+     */
+    public EnumKeyValueConfiguration convert(com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration enumKeyValueConfigurationAnnotation) throws ValidationException {
+        if (enumKeyValueConfigurationAnnotation == null) {
+            return null;            
+        }
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration = null;
+        enumKeyValueConfiguration = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration.setDescription(enumKeyValueConfigurationAnnotation.description());
+        
+        EnumKeyValueConfigurationDataType type = EnumUtil.getInstance().mapEnum(EnumKeyValueConfigurationDataType.class, enumKeyValueConfigurationAnnotation.dataType());
+        enumKeyValueConfiguration.setDataType(type);
+        enumKeyValueConfiguration.setDefaultValue(enumKeyValueConfigurationAnnotation.defaultValue());
+        enumKeyValueConfiguration.setValueSize(EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), 
+                                                                                                                                                  enumKeyValueConfigurationAnnotation.minValue(), 
+                                                                                                                                                  enumKeyValueConfigurationAnnotation.maxValue()));
+        enumKeyValueConfiguration.setExampleValue(enumKeyValueConfigurationAnnotation.exampleValue());
+        enumKeyValueConfiguration.setCardinality(parseCardinality(enumKeyValueConfigurationAnnotation.cardinality()));
+        enumKeyValueConfiguration.setConfidential(enumKeyValueConfigurationAnnotation.isConfidential());
+        
+        if (enumKeyValueConfigurationAnnotation.validFrom() != null && !enumKeyValueConfigurationAnnotation.validFrom().trim().isEmpty()) {
+            enumKeyValueConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumKeyValueConfigurationAnnotation.validFrom()));
+        }
+        
+        if (enumKeyValueConfigurationAnnotation.validTill() != null && !enumKeyValueConfigurationAnnotation.validTill().trim().isEmpty()) {
+            enumKeyValueConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(enumKeyValueConfigurationAnnotation.validTill()));
+        }
+        
+        return enumKeyValueConfiguration;
     }
 
     
@@ -123,13 +155,13 @@ public final class AnnotationConvertUtil {
      * @param inputCardinality the cardinality
      * @return the parsed cardinality
      */
-    public EnumValueConfigurationSizing<Integer> parseCardinality(String inputCardinality) {
+    public EnumKeyValueConfigurationSizing<Integer> parseCardinality(String inputCardinality) {
 
         if (inputCardinality == null || inputCardinality.trim().isEmpty()) {
             return null;
         }
         
-        EnumValueConfigurationSizing<Integer> cardinality = new EnumValueConfigurationSizing<Integer>(1, 1);
+        EnumKeyValueConfigurationSizing<Integer> cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
         String cardinalityString = inputCardinality.trim();
         int idx = cardinalityString.indexOf("..");
         if (idx >= 0) {
@@ -146,7 +178,7 @@ public final class AnnotationConvertUtil {
                 try {
                     cardinality.setMaxSizeAsString(value);
                     
-                    if (EnumValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
+                    if (EnumKeyValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
                         cardinality.setMaxSize(Integer.MAX_VALUE);
                     } else {
                         cardinality.setMaxSize(Integer.valueOf(value));
@@ -160,7 +192,7 @@ public final class AnnotationConvertUtil {
                 String value = cardinalityString.trim();
                 cardinality.setMaxSizeAsString(value);
                 
-                if (EnumValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
+                if (EnumKeyValueConfigurationSizing.MAX_CARDINALITY.equals(value)) {
                     cardinality.setMaxSize(Integer.MAX_VALUE);
                 } else {
                     cardinality.setMaxSize(Integer.valueOf(value));
@@ -186,7 +218,7 @@ public final class AnnotationConvertUtil {
      * @param input the string input, either number or *. In case it's null it will return null 
      * @return the parsed result
      */
-    public <T> T parseSizeValue(EnumValueConfigurationDataType dataType, String input) {
+    public <T> T parseSizeValue(EnumKeyValueConfigurationDataType dataType, String input) {
         if (input == null || input.trim().isEmpty()) {
             return null;
         }

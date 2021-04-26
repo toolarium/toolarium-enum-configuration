@@ -12,8 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
-import com.github.toolarium.enumeration.configuration.annotation.EnumValueConfiguration;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration;
+import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -55,8 +56,24 @@ public class AnnotationConvertUtilTest {
      * Test parse annotation
      */
     @Test
-    public void testParseAnnotation() {
-        com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration value = EnumUtil.getInstance().getAnnotationInformation(MyConfigTest.FIRST);
+    public void testParseEnumKeyConfigurationAnnotation() {
+        com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration value = EnumUtil.getInstance().getEnumKeyConfigurationAnnotationInformation(MyConfigTest.THIRD);
+        assertNotNull(value);
+        assertEquals("THIRD", value.getKey());
+        assertEquals("Third", value.getDescription());
+        //assertEquals("11", value.getValidFrom());
+        //assertEquals("11", value.getValidTill());
+
+        assertNull(EnumUtil.getInstance().getEnumKeyConfigurationAnnotationInformation(MyConfigTest.SECOND));
+    }
+
+    
+    /**
+     * Test parse annotation
+     */
+    @Test
+    public void testParseEnumKeyValueConfigurationAnnotation() {
+        com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration value = EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(MyConfigTest.FIRST);
         assertNotNull(value);
         assertEquals("FIRST", value.getKey());
         assertEquals("First", value.getDescription());
@@ -64,14 +81,15 @@ public class AnnotationConvertUtilTest {
         //assertEquals("11", value.getValidFrom());
         //assertEquals("11", value.getValidTill());
 
-        value = EnumUtil.getInstance().getAnnotationInformation(MyConfigTest.SECOND);
+        value = EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(MyConfigTest.SECOND);
         assertNotNull(value);
         assertEquals("SECOND", value.getKey());
         assertEquals("Second", value.getDescription());
         assertEquals("22", value.getDefaultValue());
         
+        assertNull(EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(MyConfigTest.THIRD));
     }
-    
+
 
     /**
      * Test the parseCardinality
@@ -80,12 +98,12 @@ public class AnnotationConvertUtilTest {
     public void testParseCardinality() {
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(null));
         assertNull(AnnotationConvertUtil.getInstance().parseCardinality(""));
-        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality(ONE_STRING));
-        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
-        assertEquals(new EnumValueConfigurationSizing<Integer>("0", 0, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  0..1  "));
-        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "2", 2), AnnotationConvertUtil.getInstance().parseCardinality("  1   .. 2  "));
-        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
-        assertEquals(new EnumValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("1..*"));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality(ONE_STRING));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>(ONE_STRING, 1, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  1  "));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>("0", 0, ONE_STRING, 1), AnnotationConvertUtil.getInstance().parseCardinality("  0..1  "));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>(ONE_STRING, 1, "2", 2), AnnotationConvertUtil.getInstance().parseCardinality("  1   .. 2  "));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("*"));
+        assertEquals(new EnumKeyValueConfigurationSizing<Integer>(ONE_STRING, 1, "*", Integer.MAX_VALUE), AnnotationConvertUtil.getInstance().parseCardinality("1..*"));
         
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             AnnotationConvertUtil.getInstance().parseCardinality("*..1");
@@ -99,11 +117,14 @@ public class AnnotationConvertUtilTest {
        
     @EnumConfiguration(description = "The description")
     public enum MyConfigTest implements IEnumConfiguration {
-        @EnumValueConfiguration(description =  "First", defaultValue = "11", exampleValue = "42")
+        @EnumKeyValueConfiguration(description =  "First", defaultValue = "11", exampleValue = "42")
         FIRST,
         
-        @EnumValueConfiguration(description =  "Second", defaultValue = "22", exampleValue = "42")
-        SECOND;
+        @EnumKeyValueConfiguration(description =  "Second", defaultValue = "22", exampleValue = "42")
+        SECOND,
+        
+        @EnumKeyConfiguration(description =  "Third")
+        THIRD;
     }
 }
 

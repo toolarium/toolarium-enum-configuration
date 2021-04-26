@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.resource;
 
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,11 +50,12 @@ public final class EnumConfigurationResourceFactory {
     /**
      * Load a collection of {@link EnumConfiguration}.
      * 
+     * @param <T> The generic type
      * @param inputstream the input stream
      * @return the collection
      * @throws IOException In case of an error
      */
-    public EnumConfigurations load(InputStream inputstream) throws IOException {
+    public <T extends EnumKeyConfiguration> EnumConfigurations load(InputStream inputstream) throws IOException {
         if (inputstream == null) {
             return null;
         }

@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import java.io.ByteArrayInputStream;
@@ -48,11 +49,11 @@ public class EnumConfigurationResourceFactoryTest {
         });
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new EnumConfigurations().add(new EnumConfiguration(""));
+            new EnumConfigurations().add(new EnumConfiguration<>(""));
         });
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new EnumConfigurations().add(new EnumConfiguration("  "));
+            new EnumConfigurations().add(new EnumConfiguration<>("  "));
         });
     }
 
@@ -65,39 +66,47 @@ public class EnumConfigurationResourceFactoryTest {
     @Test
     public void writeEnumConfigurations() throws IOException {
         EnumConfigurations e = new EnumConfigurations();
-        e.add(new EnumConfiguration("myName"));
+        e.add(new EnumConfiguration<>("myName"));
         Assert.assertEquals(e, writeAndRead(e));
 
         e = new EnumConfigurations();
-        EnumConfiguration ec = new EnumConfiguration("myName");
+        EnumConfiguration<? super EnumKeyConfiguration> ec = new EnumConfiguration<>("myName");
         ec.setDescription("My description");
         
-        EnumValueConfiguration enumValueConfiguration1 = new EnumValueConfiguration();
-        enumValueConfiguration1.setKey("myKey1");
-        enumValueConfiguration1.setConfidential(true);
-        enumValueConfiguration1.setDescription("My key 1 description");
-        enumValueConfiguration1.setDefaultValue("default value 1");
-        enumValueConfiguration1.setValidFrom(null);
-        enumValueConfiguration1.setValidTill(null);
-        ec.add(enumValueConfiguration1);
+        EnumKeyValueConfiguration enumKeyValueConfiguration1 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration1.setKey("myKey1");
+        enumKeyValueConfiguration1.setConfidential(true);
+        enumKeyValueConfiguration1.setDescription("My key 1 description");
+        enumKeyValueConfiguration1.setDefaultValue("default value 1");
+        enumKeyValueConfiguration1.setValidFrom(null);
+        enumKeyValueConfiguration1.setValidTill(null);
+        ec.add(enumKeyValueConfiguration1);
         
-        EnumValueConfiguration enumValueConfiguration2 = new EnumValueConfiguration();
-        enumValueConfiguration2.setKey("myKey2");
-        enumValueConfiguration2.setConfidential(false);
-        enumValueConfiguration2.setDescription("My key 2 description");
-        enumValueConfiguration2.setDefaultValue("default value 2");
-        enumValueConfiguration2.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
-        enumValueConfiguration2.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
-        ec.add(enumValueConfiguration2);
+        EnumKeyValueConfiguration enumKeyValueConfiguration2 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration2.setKey("myKey2");
+        enumKeyValueConfiguration2.setConfidential(false);
+        enumKeyValueConfiguration2.setDescription("My key 2 description");
+        enumKeyValueConfiguration2.setDefaultValue("default value 2");
+        enumKeyValueConfiguration2.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration2.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec.add(enumKeyValueConfiguration2);
 
-        EnumValueConfiguration enumValueConfiguration3 = new EnumValueConfiguration();
-        enumValueConfiguration3.setKey("myKey3");
-        enumValueConfiguration3.setConfidential(false);
-        enumValueConfiguration3.setDescription("My key 3 description");
-        enumValueConfiguration3.setDefaultValue("default value 3");
-        enumValueConfiguration3.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
-        enumValueConfiguration3.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
-        ec.add(enumValueConfiguration3);
+        EnumKeyValueConfiguration enumKeyValueConfiguration3 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration3.setKey("myKey3");
+        enumKeyValueConfiguration3.setConfidential(false);
+        enumKeyValueConfiguration3.setDescription("My key 3 description");
+        enumKeyValueConfiguration3.setDefaultValue("default value 3");
+        enumKeyValueConfiguration3.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration3.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec.add(enumKeyValueConfiguration3);
+
+        EnumKeyConfiguration enumKeyConfiguration4 = new EnumKeyConfiguration();
+        enumKeyConfiguration4.setKey("myKey4");
+        enumKeyConfiguration4.setConfidential(false);
+        enumKeyConfiguration4.setDescription("My key 4 description");
+        enumKeyConfiguration4.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
+        enumKeyConfiguration4.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec.add(enumKeyConfiguration4);
 
         e.add(ec);
         Assert.assertEquals(e, writeAndRead(e));
@@ -111,130 +120,130 @@ public class EnumConfigurationResourceFactoryTest {
      */
     @Test
     public void test() throws IOException {
-        EnumConfiguration ec1 = new EnumConfiguration("myName1");
+        EnumConfiguration<? super EnumKeyConfiguration> ec1 = new EnumConfiguration<>("myName1");
         ec1.setDescription("My description 1");
 
-        EnumValueConfiguration enumValueConfiguration1 = new EnumValueConfiguration();
-        enumValueConfiguration1.setKey("myKey1");
-        enumValueConfiguration1.setConfidential(true);
-        enumValueConfiguration1.setDescription("My key 1 description");
-        enumValueConfiguration1.setExampleValue("example value 1");
-        enumValueConfiguration1.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
-        enumValueConfiguration1.setValidFrom(null);
-        enumValueConfiguration1.setValidTill(null);
-        ec1.add(enumValueConfiguration1);
+        EnumKeyValueConfiguration enumKeyValueConfiguration1 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration1.setKey("myKey1");
+        enumKeyValueConfiguration1.setConfidential(true);
+        enumKeyValueConfiguration1.setDescription("My key 1 description");
+        enumKeyValueConfiguration1.setExampleValue("example value 1");
+        enumKeyValueConfiguration1.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
+        enumKeyValueConfiguration1.setValidFrom(null);
+        enumKeyValueConfiguration1.setValidTill(null);
+        ec1.add(enumKeyValueConfiguration1);
 
-        EnumValueConfiguration enumValueConfiguration2 = new EnumValueConfiguration();
-        enumValueConfiguration2.setKey("myKey2");
-        enumValueConfiguration2.setConfidential(true);
-        enumValueConfiguration2.setDescription("My key 2 description");
-        enumValueConfiguration2.setDefaultValue("default value 2");
-        enumValueConfiguration2.setExampleValue("example value 2");
-        enumValueConfiguration2.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
-        enumValueConfiguration2.setValidFrom(null);
-        enumValueConfiguration2.setValidTill(null);
-        ec1.add(enumValueConfiguration2);
+        EnumKeyValueConfiguration enumKeyValueConfiguration2 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration2.setKey("myKey2");
+        enumKeyValueConfiguration2.setConfidential(true);
+        enumKeyValueConfiguration2.setDescription("My key 2 description");
+        enumKeyValueConfiguration2.setDefaultValue("default value 2");
+        enumKeyValueConfiguration2.setExampleValue("example value 2");
+        enumKeyValueConfiguration2.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
+        enumKeyValueConfiguration2.setValidFrom(null);
+        enumKeyValueConfiguration2.setValidTill(null);
+        ec1.add(enumKeyValueConfiguration2);
         
-        EnumValueConfiguration enumValueConfiguration3 = new EnumValueConfiguration();
-        enumValueConfiguration3.setKey("myKey3");
-        enumValueConfiguration3.setConfidential(false);
-        enumValueConfiguration3.setDescription("My key 3 description");
-        enumValueConfiguration3.setDefaultValue("default value 3");
-        enumValueConfiguration3.setExampleValue("example value 3");
-        enumValueConfiguration3.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
-        enumValueConfiguration3.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
-        ec1.add(enumValueConfiguration3);
+        EnumKeyValueConfiguration enumKeyValueConfiguration3 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration3.setKey("myKey3");
+        enumKeyValueConfiguration3.setConfidential(false);
+        enumKeyValueConfiguration3.setDescription("My key 3 description");
+        enumKeyValueConfiguration3.setDefaultValue("default value 3");
+        enumKeyValueConfiguration3.setExampleValue("example value 3");
+        enumKeyValueConfiguration3.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration3.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration3);
 
-        EnumValueConfiguration enumValueConfiguration4 = new EnumValueConfiguration();
-        enumValueConfiguration4.setKey("myKey4");
-        enumValueConfiguration4.setConfidential(false);
-        enumValueConfiguration4.setDescription("My key 4 description");
-        enumValueConfiguration4.setExampleValue("example value 4");
-        enumValueConfiguration4.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
-        enumValueConfiguration4.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
-        ec1.add(enumValueConfiguration4);
+        EnumKeyValueConfiguration enumKeyValueConfiguration4 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration4.setKey("myKey4");
+        enumKeyValueConfiguration4.setConfidential(false);
+        enumKeyValueConfiguration4.setDescription("My key 4 description");
+        enumKeyValueConfiguration4.setExampleValue("example value 4");
+        enumKeyValueConfiguration4.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration4.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration4);
 
         EnumConfigurations e = new EnumConfigurations();
         e.add(ec1);
         
         // 
         
-        EnumConfiguration ec2 = new EnumConfiguration("myName2");
+        EnumConfiguration<? super EnumKeyConfiguration> ec2 = new EnumConfiguration<>("myName2");
         ec2.setDescription("My description 2");
         
-        EnumValueConfiguration enumValueConfiguration5 = new EnumValueConfiguration();
-        enumValueConfiguration5.setKey("myKey5");
-        enumValueConfiguration5.setConfidential(true);
-        enumValueConfiguration5.setDescription("My key 5 description");
-        enumValueConfiguration5.setExampleValue("example value 5");
-        enumValueConfiguration5.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
-        enumValueConfiguration5.setValidFrom(null);
-        enumValueConfiguration5.setValidTill(null);
-        ec2.add(enumValueConfiguration5);
+        EnumKeyValueConfiguration enumKeyValueConfiguration5 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration5.setKey("myKey5");
+        enumKeyValueConfiguration5.setConfidential(true);
+        enumKeyValueConfiguration5.setDescription("My key 5 description");
+        enumKeyValueConfiguration5.setExampleValue("example value 5");
+        enumKeyValueConfiguration5.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
+        enumKeyValueConfiguration5.setValidFrom(null);
+        enumKeyValueConfiguration5.setValidTill(null);
+        ec2.add(enumKeyValueConfiguration5);
 
-        EnumValueConfiguration enumValueConfiguration6 = new EnumValueConfiguration();
-        enumValueConfiguration6.setKey("myKey6");
-        enumValueConfiguration6.setConfidential(true);
-        enumValueConfiguration6.setDescription("My key 6 description");
-        enumValueConfiguration6.setDefaultValue("default value 6");
-        enumValueConfiguration6.setExampleValue("example value 6");
-        enumValueConfiguration6.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
-        enumValueConfiguration6.setValidFrom(null);
-        enumValueConfiguration6.setValidTill(null);
-        ec2.add(enumValueConfiguration6);
+        EnumKeyValueConfiguration enumKeyValueConfiguration6 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration6.setKey("myKey6");
+        enumKeyValueConfiguration6.setConfidential(true);
+        enumKeyValueConfiguration6.setDescription("My key 6 description");
+        enumKeyValueConfiguration6.setDefaultValue("default value 6");
+        enumKeyValueConfiguration6.setExampleValue("example value 6");
+        enumKeyValueConfiguration6.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality("0..1"));
+        enumKeyValueConfiguration6.setValidFrom(null);
+        enumKeyValueConfiguration6.setValidTill(null);
+        ec2.add(enumKeyValueConfiguration6);
         
-        EnumValueConfiguration enumValueConfiguration7 = new EnumValueConfiguration();
-        enumValueConfiguration7.setKey("myKey7");
-        enumValueConfiguration7.setConfidential(false);
-        enumValueConfiguration7.setDescription("My key 7 description");
-        enumValueConfiguration7.setDefaultValue("default value 7");
-        enumValueConfiguration7.setExampleValue("example value 7");
-        enumValueConfiguration7.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
-        enumValueConfiguration7.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
-        ec2.add(enumValueConfiguration7);
+        EnumKeyValueConfiguration enumKeyValueConfiguration7 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration7.setKey("myKey7");
+        enumKeyValueConfiguration7.setConfidential(false);
+        enumKeyValueConfiguration7.setDescription("My key 7 description");
+        enumKeyValueConfiguration7.setDefaultValue("default value 7");
+        enumKeyValueConfiguration7.setExampleValue("example value 7");
+        enumKeyValueConfiguration7.setValidFrom(Instant.now().plus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration7.setValidTill(DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration7);
 
-        EnumValueConfiguration enumValueConfiguration8 = new EnumValueConfiguration();
-        enumValueConfiguration8.setKey("myKey8");
-        enumValueConfiguration8.setConfidential(false);
-        enumValueConfiguration8.setDescription("My key 8 description");
-        enumValueConfiguration8.setExampleValue("example value 8");
-        enumValueConfiguration8.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
-        enumValueConfiguration8.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
-        ec2.add(enumValueConfiguration8);
+        EnumKeyValueConfiguration enumKeyValueConfiguration8 = new EnumKeyValueConfiguration();
+        enumKeyValueConfiguration8.setKey("myKey8");
+        enumKeyValueConfiguration8.setConfidential(false);
+        enumKeyValueConfiguration8.setDescription("My key 8 description");
+        enumKeyValueConfiguration8.setExampleValue("example value 8");
+        enumKeyValueConfiguration8.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
+        enumKeyValueConfiguration8.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration8);
         
         e.add(ec2);
         Assert.assertEquals(e, writeAndRead(e));
         
-        EnumConfiguration eref1 = new EnumConfiguration(ec1.getName());
+        EnumConfiguration<? super EnumKeyConfiguration> eref1 = new EnumConfiguration<>(ec1.getName());
         eref1.setDescription(ec1.getDescription());
         eref1.setValidFrom(ec1.getValidFrom());
         eref1.setValidTill(ec1.getValidTill());
-        eref1.add(enumValueConfiguration3);     
-        eref1.add(enumValueConfiguration4);     
-        Set<EnumConfiguration> set1 = new LinkedHashSet<EnumConfiguration>();
+        eref1.add(enumKeyValueConfiguration3);     
+        eref1.add(enumKeyValueConfiguration4);     
+        Set<EnumConfiguration<? super EnumKeyValueConfiguration>> set1 = new LinkedHashSet<>();
         set1.add(eref1);
 
-        EnumConfiguration eref2 = new EnumConfiguration(ec2.getName());
+        EnumConfiguration<EnumKeyValueConfiguration> eref2 = new EnumConfiguration<EnumKeyValueConfiguration>(ec2.getName());
         eref2.setDescription(ec2.getDescription());
         eref2.setValidFrom(ec2.getValidFrom());
         eref2.setValidTill(ec2.getValidTill());
-        eref2.add(enumValueConfiguration7);     
-        eref2.add(enumValueConfiguration8);     
+        eref2.add(enumKeyValueConfiguration7);     
+        eref2.add(enumKeyValueConfiguration8);     
         set1.add(eref2);
 
-        EnumConfiguration eref3 = new EnumConfiguration(ec1.getName());
+        EnumConfiguration<EnumKeyValueConfiguration> eref3 = new EnumConfiguration<EnumKeyValueConfiguration>(ec1.getName());
         eref3.setDescription(ec1.getDescription());
         eref3.setValidFrom(ec1.getValidFrom());
         eref3.setValidTill(ec1.getValidTill());
-        eref3.add(enumValueConfiguration4);
-        Set<EnumConfiguration> set2 = new LinkedHashSet<EnumConfiguration>();
+        eref3.add(enumKeyValueConfiguration4);
+        Set<EnumConfiguration<EnumKeyValueConfiguration>> set2 = new LinkedHashSet<EnumConfiguration<EnumKeyValueConfiguration>>();
         set2.add(eref3);
         
-        EnumConfiguration eref4 = new EnumConfiguration(ec2.getName());
+        EnumConfiguration<EnumKeyValueConfiguration> eref4 = new EnumConfiguration<EnumKeyValueConfiguration>(ec2.getName());
         eref4.setDescription(ec2.getDescription());
         eref4.setValidFrom(ec2.getValidFrom());
         eref4.setValidTill(ec2.getValidTill());
-        eref4.add(enumValueConfiguration8);
+        eref4.add(enumKeyValueConfiguration8);
         set2.add(eref4);
 
         assertEquals(set1, e.selectMandatoryConfigurationList());
@@ -256,6 +265,7 @@ public class EnumConfigurationResourceFactoryTest {
         EnumConfigurationResourceFactory.getInstance().store(inputEnumConfigurations, outputstream);
         
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputstream.toByteArray());
+        //out.println("==>"+new String(outputstream.toByteArray()));
         return EnumConfigurationResourceFactory.getInstance().load(inputStream);
     }
 }

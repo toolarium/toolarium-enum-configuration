@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import org.junit.jupiter.api.Test;
 
 
@@ -20,7 +20,7 @@ public class BooleanConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for BooleanValidatorTest
      */
     BooleanConverterTest() {
-        super(EnumValueConfigurationDataType.BOOLEAN);
+        super(EnumKeyValueConfigurationDataType.BOOLEAN);
     }
 
 

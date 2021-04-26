@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 /**
  * Test color validator test
@@ -18,7 +18,7 @@ public class ColorValidatorTest extends AbstractValidatorTest {
      * Constructor for ColorValidatorTest
      */
     ColorValidatorTest() {
-        super(EnumValueConfigurationDataType.COLOR,
+        super(EnumKeyValueConfigurationDataType.COLOR,
               null, /* min value */
               null, /* max value */
               /* valid values */

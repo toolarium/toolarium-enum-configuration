@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class UUIDConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for UUIDValidatorTest
      */
     UUIDConverterTest() {
-        super(EnumValueConfigurationDataType.UUID);
+        super(EnumKeyValueConfigurationDataType.UUID);
     }
 
 

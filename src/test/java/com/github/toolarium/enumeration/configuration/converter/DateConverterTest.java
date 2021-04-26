@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class DateConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for DateValidatorTest
      */
     DateConverterTest() {
-        super(EnumValueConfigurationDataType.DATE);
+        super(EnumKeyValueConfigurationDataType.DATE);
     }
 
 

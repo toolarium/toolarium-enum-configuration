@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import org.junit.jupiter.api.Test;
 
 
@@ -20,7 +20,7 @@ public class EmailConverterTest extends AbstractStringTypeConverterTest {
      * Constructor for MailValidatorTest
      */
     EmailConverterTest() {
-        super(EnumValueConfigurationDataType.EMAIL);
+        super(EnumKeyValueConfigurationDataType.EMAIL);
     }
 
 

@@ -6,7 +6,7 @@
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 
 /**
@@ -20,7 +20,7 @@ public class URIValidatorTest extends AbstractValidatorTest {
      * Constructor for URIValidatorTest
      */
     URIValidatorTest() {
-        super(EnumValueConfigurationDataType.URI,
+        super(EnumKeyValueConfigurationDataType.URI,
               null, /* min value */
               null, /* max value */
               /* valid values */

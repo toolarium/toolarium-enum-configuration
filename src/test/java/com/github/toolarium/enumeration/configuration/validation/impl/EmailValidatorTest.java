@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 
 /**
@@ -19,7 +19,7 @@ public class EmailValidatorTest extends AbstractValidatorTest {
      * Constructor for MailValidatorTest
      */
     EmailValidatorTest() {
-        super(EnumValueConfigurationDataType.EMAIL,
+        super(EnumKeyValueConfigurationDataType.EMAIL,
               null, /* min value */
               null, /* max value */
               /* valid values */

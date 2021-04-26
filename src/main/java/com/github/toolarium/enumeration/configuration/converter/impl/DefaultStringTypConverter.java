@@ -6,7 +6,7 @@
 package com.github.toolarium.enumeration.configuration.converter.impl;
 
 import com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter;
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 
@@ -18,11 +18,11 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
  */
 public class DefaultStringTypConverter extends AbstractStringTypeConverter {
     /**
-     * @see com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter#convert(com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType, java.lang.String)
+     * @see com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter#convert(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, java.lang.String)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T convert(EnumValueConfigurationDataType dataType, String inputToTest) throws ValidationException {
+    public <T> T convert(EnumKeyValueConfigurationDataType dataType, String inputToTest) throws ValidationException {
         try {
             switch (dataType) {
                 case NUMBER:      return (T)getNumber(inputToTest); 

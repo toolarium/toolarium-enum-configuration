@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import java.util.UUID;
 
 /**
@@ -19,7 +19,7 @@ public class UUIDValidatorTest extends AbstractValidatorTest {
      * Constructor for UUIDValidatorTest
      */
     UUIDValidatorTest() {
-        super(EnumValueConfigurationDataType.UUID,
+        super(EnumKeyValueConfigurationDataType.UUID,
               null, /* min value */
               null, /* max value */
               /* valid values */

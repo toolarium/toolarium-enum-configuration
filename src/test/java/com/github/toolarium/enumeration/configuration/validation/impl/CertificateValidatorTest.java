@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 
 /**
@@ -19,7 +19,7 @@ public class CertificateValidatorTest extends AbstractValidatorTest {
      * Constructor for CertificateValidatorTest
      */
     CertificateValidatorTest() {
-        super(EnumValueConfigurationDataType.CERTIFICATE, 
+        super(EnumKeyValueConfigurationDataType.CERTIFICATE, 
               null, 
               null,
               /* valid values */

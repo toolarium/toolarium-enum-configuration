@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 
 
 /**
@@ -19,7 +19,7 @@ public class DoubleValidatorTest extends AbstractValidatorTest {
      * Constructor for DoubleValidatorTest
      */
     public DoubleValidatorTest() {
-        super(EnumValueConfigurationDataType.DOUBLE, 
+        super(EnumKeyValueConfigurationDataType.DOUBLE, 
               "1", 
               "123",
               /* valid values */

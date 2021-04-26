@@ -5,7 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.converter;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 
 
@@ -25,5 +25,5 @@ public interface IStringTypeConverter {
      * @return the result
      * @throws ValidationException In case of a validation error
      */
-    <T> T convert(EnumValueConfigurationDataType dataType, String input) throws ValidationException;
+    <T> T convert(EnumKeyValueConfigurationDataType dataType, String input) throws ValidationException;
 }

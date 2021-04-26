@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author patrick
  */
-public class EnumConfiguration extends AbstractEnumConfiguration {
+public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractEnumConfiguration {
     /** Defines the max timestamp */
     public static final String MAX_TIMESTAMP_STRING = "9999-12-31T12:00:00.000Z";
 
@@ -27,7 +27,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
 
     private static final long serialVersionUID = -5016414165364299512L;
     private String name;
-    private Map<String, EnumValueConfiguration> keyList;
+    private Map<String, T> keyList;
     private Set<String> interfaceList;
     private Set<String> markerInterfaceList;
 
@@ -38,7 +38,7 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     public EnumConfiguration() {
         super();
         name = null;
-        keyList = new LinkedHashMap<String, EnumValueConfiguration>();
+        keyList = new LinkedHashMap<String, T>();
         interfaceList = new LinkedHashSet<String>();
         markerInterfaceList = new LinkedHashSet<String>();
     }
@@ -78,14 +78,16 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     /**
      * Set the key list
      * 
+     * @param <K> The generic type
      * @param keyList the key list.
      */
-    public void setKeyList(Set<EnumValueConfiguration> keyList) {
-        this.keyList = new LinkedHashMap<String, EnumValueConfiguration>();
+    @SuppressWarnings("unchecked")
+    public <K extends EnumKeyConfiguration> void setKeyList(Set<K> keyList) {
+        this.keyList = new LinkedHashMap<String, T>();
         
         if (keyList != null) {
-            for (EnumValueConfiguration e : keyList) {
-                add(e);
+            for (K k : keyList) {
+                add((T)k);
             }
         }
     }
@@ -96,9 +98,9 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
      * 
      * @return the key list
      */
-    public Set<EnumValueConfiguration> getKeyList() {
-        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
-        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
+    public Set<T> getKeyList() {
+        Set<T> result = new LinkedHashSet<T>();
+        for (Map.Entry<String, T> e : keyList.entrySet()) {
             result.add(e.getValue());
         }
         
@@ -144,33 +146,33 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
     public Set<String> getMarkerInterfaceList() {
         return markerInterfaceList;
     }
-
+    
     
     /**
-     * Adds an {@link EnumValueConfiguration} and corrects validFrom / validTill in case it's not consistent regarding the parent element.
+     * Adds an {@link EnumKeyConfiguration} and corrects validFrom / validTill in case it's not consistent regarding the parent element.
      * 
-     * @param enumValueConfiguration the {@link EnumValueConfiguration}
+     * @param enumKeyConfiguration the {@link EnumKeyConfiguration}
      * @return the added enum value configuration
      * @throws IllegalArgumentException In case the key doesn't exist
      */
-    public EnumValueConfiguration add(EnumValueConfiguration enumValueConfiguration) {
+    public T add(T enumKeyConfiguration) {
         
-        if (enumValueConfiguration == null || enumValueConfiguration.getKey() == null || enumValueConfiguration.getKey().trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid enum value configuration:" + enumValueConfiguration);
+        if (enumKeyConfiguration == null || enumKeyConfiguration.getKey() == null || enumKeyConfiguration.getKey().trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid enum value configuration:" + enumKeyConfiguration);
         }
         
-        if (enumValueConfiguration.getValidFrom() == null || getValidFrom().isAfter(enumValueConfiguration.getValidFrom())) {
-            enumValueConfiguration.setValidFrom(getValidFrom());
+        if (enumKeyConfiguration.getValidFrom() == null || getValidFrom().isAfter(enumKeyConfiguration.getValidFrom())) {
+            enumKeyConfiguration.setValidFrom(getValidFrom());
         }
         
-        if (enumValueConfiguration.getValidTill() == null || getValidTill().isBefore(enumValueConfiguration.getValidTill())) {
-            enumValueConfiguration.setValidTill(getValidTill());
+        if (enumKeyConfiguration.getValidTill() == null || getValidTill().isBefore(enumKeyConfiguration.getValidTill())) {
+            enumKeyConfiguration.setValidTill(getValidTill());
         }
 
-        String key = enumValueConfiguration.getKey().trim();
+        String key = enumKeyConfiguration.getKey().trim();
         if (!keyList.containsKey(key)) {
-            this.keyList.put(key, enumValueConfiguration);
-            return enumValueConfiguration;
+            this.keyList.put(key, enumKeyConfiguration);
+            return enumKeyConfiguration;
         }
         
         return null;
@@ -178,14 +180,19 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
 
 
     /**
-     * Returns a list of mandatory {@link EnumValueConfiguration}.
+     * Returns a list of mandatory {@link EnumKeyValueConfiguration}.
      *
-     * @return the list of mandatory {@link EnumValueConfiguration}.
+     * @return the list of mandatory {@link EnumKeyValueConfiguration}.
      */
-    public Set<EnumValueConfiguration> selectMandatoryEnumValueConfigurationList() {
-        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
-        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
-            if (e.getValue().isMandatory()) {
+    public Set<T> selectMandatoryConfigurationList() {
+        Set<T> result = new LinkedHashSet<>();
+        for (Map.Entry<String, T> e : keyList.entrySet()) {
+            
+            if (EnumKeyValueConfiguration.class.isInstance(e.getValue())) {
+                if (((EnumKeyValueConfiguration)e.getValue()).isMandatory()) {
+                    result.add(e.getValue());
+                }
+            } else {
                 result.add(e.getValue());
             }
         }
@@ -195,14 +202,19 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
 
     
     /**
-     * Returns a list of mandatory {@link EnumValueConfiguration} with no default value
+     * Returns a list of mandatory {@link EnumKeyValueConfiguration} with no default value
      *
-     * @return the list of mandatory {@link EnumValueConfiguration}.
+     * @return the list of mandatory {@link EnumKeyValueConfiguration}.
      */
-    public Set<EnumValueConfiguration> selectMandatoryEnumValueConfigurationListWithMissingDefaultValue() {
-        Set<EnumValueConfiguration> result = new LinkedHashSet<EnumValueConfiguration>();
-        for (Map.Entry<String, EnumValueConfiguration> e : keyList.entrySet()) {
-            if (e.getValue().isMandatory() && !e.getValue().hasDefaultValue()) {
+    public Set<T> selectMandatoryListWithMissingDefaultValue() {
+        Set<T> result = new LinkedHashSet<>();
+        for (Map.Entry<String, T> e : keyList.entrySet()) {
+            
+            if (EnumKeyValueConfiguration.class.isInstance(e.getValue())) {
+                if (((EnumKeyValueConfiguration)e.getValue()).isMandatory() && !((EnumKeyValueConfiguration)e.getValue()).hasDefaultValue()) {
+                    result.add(e.getValue());
+                }
+            } else {
                 result.add(e.getValue());
             }
         }
@@ -260,7 +272,8 @@ public class EnumConfiguration extends AbstractEnumConfiguration {
             return false;
         }
 
-        EnumConfiguration other = (EnumConfiguration)obj;
+        @SuppressWarnings("unchecked")
+        EnumConfiguration<T> other = (EnumConfiguration<T>)obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
