@@ -19,6 +19,7 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -56,6 +57,7 @@ import javax.tools.StandardLocation;
 public class EnumConfigurationProcessor extends AbstractProcessor {
     private static final String ENUM_CONFIGURATION = "com.github.toolarium.enumeration.configuration.IEnumConfiguration";
     private List<Class<? extends Annotation>> annoationClassList;
+    private List<String> warnList;
     
     
     /**
@@ -63,6 +65,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
      */
     public EnumConfigurationProcessor() {
         annoationClassList = Arrays.asList(EnumConfiguration.class, EnumKeyConfiguration.class, EnumKeyValueConfiguration.class);
+        warnList = new ArrayList<String>();
     }
 
     
@@ -122,7 +125,10 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                 
                 com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<? super com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration> enumConfiguration = enumConfigurationContentMap.get(fullQualifiedName);
                 if (enumConfiguration == null) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);                    
+                    if (!warnList.contains(fullQualifiedName)) {
+                        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);
+                        warnList.add(fullQualifiedName);
+                    }
                 } else { 
                     com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = processEnumKeyConfigurationElement(element);
                     if (enumKeyConfiguration != null) {
@@ -140,7 +146,10 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                    
                 com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<? super com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration> enumConfiguration = enumConfigurationContentMap.get(fullQualifiedName);
                 if (enumConfiguration == null) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);                    
+                    if (!warnList.contains(fullQualifiedName)) {
+                        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);
+                        warnList.add(fullQualifiedName);
+                    }
                 } else { 
                     com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = processEnumKeyValueConfigurationElement(element);
                     if (enumKeyValueConfiguration != null) {
