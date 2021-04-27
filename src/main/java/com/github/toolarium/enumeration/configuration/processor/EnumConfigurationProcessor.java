@@ -121,9 +121,13 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                 String fullQualifiedName = "" + element.getEnclosingElement();
                 
                 com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<? super com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration> enumConfiguration = enumConfigurationContentMap.get(fullQualifiedName);
-                com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = processEnumKeyConfigurationElement(element);
-                if (enumKeyConfiguration != null) {
-                    enumConfiguration.add(enumKeyConfiguration);
+                if (enumConfiguration == null) {
+                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);                    
+                } else { 
+                    com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = processEnumKeyConfigurationElement(element);
+                    if (enumKeyConfiguration != null) {
+                        enumConfiguration.add(enumKeyConfiguration);
+                    }
                 }
             }
         }
@@ -135,9 +139,13 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                 String fullQualifiedName = "" + element.getEnclosingElement();
                    
                 com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<? super com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration> enumConfiguration = enumConfigurationContentMap.get(fullQualifiedName);
-                com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = processEnumKeyValueConfigurationElement(element);
-                if (enumKeyValueConfiguration != null) {
-                    enumConfiguration.add(enumKeyValueConfiguration);
+                if (enumConfiguration == null) {
+                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Missing EnumConfiguration reference on enum in " + fullQualifiedName);                    
+                } else { 
+                    com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = processEnumKeyValueConfigurationElement(element);
+                    if (enumKeyValueConfiguration != null) {
+                        enumConfiguration.add(enumKeyValueConfiguration);
+                    }
                 }
             }
         }
