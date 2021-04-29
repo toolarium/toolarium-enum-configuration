@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -82,6 +83,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
      * @param keyList the key list.
      */
     @SuppressWarnings("unchecked")
+    @JsonDeserialize(as = LinkedHashSet.class)
     public <K extends EnumKeyConfiguration> void setKeyList(Set<K> keyList) {
         this.keyList = new LinkedHashMap<String, T>();
         
@@ -214,9 +216,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
                 if (((EnumKeyValueConfiguration)e.getValue()).isMandatory() && !((EnumKeyValueConfiguration)e.getValue()).hasDefaultValue()) {
                     result.add(e.getValue());
                 }
-            } else {
-                result.add(e.getValue());
-            }
+            } 
         }
         
         return result;

@@ -169,10 +169,10 @@ public final class JSONUtil {
     private ObjectMapper getMapper() {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-            objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+            objectMapper.registerModule(new JavaTimeModule());            
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            objectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         }
         return objectMapper;
     }

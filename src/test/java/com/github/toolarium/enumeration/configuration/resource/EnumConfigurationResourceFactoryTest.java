@@ -163,6 +163,14 @@ public class EnumConfigurationResourceFactoryTest {
         enumKeyValueConfiguration4.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
         ec1.add(enumKeyValueConfiguration4);
 
+        EnumKeyConfiguration enumKeyConfiguration1 = new EnumKeyConfiguration();
+        enumKeyConfiguration1.setKey("myKeyOnly");
+        enumKeyConfiguration1.setConfidential(false);
+        enumKeyConfiguration1.setDescription("My key only description");
+        enumKeyConfiguration1.setValidFrom(Instant.now().minus(24, ChronoUnit.HOURS));
+        enumKeyConfiguration1.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyConfiguration1);
+
         EnumConfigurations e = new EnumConfigurations();
         e.add(ec1);
         
@@ -213,6 +221,12 @@ public class EnumConfigurationResourceFactoryTest {
         
         e.add(ec2);
         Assert.assertEquals(e, writeAndRead(e));
+
+        ByteArrayOutputStream outputstream1 = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(e, outputstream1);
+        ByteArrayOutputStream outputstream2 = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(writeAndRead(e), outputstream2);
+        Assert.assertEquals(new String(outputstream1.toByteArray()), new String(outputstream2.toByteArray()));
         
         EnumConfiguration<? super EnumKeyConfiguration> eref1 = new EnumConfiguration<>(ec1.getName());
         eref1.setDescription(ec1.getDescription());
@@ -220,6 +234,7 @@ public class EnumConfigurationResourceFactoryTest {
         eref1.setValidTill(ec1.getValidTill());
         eref1.add(enumKeyValueConfiguration3);     
         eref1.add(enumKeyValueConfiguration4);     
+        eref1.add(enumKeyConfiguration1);     
         Set<EnumConfiguration<? super EnumKeyValueConfiguration>> set1 = new LinkedHashSet<>();
         set1.add(eref1);
 

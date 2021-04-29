@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.toolarium.enumeration.configuration.Version;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -109,6 +110,7 @@ public class EnumConfigurations implements Serializable {
      * 
      * @param list the enumeration configuration content list
      */
+    @JsonDeserialize(as = LinkedHashSet.class)
     public void setEnumConfigurationList(Set<EnumConfiguration<? extends EnumKeyConfiguration>> list) {
         enumConfigurationContentMap = new LinkedHashMap<String, EnumConfiguration<? extends EnumKeyConfiguration>>();
         
