@@ -23,13 +23,14 @@ public class CertificateValidatorTest extends AbstractValidatorTest {
               null, 
               null,
               /* valid values */
-              new String[] {"-- my certficiate --", "  -- my certificate --   ", "-- your certficiate --"},
+              new String[] {"-- my certficiate --", "  -- my certificates --   ", "-- your certficiate --"},
               /* invalid values */
               new String[] {"123"},
               /* too small value */
               null,        
               /* too big value */
-              null);
+              null,
+              true /* uniqueness */);
     }
 
 

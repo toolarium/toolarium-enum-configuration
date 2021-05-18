@@ -33,21 +33,23 @@ public class URIEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyV
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public URI validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         URI inputURI = parseValue(inputValue);
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputURI;
         }
         
         if (inputURI == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputURI;
             }
             
             throw new EmptyValueException("Empty value: invalid timestamp, should be at least [" + valueSize.getMinSizeAsString() + "]!");
         }
+        
+        return inputURI;
     }
 
 

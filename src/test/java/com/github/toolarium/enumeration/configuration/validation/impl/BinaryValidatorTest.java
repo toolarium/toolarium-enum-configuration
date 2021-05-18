@@ -23,21 +23,22 @@ public class BinaryValidatorTest extends AbstractValidatorTest {
     BinaryValidatorTest() {
         super(EnumKeyValueConfigurationDataType.BINARY, 
               null, 
-              "19",
+              "20",
               /* valid values */
               new String[] {MESSAGE_ENCODED, 
-                            "  " + MESSAGE_ENCODED + " ", 
-                            "filename.txt|    " + MESSAGE_ENCODED + " ", 
-                            "filename.txt|" + MESSAGE_ENCODED, 
-                            "filename.txt|2021-03-15T08:59:22.123Z|" + MESSAGE_ENCODED,
-                            "filename.txt|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED,
-                            "|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED},
+                            "  ICBteSBmaWxlIGNvbnRlbnQwICA= ", 
+                            "filename1.txt|    ICBteSBmaWxlIGNvbnRlbnQxICA= ", 
+                            "filename2.txt|ICBteSBmaWxlIGNvbnRlbnQyICA=", 
+                            "filename3.txt|2021-03-15T08:59:22.123Z|ICBteSBmaWxlIGNvbnRlbnQzICA=",
+                            "filename4.txt|2021-03-15T08:59:22.123Z|plain/text|ICBteSBmaWxlIGNvbnRlbnQ0ICA=",
+                            "|2021-03-15T08:59:22.123Z|plain/text|ICBteSBmaWxlIGNvbnRlbnQ1ICA="},
               /* invalid values */
               new String[] {"filename.txt|2021-03-15T08:59:22.123Z|plain/text|" + MESSAGE, "filename.txt|2021-33-15T08:59:22.123Z|plain/text|" + MESSAGE_ENCODED},
               /* too small value */
               null,        
               /* too big value */
-              null);
+              null,
+              true /* uniqueness */);
     }
 
 

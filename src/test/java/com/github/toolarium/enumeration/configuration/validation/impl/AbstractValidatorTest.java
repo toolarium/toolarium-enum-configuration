@@ -18,7 +18,10 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 
@@ -34,7 +37,8 @@ public abstract class AbstractValidatorTest {
     private String[] validValues; 
     private String[] invalidValues; 
     private String[] tooSmallValues; 
-    private String[] tooBigValues; 
+    private String[] tooBigValues;
+    private boolean runUniqnessTest;
 
     
     /**
@@ -46,6 +50,7 @@ public abstract class AbstractValidatorTest {
      * @param invalidValues the invalid values
      * @param tooSmallValues the too small values
      * @param tooBigValues the too big values
+     * @param runUniqnessTest true to run uniqness test
      */
     AbstractValidatorTest(EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType, 
                           String minValueSize, 
@@ -53,7 +58,8 @@ public abstract class AbstractValidatorTest {
                           String[] validValues,
                           String[] invalidValues,
                           String[] tooSmallValues, 
-                          String[] tooBigValues) {
+                          String[] tooBigValues,
+                          boolean runUniqnessTest) {
         this.enumKeyValueConfigurationDataType = enumKeyValueConfigurationDataType;
         this.minValueSize = minValueSize;
         this.maxValueSize = maxValueSize;
@@ -61,6 +67,7 @@ public abstract class AbstractValidatorTest {
         this.invalidValues = invalidValues;
         this.tooSmallValues = tooSmallValues;
         this.tooBigValues = tooBigValues;
+        this.runUniqnessTest = runUniqnessTest;
         
         assertNotNull(validValues);
         assertTrue(validValues.length > 2);
@@ -100,26 +107,26 @@ public abstract class AbstractValidatorTest {
         boolean allowEmptyValue = allowEmptyValue(minValueSize, maxValueSize);
         if (allowEmptyValue) {
             // test no value, no cardinality --> min value > than empty string!
-            isValid("", null, minValueSize, maxValueSize);
+            isValid("", null, false, minValueSize, maxValueSize, null);
         } else {
             // test no value, no cardinality --> min value > than empty string!
-            isInValid("", null, minValueSize, maxValueSize);
+            isInValid("", null, false, minValueSize, maxValueSize, null);
         }
 
         // test no value --> min value > than empty string!
-        isInValid("", "1..1", minValueSize, maxValueSize);
+        isInValid("", "1..1", false, minValueSize, maxValueSize, null);
 
         // test valid values, no cardinality
         if (validValues != null) {
             for (String validValue : validValues) {
-                isValid(validValue, null, minValueSize, maxValueSize);
+                isValid(validValue, null, false, minValueSize, maxValueSize, null);
             }
         }
         
         // test invalid values, no cardinality
         if (invalidValues != null) {
             for (String invalidValue : invalidValues) {
-                isInValid(invalidValue, null, minValueSize, maxValueSize);
+                isInValid(invalidValue, null, false, minValueSize, maxValueSize, null);
             }
         }
         
@@ -127,10 +134,10 @@ public abstract class AbstractValidatorTest {
         if (tooSmallValues != null) {
             for (String tooSmallValue : tooSmallValues) {
                 if (isTooSmallValue(tooSmallValue, minValueSize)) {
-                    isInValid(tooSmallValue, null, minValueSize, maxValueSize);
+                    isInValid(tooSmallValue, null, false, minValueSize, maxValueSize, null);
                 } else {
                     // in case too small value is equals to the min value
-                    isValid(tooSmallValue, null, minValueSize, maxValueSize);
+                    isValid(tooSmallValue, null, false, minValueSize, maxValueSize, null);
                 }
             }
         }
@@ -138,7 +145,7 @@ public abstract class AbstractValidatorTest {
         // test too big value, no cardinality
         if (tooBigValues != null) {
             for (String tooBigValue : tooBigValues) {
-                isInValid(tooBigValue, null, minValueSize, maxValueSize);
+                isInValid(tooBigValue, null, false, minValueSize, maxValueSize, null);
             }
         }
     }
@@ -178,36 +185,36 @@ public abstract class AbstractValidatorTest {
         boolean allowEmptyValue = allowEmptyValue(minValueSize, maxValueSize);
         if (allowEmptyValue) {
             // test no value, no cardinality
-            isValid("", cardinality, minValueSize, maxValueSize);
+            isValid("", cardinality, false, minValueSize, maxValueSize, null);
         } else {
             // test no value, no cardinality
-            isInValid("", cardinality, minValueSize, maxValueSize);
+            isInValid("", cardinality, false, minValueSize, maxValueSize, null);
         }
 
         // test min, no cardinality
-        isValid(createValueContent(minValueSize), cardinality, minValueSize, maxValueSize);
+        isValid(createValueContent(minValueSize), cardinality, false, minValueSize, maxValueSize, null);
         
         // test max, no cardinality
-        isValid(createValueContent(maxValueSize), cardinality, minValueSize, maxValueSize);
+        isValid(createValueContent(maxValueSize), cardinality, false, minValueSize, maxValueSize, null);
 
         // test valid value, no cardinality
         for (String validValue : validValues) {
-            isValid(validValue, cardinality, minValueSize, maxValueSize);
+            isValid(validValue, cardinality, false, minValueSize, maxValueSize, null);
         }
 
         // test invalid value, no cardinality
         for (String invalidValue : invalidValues) {
-            isInValid(invalidValue, cardinality, minValueSize, maxValueSize);
+            isInValid(invalidValue, cardinality, false, minValueSize, maxValueSize, null);
         }
 
         // test too small value, no cardinality
         if (tooSmallValues != null) {
             for (String tooSmallValue : tooSmallValues) {
                 if (isTooSmallValue(tooSmallValue, minValueSize)) {
-                    isInValid(tooSmallValue, cardinality, minValueSize, maxValueSize);
+                    isInValid(tooSmallValue, cardinality, false, minValueSize, maxValueSize, null);
                 } else {
                     // in case too small value is equals to the min value
-                    isValid(tooSmallValue, cardinality, minValueSize, maxValueSize);
+                    isValid(tooSmallValue, cardinality, false, minValueSize, maxValueSize, null);
                 }
             }
         }
@@ -215,7 +222,7 @@ public abstract class AbstractValidatorTest {
         // test too big value, no cardinality
         if (tooBigValues != null) {
             for (String tooBigValue : tooBigValues) {
-                isInValid(tooBigValue, cardinality, minValueSize, maxValueSize);
+                isInValid(tooBigValue, cardinality, false, minValueSize, maxValueSize, null);
             }
         }
     }
@@ -226,7 +233,12 @@ public abstract class AbstractValidatorTest {
      */
     @Test
     public void testCardinalityWithValidatorMinSize() {
-        testCardinality(getValidatorMinValueSizeAsString(), maxValueSize, validValues);
+        String[] duplicatedValidValues = Stream.concat(Arrays.stream(validValues), Arrays.stream(validValues)).toArray(String[]::new);
+        testCardinality(getValidatorMinValueSizeAsString(), maxValueSize, duplicatedValidValues, false);
+        
+        if (runUniqnessTest) {
+            testCardinality(getValidatorMinValueSizeAsString(), maxValueSize, validValues, true);
+        }
     }
 
     
@@ -235,7 +247,12 @@ public abstract class AbstractValidatorTest {
      */
     @Test
     public void testCardinalityWithGivenMinSize() {
-        testCardinality(minValueSize, maxValueSize, validValues);
+        String[] duplicatedValidValues = Stream.concat(Arrays.stream(validValues), Arrays.stream(validValues)).toArray(String[]::new);
+        testCardinality(minValueSize, maxValueSize, duplicatedValidValues, false);
+        
+        if (runUniqnessTest) {
+            testCardinality(minValueSize, maxValueSize, validValues, true);
+        }
     }
 
     
@@ -245,24 +262,30 @@ public abstract class AbstractValidatorTest {
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
      * @param validValues the valid values
+     * @param uniqueness true for uniquness
      */
-    public void testCardinality(String minValueSize, String maxValueSize, String[] validValues) {
+    public void testCardinality(String minValueSize, String maxValueSize, String[] validValues, boolean uniqueness) {
         
         //protected void isValid(String input, String inputCardinality, String minValueSize, String maxValueSize, boolean isOptional) {
         
         assertNotNull(validValues);
         assertTrue(validValues.length > 2);
         
+        // check if valid values are unique
+        if (uniqueness) {
+            assertTrue(areUnique(validValues));
+        }
+        
         // test no value
-        isValid("", "0..1", minValueSize, maxValueSize);
-        isInValid("", "1..1", minValueSize, maxValueSize);
-        isValid("", "0..0", minValueSize, maxValueSize);
-        isValid("", "0", minValueSize, maxValueSize);
-        isInValid("", "1", minValueSize, maxValueSize);
+        isValid("", "0..1", uniqueness, minValueSize, maxValueSize, null);
+        isInValid("", "1..1", uniqueness, minValueSize, maxValueSize, null);
+        isValid("", "0..0", uniqueness, minValueSize, maxValueSize, null);
+        isValid("", "0", uniqueness, minValueSize, maxValueSize, null);
+        isInValid("", "1", uniqueness, minValueSize, maxValueSize, null);
 
         List<String> list = new ArrayList<String>(); 
         for (String validValue : validValues) {
-            isValid(validValue, "1", minValueSize, maxValueSize);
+            isValid(validValue, "1", false, minValueSize, maxValueSize, null);
             list.add(validValue);
         }
         
@@ -270,19 +293,51 @@ public abstract class AbstractValidatorTest {
         //String[] validValueList = list.toArray(String[]::new);
 
         // test max cardinality
-        isValid(validValueList, "" + validValues.length, minValueSize, maxValueSize);
-        isValid(validValueList, "*", minValueSize, maxValueSize);
-        isValid(validValueList, "0..*", minValueSize, maxValueSize);
-        isValid(validValueList, "1..*", minValueSize, maxValueSize);
-        isValid(validValueList, "" + (validValues.length - 1) + ".." + validValues.length, minValueSize, maxValueSize);
-        isValid(validValueList, "" + (validValues.length - 1) + "..*", minValueSize, maxValueSize);
-        isValid(validValueList, "" + validValues.length + ".." + validValues.length, minValueSize, maxValueSize);
+        isValid(validValueList, "" + validValues.length, uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "*", uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "0..*", uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "1..*", uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + (validValues.length - 1) + ".." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + (validValues.length - 1) + "..*", uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + validValues.length + ".." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
 
         // test too long cardinality elements
-        isInValid(validValueList, "" + (validValues.length - 1), minValueSize, maxValueSize);
+        isInValid(validValueList, "" + (validValues.length - 1), uniqueness, minValueSize, maxValueSize, null);
 
         // test too short cardinality elements
-        isInValid("[" + validValues[0] + "]", "2.." + validValues.length, minValueSize, maxValueSize);
+        isInValid("[" + validValues[0] + "]", "2.." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
+    }
+
+    
+    /**
+     * Test object in range.
+     */
+    @Test
+    public void testEnumeration() {
+        
+        assertNotNull(validValues);
+        assertTrue(validValues.length > 2);
+        
+        // test no enumeration
+        isValid("", "0..1", true, minValueSize, maxValueSize, "");
+        isValid("", "0..1", true, minValueSize, maxValueSize, null);
+        isValid(null, "0..1", true, minValueSize, maxValueSize, null);
+
+        List<String> list = new ArrayList<String>(); 
+        for (String validValue : validValues) {
+            list.add(validValue);
+        }
+        
+        isValid(list.get(0), "1", true, minValueSize, maxValueSize, list.get(0));
+        isInValid("[ \"" + list.get(0) + "\", \"" + list.get(1) + "\"  ]", "*", true, minValueSize, maxValueSize, list.get(0));
+        isValid("[ \"" + list.get(0) + "\" , \"" + list.get(1) + "\"  ]", "*", runUniqnessTest, minValueSize, maxValueSize, "[\"" + list.get(0) + "\", \"" + list.get(1) + "\" ]");
+
+        String validValueList = "[\"" + String.join("\", \"", list) + "\" ]";
+        isValid(validValueList, "1..*", runUniqnessTest, minValueSize, maxValueSize, validValueList);
+        
+        if (runUniqnessTest) {
+            isInValid(validValueList, "1..*", runUniqnessTest, minValueSize, maxValueSize, "[\"" + String.join("\", \"", list.subList(0, list.size() - 1)) + "\" ]");
+        }
     }
 
     
@@ -370,22 +425,24 @@ public abstract class AbstractValidatorTest {
      * Check if it is valid
      *
      * @param input the input to check
-     * @param inputCardinality the input cardinality
-     */
-    protected void isValid(String input, String inputCardinality) {
-        isValid(input, inputCardinality, minValueSize, maxValueSize);
-    }
-
-    
-    /**
-     * Check if it is valid
-     *
-     * @param input the input to check
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
      */
     protected void isValid(String input, String minValueSize, String maxValueSize) {
-        isValid(input, null, minValueSize, maxValueSize);
+        isValid(input, null, false, minValueSize, maxValueSize, null);
+    }
+
+    
+    /**
+     * Check if it is valid
+     *
+     * @param input the input to check
+     * @param inputCardinality the input cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param enumerationValue In case the input has to be inside the enumeration
+     */
+    protected void isValid(String input, String inputCardinality, boolean uniqueness, String enumerationValue) {
+        isValid(input, inputCardinality, uniqueness, minValueSize, maxValueSize, enumerationValue);
     }
 
     
@@ -396,13 +453,15 @@ public abstract class AbstractValidatorTest {
      * @param inputCardinality the input cardinality
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isValid(String input, String inputCardinality, String minValueSize, String maxValueSize) {
+    protected void isValid(String input, String inputCardinality, boolean uniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
         try {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, valueSize, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, uniqueness, valueSize, enumerationValue, input);
         } catch (ValidationException ex) {
             fail(ExceptionUtil.getInstance().prepareExceptionWithStacktraceInMessage(ex));
         }
@@ -424,9 +483,11 @@ public abstract class AbstractValidatorTest {
      *
      * @param input the input to check
      * @param inputCardinality the input cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isInValid(String input, String inputCardinality) {
-        isInValid(input, inputCardinality, minValueSize, maxValueSize);
+    protected void isInValid(String input, String inputCardinality, boolean uniqueness, String enumerationValue) {
+        isInValid(input, inputCardinality, uniqueness, minValueSize, maxValueSize, enumerationValue);
     }
 
     
@@ -438,7 +499,7 @@ public abstract class AbstractValidatorTest {
      * @param maxValueSize the max value size
      */
     protected void isInValid(String input, String minValueSize, String maxValueSize) {
-        isInValid(input, null, minValueSize, maxValueSize);
+        isInValid(input, null, true, minValueSize, maxValueSize, null);
     }
 
     
@@ -447,18 +508,46 @@ public abstract class AbstractValidatorTest {
      *
      * @param input the input to check
      * @param inputCardinality the input cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
+     * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isInValid(String input, String inputCardinality, String minValueSize, String maxValueSize) {
+    protected void isInValid(String input, String inputCardinality, boolean uniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
         try {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, valueSize, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, uniqueness, valueSize, enumerationValue, input);
             fail("Input [" + input + "], cardinality [" + inputCardinality + "], min: " + minValueSize + ", max: " + maxValueSize);
         } catch (ValidationException ex) {
             // NOP
         }
     }
+
+
+    /**
+     * Are unique array
+     *
+     * @param <T> the generic type
+     * @param array the array
+     * @return true if there are duplicates
+     */
+    protected static <T> boolean areUnique(T[] array) {
+        final Stream<T> stream = Arrays.asList(array).stream();
+        return stream.allMatch(new HashSet<>()::add);
+    }
+
+
+    /**
+     * Are unique string array
+     *
+     * @param array the array
+     * @return true if there are duplicates
+     */
+    protected static boolean areUnique(String[] array) {
+        final Stream<String> stream = Arrays.asList(array).stream();
+        return stream.map(String::trim).allMatch(new HashSet<>()::add);
+    }
 }
+

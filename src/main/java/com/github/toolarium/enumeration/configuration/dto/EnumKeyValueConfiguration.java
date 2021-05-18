@@ -19,8 +19,10 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
     private EnumKeyValueConfigurationDataType dataType;
     private String defaultValue;
     private String exampleValue;
+    private String enumerationValue;
     private EnumKeyValueConfigurationSizing<?> valueSize;
     private EnumKeyValueConfigurationSizing<Integer> cardinality;
+    private boolean uniqueness;
 
   
     /**
@@ -31,8 +33,10 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         dataType = EnumKeyValueConfigurationDataType.STRING;
         defaultValue = "";
         exampleValue = "";
+        enumerationValue = "";
         valueSize = null;
         cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
+        uniqueness = false;
     }
     
         
@@ -108,6 +112,26 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
 
     
     /**
+     * Get the enumeration value
+     * 
+     * @return the enumeration value
+     */
+    public String getEnumerationValue() {
+        return enumerationValue;
+    }
+    
+        
+    /**
+     * Set the enumeration value
+     * 
+     * @param enumerationValue the enumeration value
+     */
+    public void setEnumerationValue(String enumerationValue) {
+        this.enumerationValue = enumerationValue;
+    }
+    
+    
+    /**
      * Get the value size
      * 
      * @return the value size
@@ -159,48 +183,24 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
     
     
     /**
-     * Initialize a default example value
+     * Specifies that the input value is unique. This is only relevant if you have a cardinality.
+     * 
+     * @return True if it is unique; otherwise false, which means that the same value can occur more than once.
      */
-    /*
-    public void initExampleValue() {
-        if (getExampleValue() == null || exampleValue.isEmpty()) {
-            switch (dataType) {
-                case NUMBER:      setExampleValue("1234"); 
-                                  break;
-                case DOUBLE:      setExampleValue("12.34"); 
-                                  break;
-                case BOOLEAN:     setExampleValue("true"); 
-                                  break;
-                case DATE:        setExampleValue("2021-03-15"); 
-                                  break;
-                case TIME:        setExampleValue("12:34:56.789");
-                                  break;
-                case TIMESTAMP:   setExampleValue("2021-03-15T08:59:22.123Z");
-                                  break;
-                case REGEXP:      setExampleValue(".*(jim|joe).*");
-                                  break;
-                case UUID:        setExampleValue("f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
-                                  break;
-                case URI:         setExampleValue("https://my.url.com");
-                                  break;
-                case CIDR:        setExampleValue("10.2.0.0/16");                
-                                  break;
-                case EMAIL:       setExampleValue("mail@domain.com");
-                                  break;
-                case CRON:        setExampleValue("* * * * *");
-                                  break;
-                case COLOR:       setExampleValue("#40394A");
-                                  break;
-                case BINARY:      setExampleValue("myfile.txt|2021-03-15T08:59:22.123Z|text/plain|VGV4dAo=");
-                                  break;
-                case CERTIFICATE: 
-                case STRING:      
-                default:
-                    setExampleValue("");
-            }
-        }
+    public boolean uniqueness() {
+        return uniqueness;
     }
-    */
+
+    
+    /**
+     * Specifies that the input value is unique. This is only relevant if you have a cardinality.
+     * 
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once.
+     */
+    public void setUniqueness(boolean uniqueness) {
+        this.uniqueness = uniqueness;
+    }
+
     
     /**
      * @see java.lang.Object#hashCode()
@@ -226,6 +226,11 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         }
 
         result = prime * result;
+        if (enumerationValue != null) {
+            result += enumerationValue.hashCode();
+        }
+        
+        result = prime * result;
         if (valueSize != null) {
             result += valueSize.hashCode();
         }
@@ -233,6 +238,13 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         result = prime * result;
         if (cardinality != null) {
             result += cardinality.hashCode();
+        }
+
+        result = prime * result;
+        if (uniqueness) {
+            result += 1231;
+        } else {
+            result += 1237;
         }
 
         return result;
@@ -281,6 +293,14 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
             return false;
         }
 
+        if (enumerationValue == null) {
+            if (other.enumerationValue != null) {
+                return false;
+            }
+        } else if (!enumerationValue.equals(other.enumerationValue)) {
+            return false;
+        }
+
         if (valueSize == null) {
             if (other.valueSize != null) {
                 return false;
@@ -297,6 +317,10 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
             return false;
         }
 
+        if (uniqueness != other.uniqueness) {
+            return false;
+        }
+
         return true;
     }
 
@@ -310,10 +334,13 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
                + ", dataType=" + getDataType()
                + ", description=" + getDescription() 
                + ", defaultValue=" + getDefaultValue() 
-               + ", exampleValue=" + getExampleValue() 
+               + ", exampleValue=" + getExampleValue()
+               + ", enumerationValue=" + getEnumerationValue()
                + ", valueSize=" + getValueSize() 
                + ", cardinality=" + getCardinality() 
-               + ", isConfidential=" + isConfidential()
+               + ", uniqueness=" + uniqueness()
+               + ", mandatory=" + isMandatory()
+               + ", confidential=" + isConfidential()
                + ", validFrom=" + getValidFrom() 
                + ", validTill=" + getValidTill() 
                + "]";

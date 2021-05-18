@@ -35,17 +35,17 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public EnumKeyValueConfigurationBinaryObject validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         EnumKeyValueConfigurationBinaryObject inputBinaryObject = parseValue(inputValue);
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputBinaryObject;
         }
 
         if (inputBinaryObject == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputBinaryObject;
             }
             
             throw new EmptyValueException("Empty value: invalid binary, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
@@ -81,6 +81,8 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
         if (length.compareTo(minMaxValue.getMax()) > 0) {
             throw new ValidationException("Too big: invalid size of file, should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ", encoded size: " + length + ")!");
         }
+        
+        return inputBinaryObject;
     }
 
     

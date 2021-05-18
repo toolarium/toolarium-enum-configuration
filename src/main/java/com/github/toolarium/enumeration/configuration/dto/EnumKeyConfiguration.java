@@ -94,7 +94,6 @@ public class EnumKeyConfiguration extends AbstractEnumConfiguration {
             result += 1237;
         }
 
-
         return result;
     }
 
@@ -128,7 +127,6 @@ public class EnumKeyConfiguration extends AbstractEnumConfiguration {
         if (isConfidential != other.isConfidential) {
             return false;
         }
-
 
         return true;
     }

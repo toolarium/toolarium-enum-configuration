@@ -347,6 +347,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                             case "description":
                                 enumKeyValueConfiguration.setDescription(("" + value).trim());
                                 break;
+                                
                             case "dataType": 
                                 EnumKeyValueConfigurationDataType type = EnumUtil.getInstance().valueOf(EnumKeyValueConfigurationDataType.class, value);
                                 if (type == null) {
@@ -355,18 +356,27 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 
                                 enumKeyValueConfiguration.setDataType(type);
                                 break;
+                                
                             case "defaultValue": 
                                 enumKeyValueConfiguration.setDefaultValue(value);
                                 break;
+                                
                             case "minValue": 
                                 minValueSize = value;
                                 break;
+                                
                             case "maxValue": 
                                 maxValueSize = value;
                                 break;
+                                
                             case "exampleValue": 
                                 enumKeyValueConfiguration.setExampleValue(value);
                                 break;
+                                
+                            case "enumerationValue": 
+                                enumKeyValueConfiguration.setEnumerationValue(value);
+                                break;
+                                
                             case "cardinality": 
                                 try {
                                     enumKeyValueConfiguration.setCardinality(AnnotationConvertUtil.getInstance().parseCardinality(value));
@@ -374,15 +384,23 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
                                 }
                                 break;
+                                
+                            case "uniqueness": 
+                                enumKeyValueConfiguration.setUniqueness("true".equalsIgnoreCase(("" + value).trim()));
+                                break;
+                                
                             case "isConfidential": 
                                 enumKeyValueConfiguration.setConfidential("true".equalsIgnoreCase(("" + value).trim()));
                                 break;
+                                
                             case "validFrom": 
                                 enumKeyValueConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(value));
                                 break;
+                                
                             case "validTill": 
                                 enumKeyValueConfiguration.setValidTill(DateUtil.getInstance().parseTimestamp(value));
                                 break;
+                                
                             default: 
                                 //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found unknwon annotation value: " + e.getKey().getClass().getName() + "/" + e.getKey() + "/" + e.getKey().getSimpleName() + "/" + e.getValue());
                         }

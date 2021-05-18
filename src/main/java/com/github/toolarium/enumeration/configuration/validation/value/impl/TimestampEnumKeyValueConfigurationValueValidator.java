@@ -36,17 +36,17 @@ public class TimestampEnumKeyValueConfigurationValueValidator extends AbstractEn
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<Instant> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public Instant validateValue(EnumKeyValueConfigurationSizing<Instant> valueSize, String inputValue) throws EmptyValueException, ValidationException {
 
         Instant inputTimestamp = parseValue(inputValue);
         MinMaxValue<Instant> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputTimestamp;
         }
         
         if (inputTimestamp == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputTimestamp;
             }
             
             throw new EmptyValueException("Empty value: invalid timestamp, should be at least [" + valueSize.getMinSizeAsString() + "]!");
@@ -60,6 +60,8 @@ public class TimestampEnumKeyValueConfigurationValueValidator extends AbstractEn
         if (inputTimestamp.compareTo(minMaxValue.getMax()) > 0) {
             throw new ValidationException("Too big: invalid timestamp of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
         }
+        
+        return inputTimestamp;
     }
 
 

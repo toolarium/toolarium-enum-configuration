@@ -23,13 +23,14 @@ public class TimeValidatorTest extends AbstractValidatorTest {
               "00:01:00.000", 
               "23:00:00",
               /* valid values */
-              new String[] {"13:15:18.009", "  13:15:18.009  ", "23:00"},
+              new String[] {"13:15:18.009", "  13:15:18.010  ", "23:00"},
               /* invalid values */
               new String[] {"33:15:18.009", "2021-03-35T12:34:55Z", "23:00:01"},
               /* too small value */
               new String[] {"00:00:00"},        
               /* too big value */
-              new String[] {"23:10", "23:00:2"});
+              new String[] {"23:10", "23:00:2"},
+              true /* uniqueness */);
     }
 
 

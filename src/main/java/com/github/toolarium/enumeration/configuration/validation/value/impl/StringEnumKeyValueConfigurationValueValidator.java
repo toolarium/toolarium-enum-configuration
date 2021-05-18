@@ -44,17 +44,17 @@ public class StringEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public String validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         String inputString = parseValue(inputValue);        
         MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputString;
         }
 
         if (inputString == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputString;
             }
             
             throw new EmptyValueException("Empty value: invalid string, should be at the length of [" + valueSize.getMinSizeAsString() + "]!");
@@ -68,6 +68,8 @@ public class StringEnumKeyValueConfigurationValueValidator extends AbstractEnumK
         if (inputLength > minMaxValue.getMax().longValue()) {
             throw new ValidationException("Too long: invalid length of [" + inputValue + "], should be in range of [" + minMaxValue.getMin() + ".." + minMaxValue.getMax() + "] (now " + inputLength + ")!");
         }
+        
+        return inputString;
     }
 
     

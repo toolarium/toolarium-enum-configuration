@@ -35,17 +35,17 @@ public class DateEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<LocalDate> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public LocalDate validateValue(EnumKeyValueConfigurationSizing<LocalDate> valueSize, String inputValue) throws EmptyValueException, ValidationException {
 
         LocalDate inputDate = parseValue(inputValue);
         MinMaxValue<LocalDate> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputDate;
         }
         
         if (inputDate == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputDate;
             }
             
             throw new EmptyValueException("Empty value: invalid date, should be at least [" + valueSize.getMinSizeAsString() + "]!");
@@ -58,6 +58,8 @@ public class DateEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
         if (inputDate.compareTo(minMaxValue.getMax()) > 0) {
             throw new ValidationException("Too big: invalid date of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
         }
+        
+        return inputDate;
     }
 
 

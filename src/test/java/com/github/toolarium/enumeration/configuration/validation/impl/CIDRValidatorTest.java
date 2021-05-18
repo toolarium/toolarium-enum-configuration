@@ -23,11 +23,12 @@ public class CIDRValidatorTest extends AbstractValidatorTest {
               null, /* min value */
               null, /* max value */
               /* valid values */
-              new String[] {"10.2.0.0/16", "FF00::/8", "  10.2.0.0/16  ", "  FF00::/8   "},
+              new String[] {"10.2.0.0/16", "AA00::/8", "  10.3.0.0/16  ", "  FF00::/8   "},
               /* invalid values */
               new String[] {"10.2.0.0"},
               null, /* too small values */
-              null  /* too big values */);
+              null  /* too big values */,
+              true /* uniqueness */);
     }
 
 

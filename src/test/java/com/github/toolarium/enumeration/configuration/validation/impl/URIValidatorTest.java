@@ -24,11 +24,12 @@ public class URIValidatorTest extends AbstractValidatorTest {
               null, /* min value */
               null, /* max value */
               /* valid values */
-              new String[] {"https://www.sbb.ch", "  https://www.sbb.ch   ", "https://www.google.com"},
+              new String[] {"https://www.sbb.ch", "  https://www.github.com   ", "https://www.google.com"},
               /* invalid values */
               new String[] {"httds://www.sbb.ch\\files"},
               null, /* too small values */
-              null  /* too big values */);
+              null  /* too big values */,
+              true /* uniqueness */);
     }
 
 

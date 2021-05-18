@@ -134,7 +134,9 @@ public final class AnnotationConvertUtil {
                                                                                                                                                   enumKeyValueConfigurationAnnotation.minValue(), 
                                                                                                                                                   enumKeyValueConfigurationAnnotation.maxValue()));
         enumKeyValueConfiguration.setExampleValue(enumKeyValueConfigurationAnnotation.exampleValue());
+        enumKeyValueConfiguration.setEnumerationValue(enumKeyValueConfigurationAnnotation.enumerationValue());
         enumKeyValueConfiguration.setCardinality(parseCardinality(enumKeyValueConfigurationAnnotation.cardinality()));
+        enumKeyValueConfiguration.setUniqueness(enumKeyValueConfigurationAnnotation.uniqueness());
         enumKeyValueConfiguration.setConfidential(enumKeyValueConfigurationAnnotation.isConfidential());
         
         if (enumKeyValueConfigurationAnnotation.validFrom() != null && !enumKeyValueConfigurationAnnotation.validFrom().trim().isEmpty()) {
@@ -213,7 +215,7 @@ public final class AnnotationConvertUtil {
     /**
      * Parse the size value
      *
-     * @param <T> the generic type
+     * @param <T> the generic size type
      * @param dataType the data type
      * @param input the string input, either number or *. In case it's null it will return null 
      * @return the parsed result

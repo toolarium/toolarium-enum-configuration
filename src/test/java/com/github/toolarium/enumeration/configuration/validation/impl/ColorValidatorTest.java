@@ -22,11 +22,12 @@ public class ColorValidatorTest extends AbstractValidatorTest {
               null, /* min value */
               null, /* max value */
               /* valid values */
-              new String[] {"#12B356", "   #12B356  ", "#A2B356"},
+              new String[] {"#12B356", "   #12B357  ", "#A2B358"},
               /* invalid values */
               new String[] {"12B356", "KFB356"},
               null, /* too small values */
-              null  /* too big values */);
+              null  /* too big values */,
+              true /* uniqueness */);
     }
 
 

@@ -23,13 +23,14 @@ public class BooleanValidatorTest extends AbstractValidatorTest {
               null, 
               null,
               /* valid values */
-              new String[] {"true", "yes", "   true   ", "   yes   ", "True", "Yes", "  True  ", "  Yes  ", "false", "no", "  false  ", "  no  ", "False", "No", "  False  ", " No ", "0", "1", "  0  ", "  1  "},
+              new String[] {"true", "yes", "   True   ", "   Yes   ", "tRue", "yEs", "  trUe  ", "  yeS  ", "fAlse", "nO", "  faLse  ", "  No  ", "False", "NO", "  FalsE  ", "  0  ", "  1  "},
               /* invalid values */
               new String[] {"trus", "ja", "nein", "2"},
               /* too small value */
               null,        
               /* too big value */
-              null);
+              null,
+              false /* uniqueness */);
     }
 
 

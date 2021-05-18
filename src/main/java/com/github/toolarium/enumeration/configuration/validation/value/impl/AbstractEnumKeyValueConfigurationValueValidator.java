@@ -18,7 +18,7 @@ import java.io.Serializable;
  *  
  * @author patrick
  */
-public abstract class AbstractEnumKeyValueConfigurationValueValidator<D, T> implements Serializable, IEnumKeyConfigurationValueValidator<T> {
+public abstract class AbstractEnumKeyValueConfigurationValueValidator<D, T> implements Serializable, IEnumKeyConfigurationValueValidator<D, T> {
     private static final long serialVersionUID = 5414798875779082500L;
     private EnumKeyValueConfigurationDataType valueDataType;
     private EnumKeyValueConfigurationDataType sizeDataType;

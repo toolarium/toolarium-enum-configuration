@@ -62,7 +62,7 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
      * @param dataType the enum data type
      * @return the resolved type
      */
-    public IEnumKeyConfigurationValueValidator<?> createEnumKeyValueConfigurationValueValidator(EnumKeyValueConfigurationDataType dataType) {
+    public IEnumKeyConfigurationValueValidator<?, ?> createEnumKeyValueConfigurationValueValidator(EnumKeyValueConfigurationDataType dataType) {
         try {
             switch (dataType) {
                 case NUMBER:      return new NumberEnumKeyValueConfigurationValueValidator(); 
@@ -94,7 +94,8 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
     /**
      * Create the {@link EnumKeyValueConfigurationSizing}.
      *
-     * @param <T> The generic type
+     * @param <D> the validated data type
+     * @param <T> the size type
      * @param dataType the data type
      * @param minValue the min value
      * @param maxValue the max value
@@ -102,8 +103,8 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
      * @throws ValidationException In case of a validation error
      */
     @SuppressWarnings("unchecked")
-    public <T> EnumKeyValueConfigurationSizing<T> createEnumKeyValueConfigurationSizing(EnumKeyValueConfigurationDataType dataType, String minValue, String maxValue) throws ValidationException {
-        IEnumKeyConfigurationValueValidator<T> type = (IEnumKeyConfigurationValueValidator<T>)EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
+    public <D, T> EnumKeyValueConfigurationSizing<T> createEnumKeyValueConfigurationSizing(EnumKeyValueConfigurationDataType dataType, String minValue, String maxValue) throws ValidationException {
+        IEnumKeyConfigurationValueValidator<D, T> type = (IEnumKeyConfigurationValueValidator<D, T>)EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
         EnumKeyValueConfigurationSizing<T> result = type.createValueSize(minValue, maxValue); 
         return result; 
     }

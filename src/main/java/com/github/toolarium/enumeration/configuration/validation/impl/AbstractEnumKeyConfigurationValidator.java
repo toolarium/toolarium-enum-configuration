@@ -17,6 +17,9 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -48,14 +51,16 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
      * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration, java.lang.String)
      */
     @Override
-    public void validate(EnumKeyValueConfiguration enumKeyValueConfiguration, String input) throws ValidationException {
+    public <D> Collection<D> validate(EnumKeyValueConfiguration enumKeyValueConfiguration, String input) throws ValidationException {
         
         validate(enumKeyValueConfiguration);
         
-        validate(enumKeyValueConfiguration.getDataType(), 
-                 enumKeyValueConfiguration.getCardinality(), 
-                 enumKeyValueConfiguration.getValueSize(),
-                 input);
+        return validate(enumKeyValueConfiguration.getDataType(), 
+                        enumKeyValueConfiguration.getCardinality(),
+                        enumKeyValueConfiguration.uniqueness(),
+                        enumKeyValueConfiguration.getValueSize(),
+                        enumKeyValueConfiguration.getEnumerationValue(),
+                        input);
     }
 
 
@@ -94,21 +99,42 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         validateValidity(enumKeyValueConfiguration.getValidFrom(), enumKeyValueConfiguration.getValidTill());
         
         validateDefaultValue(enumKeyValueConfiguration.getDataType(), 
-                             enumKeyValueConfiguration.getCardinality(), 
-                             enumKeyValueConfiguration.getValueSize(), 
+                             enumKeyValueConfiguration.getCardinality(),
+                             enumKeyValueConfiguration.uniqueness(),
+                             enumKeyValueConfiguration.getValueSize(),
+                             enumKeyValueConfiguration.getEnumerationValue(),
                              enumKeyValueConfiguration.getDefaultValue());
         
         validateExampleValue(enumKeyValueConfiguration.getDataType(), 
                              enumKeyValueConfiguration.getCardinality(), 
+                             enumKeyValueConfiguration.uniqueness(),
                              enumKeyValueConfiguration.getValueSize(), 
+                             enumKeyValueConfiguration.getEnumerationValue(),
                              enumKeyValueConfiguration.getExampleValue());
+        
+        validateEnumerationValue(enumKeyValueConfiguration.getDataType(), 
+                                 enumKeyValueConfiguration.getCardinality(), 
+                                 enumKeyValueConfiguration.uniqueness(),
+                                 enumKeyValueConfiguration.getValueSize(), 
+                                 enumKeyValueConfiguration.getEnumerationValue());
+        
     }
 
 
+    /**
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, 
+     * com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, boolean, com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String, java.lang.String)
+     */
     @Override
-    public void validate(EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<Integer> cardinality, EnumKeyValueConfigurationSizing<?> valueSize, String input) throws ValidationException {
+    public <D,T> Collection<D> validate(EnumKeyValueConfigurationDataType dataType, 
+                                        EnumKeyValueConfigurationSizing<Integer> cardinality, 
+                                        boolean uniqueness, 
+                                        EnumKeyValueConfigurationSizing<T> valueSize,
+                                        String enumerationValue,
+                                        String input) 
+            throws ValidationException {
         try {
-            validateValue("input", dataType, cardinality, valueSize, input);
+            return validateValue("input", dataType, cardinality, uniqueness, valueSize, enumerationValue, input);
         } catch (ValidationException ex) {
             throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[input] " + ex.getMessage(), ex.getStackTrace());
         }
@@ -185,22 +211,32 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
     /**
      * Validate default value
      *
+     * @param <D> the validated data type
+     * @param <T> the size type
      * @param dataType the data type
      * @param cardinality the cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param valueSize the value size
+     * @param enumerationValue In case the input has to be inside the enumeration
      * @param inputDefaultValue the default value
+     * @return the validated values
      * @throws ValidationException In case of a validation violation
      */
-    protected void validateDefaultValue(EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<Integer> cardinality, EnumKeyValueConfigurationSizing<?> valueSize, String inputDefaultValue) 
+    protected <D, T> Collection<D> validateDefaultValue(EnumKeyValueConfigurationDataType dataType, 
+                                                        EnumKeyValueConfigurationSizing<Integer> cardinality,
+                                                        boolean uniqueness,
+                                                        EnumKeyValueConfigurationSizing<T> valueSize,
+                                                        String enumerationValue,
+                                                        String inputDefaultValue) 
             throws ValidationException {
 
         String defaultValue = inputDefaultValue;
-        if (defaultValue != null && defaultValue.isEmpty()) {
-            return; // in case we have no default value; ignore this check
+        if (defaultValue == null || defaultValue.isBlank()) {
+            return null; // in case we have no default value; ignore this check
         }
 
         try {
-            validateValue("defaultValue", dataType, cardinality, valueSize, defaultValue);
+            return validateValue("defaultValue", dataType, cardinality, uniqueness, valueSize, enumerationValue, defaultValue);
         } catch (ValidationException ex) {
             throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[defaultValue] " + ex.getMessage(), ex.getStackTrace());
         }
@@ -210,17 +246,27 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
     /**
      * Validate example value
      *
+     * @param <D> the validated data type
+     * @param <T> the size type
      * @param dataType the data type
      * @param cardinality the cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param valueSize the value size
+     * @param enumerationValue In case the input has to be inside the enumeration
      * @param inputExampleValue the example value
+     * @return the validated values
      * @throws ValidationException In case of a validation violation
      */
-    protected void validateExampleValue(EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<Integer> cardinality, EnumKeyValueConfigurationSizing<?> valueSize, String inputExampleValue) 
+    protected <D, T> Collection<D> validateExampleValue(EnumKeyValueConfigurationDataType dataType, 
+                                                        EnumKeyValueConfigurationSizing<Integer> cardinality,
+                                                        boolean uniqueness,
+                                                        EnumKeyValueConfigurationSizing<?> valueSize, 
+                                                        String enumerationValue,
+                                                        String inputExampleValue) 
             throws ValidationException {
         
         String exampleValue = inputExampleValue;
-        if (exampleValue != null && exampleValue.isEmpty()) {
+        if (exampleValue == null || exampleValue.isBlank()) {
             exampleValue = null;
         }
 
@@ -231,7 +277,7 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         }
 
         try {
-            validateValue("exampleValue", dataType, exampleValueCardinality, valueSize, exampleValue);
+            return validateValue("exampleValue", dataType, exampleValueCardinality, uniqueness, valueSize, enumerationValue, exampleValue);
         } catch (ValidationException ex) {
             String msg = ex.getMessage();
             msg = msg.replace("minSize=1", "minSize=" + cardinality.getMinSizeAsString());
@@ -241,19 +287,61 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
 
     
     /**
+     * Validate enumeration value
+     *
+     * @param <D> the validated data type
+     * @param <T> the size type
+     * @param dataType the data type
+     * @param cardinality the cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param valueSize the value size
+     * @param inputEnumerationValue the enumeration value
+     * @return the validated values
+     * @throws ValidationException In case of a validation violation
+     */
+    protected <D, T> Collection<D> validateEnumerationValue(EnumKeyValueConfigurationDataType dataType, 
+                                                            EnumKeyValueConfigurationSizing<Integer> cardinality, 
+                                                            boolean uniqueness,
+                                                            EnumKeyValueConfigurationSizing<T> valueSize, 
+                                                            String inputEnumerationValue) 
+            throws ValidationException {
+        
+        String enumerationValue = inputEnumerationValue;
+        if (enumerationValue == null || enumerationValue.isBlank()) {
+            return null; // in case we have no enumeration value; ignore this check
+        }
+
+        try {
+            return validateValue("enumerationValue", dataType, cardinality, uniqueness, valueSize, null, enumerationValue);
+        } catch (ValidationException ex) {
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[enumerationValue] " + ex.getMessage(), ex.getStackTrace());
+        }
+    }
+
+    
+    /**
      * Validate example value
      *
-     * @param <T> the generic type
+     * @param <D> the validated data type
+     * @param <T> the size type
      * @param inputType the input type
      * @param dataType the data type
      * @param cardinality the cardinality
+     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param valueSize the value size
-     * @param input the input value
-     * @return the number of elements
+     * @param enumerationValue In case the input has to be inside the enumeration
+     * @param input the collection of validated values
+     * @return the validated values
      * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation violation
      */
-    protected <T> int validateValue(String inputType, EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<Integer> cardinality, EnumKeyValueConfigurationSizing<T> valueSize, String input)
+    protected <D, T> Collection<D> validateValue(String inputType, 
+                                                 EnumKeyValueConfigurationDataType dataType, 
+                                                 EnumKeyValueConfigurationSizing<Integer> cardinality,
+                                                 boolean uniqueness,
+                                                 EnumKeyValueConfigurationSizing<T> valueSize,
+                                                 String enumerationValue,
+                                                 String input)
             throws EmptyValueException, ValidationException {
         
         if (dataType == null) {
@@ -264,8 +352,16 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         if ((input == null || input.isEmpty()) && isMandatory) {
             throw new ValidationException("Missing [" + inputType + "], its mandatory and not optional (cardinality: " + cardinality +  ")!");
         }
-
-        int numberOfElements = 0;
+        
+        // prepare enumeration values
+        Collection<D> enumarationValues = validateEnumerationValue(dataType, cardinality, uniqueness, valueSize, enumerationValue);
+        Collection<D> collection = null;
+        if (uniqueness) {
+            collection = new HashSet<D>();
+        } else {
+            collection = new ArrayList<D>();
+        }
+        
         if (cardinality == null || cardinality.getMaxSize() == null || cardinality.getMaxSize().intValue() <= 1) {
             // no cardinality
             
@@ -274,8 +370,8 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
             }
 
             try {
-                validateValue(inputType, dataType, valueSize, input);
-                numberOfElements++;
+                D value = validateValue(inputType, dataType, valueSize, input);
+                collection.add(value);
             } catch (EmptyValueException ex) {
                 if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
                     // empty value is valid
@@ -302,8 +398,15 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                 if (inputList != null) {
                     for (String in : inputList) {
                         try {
-                            validateValue(inputType, dataType, valueSize, in);
-                            numberOfElements++;
+                            D value = validateValue(inputType, dataType, valueSize, in);
+                            if (enumarationValues != null && !enumarationValues.contains(value)) {
+                                throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [" + input + "], allowed values are: " + enumerationValue);
+                            }
+                            
+                            if (!collection.add(value)) {
+                                throw new ValidationException("Invalid uniqueness of [" + inputType + "] for intput [" + input + "]. Value already exist!");
+                            }
+
                         } catch (EmptyValueException ex) {
                             if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
                                 // empty value is valid
@@ -318,22 +421,24 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
             }
         }
         
-        return numberOfElements;
+        return collection;
     }
     
 
     /**
      * Validate example value
      *
-     * @param <T> the generic type
+     * @param <D> the validated data type
+     * @param <T> the size type
      * @param inputType the input type
      * @param dataType the data type
      * @param valueSize the value size
      * @param input the input value
+     * @return the validated value
      * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation violation
      */
-    protected <T> void validateValue(String inputType, EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<T> valueSize, String input)
+    protected <D, T> D validateValue(String inputType, EnumKeyValueConfigurationDataType dataType, EnumKeyValueConfigurationSizing<T> valueSize, String input)
             throws EmptyValueException, ValidationException {
         
         if (dataType == null) {
@@ -341,7 +446,7 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         }
 
         @SuppressWarnings("unchecked")
-        IEnumKeyConfigurationValueValidator<T> validator = (IEnumKeyConfigurationValueValidator<T>) EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
-        validator.validateValue(valueSize, input);
+        IEnumKeyConfigurationValueValidator<D, T> validator = (IEnumKeyConfigurationValueValidator<D, T>) EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
+        return validator.validateValue(valueSize, input);
     }    
 }

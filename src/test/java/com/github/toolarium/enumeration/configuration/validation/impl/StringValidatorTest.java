@@ -28,13 +28,14 @@ public class StringValidatorTest extends AbstractValidatorTest {
               "2", 
               "" + STRING_MAX_CONTENT.length(),
               /* valid values */
-              new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+              new String[] {"My string1", "  My string2   ", STRING_MAX_CONTENT},
               /* invalid values */
               new String[] {STRING_TOO_LONG_CONTENT},
               /* too small value */
               new String[] {"m"},        
               /* too big value */
-              new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"});
+              new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"},
+              true /* uniqueness */);
     }
 
 
@@ -46,7 +47,7 @@ public class StringValidatorTest extends AbstractValidatorTest {
         testValidate(getValidatorMinValueSizeAsString(), 
                      "" + STRING_MAX_CONTENT.length(),
                      /* valid values */
-                     new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+                     new String[] {"My string1", "  My string2   ", STRING_MAX_CONTENT},
                      /* invalid values */
                      new String[] {STRING_TOO_LONG_CONTENT},
                      /* too small value */
@@ -64,7 +65,7 @@ public class StringValidatorTest extends AbstractValidatorTest {
         testRange(getValidatorMinValueSizeAsString(), 
                   "" + STRING_MAX_CONTENT.length(),
                   /* valid values */
-                  new String[] {"My string", "  My string   ", STRING_MAX_CONTENT},
+                  new String[] {"My string1", "  My string2   ", STRING_MAX_CONTENT},
                   /* invalid values */
                   new String[] {STRING_TOO_LONG_CONTENT},
                   /* too small value */

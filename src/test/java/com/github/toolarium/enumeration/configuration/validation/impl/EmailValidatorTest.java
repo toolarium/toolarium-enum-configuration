@@ -23,11 +23,12 @@ public class EmailValidatorTest extends AbstractValidatorTest {
               null, /* min value */
               null, /* max value */
               /* valid values */
-              new String[] {"my@mail", "  my@mail  ", "your@mail"},
+              new String[] {"my@mail", "  third@mail  ", "your@mail"},
               /* invalid values */
               new String[] {"mymail"},
               null, /* too small values */
-              null  /* too big values */);
+              null  /* too big values */,
+              true /* uniqueness */);
     }
 
 

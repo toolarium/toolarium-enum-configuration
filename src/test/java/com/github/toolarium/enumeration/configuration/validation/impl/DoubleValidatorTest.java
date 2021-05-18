@@ -23,13 +23,14 @@ public class DoubleValidatorTest extends AbstractValidatorTest {
               "1", 
               "123",
               /* valid values */
-              new String[] {"12.34567", "  12.34567  ", "26.51973"},
+              new String[] {"12.34567", "  12.34568  ", "26.51973"},
               /* invalid values */
               new String[] {"123'45678901234", "1A2.34567"},
               /* too small value */
               new String[] {"0.999"},        
               /* too big value */
-              new String[] {"123.001", "124.0", "125", "321321321321"});
+              new String[] {"123.001", "124.0", "125", "321321321321"},
+              true /* uniqueness */);
     }
 
 

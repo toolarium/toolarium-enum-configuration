@@ -12,14 +12,14 @@ This project implements a so-called enumeration configuration that turns a Java 
 
 The basic idea behind this is to solve the chicken-and-egg problem: Your software defines or expect some configuration values that are e.g.
 in a database. Now, in your code, you typically define a constant with which you retrieve the value. In the database you have to add the same
-constant with the corresponding value. From various experiences, there are often a lot of problems with. 
+constant with the corresponding value. From various experiences, there are often a lot of problems with.
 
-Here comes a possible solution with this project: 
-1) You simply define an enum in Java
+Here comes a possible solution with this project:
+1) You simply define an enum in Java.
 2) Then add the EnumConfiguration or the EnunmValueConfigutation. Use the annotation attributes for more information.
 3) Use the EnumConfigurationProcessor to generate the output you use, e.g. SQL queries
 
-The big advantage is that you only have one place (source code) where you define your "constant". 
+The big advantage is that you only have one place (source code) where you define your "constant".
 
 ### Installing
 

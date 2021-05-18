@@ -34,17 +34,17 @@ public class TimeEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<LocalTime> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public LocalTime validateValue(EnumKeyValueConfigurationSizing<LocalTime> valueSize, String inputValue) throws EmptyValueException, ValidationException {
 
         LocalTime inputTime = parseValue(inputValue);
         MinMaxValue<LocalTime> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputTime;
         }
         
         if (inputTime == null) {
             if (minMaxValue.getMin() == null || minMaxValue.getMin().equals(getMinSize())) {
-                return;
+                return inputTime;
             }
             
             throw new EmptyValueException("Empty value: invalid time, should be at least [" + valueSize.getMinSizeAsString() + "]!");
@@ -58,6 +58,7 @@ public class TimeEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
             throw new ValidationException("Too big: invalid date of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
         }
         
+        return inputTime;
     }
 
 

@@ -24,13 +24,14 @@ public class TimestampValidatorTest extends AbstractValidatorTest {
               "1973-01-01T00:00:00.0Z", 
               "2037-05-31T00:00:00.0Z",
               /* valid values */
-              new String[] {"2021-03-15T12:34:55.00Z", "  2021-03-15T12:34:55Z  ", "2021-03-10T12:34:55.00Z"},
+              new String[] {"2021-03-15T12:34:55.00Z", "  2021-03-15T13:34:55Z  ", "2021-03-10T14:34:55.00Z"},
               /* invalid values */
               new String[] {"2021-03-15", "12:34:55Z", "2021-33-35T12:34:55Z"},
               /* too small value */
               new String[] {"1972-12-31T00:00:00.0Z"},        
               /* too big value */
-              new String[] {"2037-06-01T00:00:00.0Z", "2038-01-01T00:00:00.0Z"});
+              new String[] {"2037-06-01T00:00:00.0Z", "2038-01-01T00:00:00.0Z"},
+              true /* uniqueness */);
     }
 
 

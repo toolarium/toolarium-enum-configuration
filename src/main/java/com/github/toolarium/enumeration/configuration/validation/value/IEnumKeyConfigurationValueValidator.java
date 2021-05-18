@@ -14,7 +14,7 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
  * 
  * @author patrick
  */
-public interface IEnumKeyConfigurationValueValidator<T> {
+public interface IEnumKeyConfigurationValueValidator<D, T> {
 
     /**
      * Create value size
@@ -32,10 +32,11 @@ public interface IEnumKeyConfigurationValueValidator<T> {
      *
      * @param inputValue the input value to validate
      * @param valueSize the value size
+     * @return the validated value
      * @throws EmptyValueException In case of an empty value
      * @throws ValidationException In case of a validation error
      */
-    void validateValue(EnumKeyValueConfigurationSizing<T> valueSize, String inputValue) throws EmptyValueException, ValidationException;
+    D validateValue(EnumKeyValueConfigurationSizing<T> valueSize, String inputValue) throws EmptyValueException, ValidationException;
     
     
     /**

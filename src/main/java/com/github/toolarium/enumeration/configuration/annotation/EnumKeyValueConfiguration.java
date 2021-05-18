@@ -102,10 +102,29 @@ public @interface EnumKeyValueConfiguration {
     
     /**
      * The default value.
-     *
+     * The default value belongs to the dataType, minValue/maxValue and the cardinality.
+     * 
      * @return The default value.
      */
     String defaultValue() default "";
+
+    
+    /**
+     * An example value. 
+     * The example value belongs to the dataType, minValue/maxValue and the cardinality.
+     *
+     * @return An example value.
+     */
+    String exampleValue();
+
+    
+    /**
+     * An enumeration value: If this is defined, only an enumeration value is accepted for defaultValue, exampleValue and value.  
+     * The enumeration value belongs to the dataType, minValue/maxValue and the cardinality.
+     *
+     * @return An example value.
+     */
+    String enumerationValue() default "";
 
     
     /**
@@ -127,14 +146,6 @@ public @interface EnumKeyValueConfiguration {
     
     
     /**
-     * An example value.
-     *
-     * @return An example value.
-     */
-    String exampleValue();
-    
-    
-    /**
      * <p>The cardinality expression for an entry. If there is more than one element, the content of the representation corresponds to a
      * JSON array, e.g. <code>[ "My string array", "with 3", "elements (cardinality = 3)" ]</code>. This means the cardinality can be 
      * combined with the different data types.</p>
@@ -150,7 +161,15 @@ public @interface EnumKeyValueConfiguration {
      * @return The cardinality expression.
      */
     String cardinality() default "1..1";
+
     
+    /**
+     * Specifies that the input value is unique. This is only relevant if you have a cardinality.
+     * 
+     * @return True if it is unique; otherwise false, which means that the same value can occur more than once.
+     */
+    boolean uniqueness() default false;
+
     
     /**
      * Determines whether the configuration value is confidential. In case of persistence it has to be secured.

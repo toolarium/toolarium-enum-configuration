@@ -33,17 +33,19 @@ public class BooleanEnumKeyValueConfigurationValueValidator extends AbstractEnum
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public void validateValue(EnumKeyValueConfigurationSizing<Boolean> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public Boolean validateValue(EnumKeyValueConfigurationSizing<Boolean> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         Boolean inputBoolean = parseValue(inputValue);
         MinMaxValue<Boolean> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
-            return;
+            return inputBoolean;
         }
 
         if (inputBoolean == null) {
             throw new EmptyValueException("Empty value: invalid boolean [" + inputValue + "]!");
         }
+        
+        return inputBoolean;
     }
 
     

@@ -24,13 +24,14 @@ public class DateValidatorTest extends AbstractValidatorTest {
               "1973-01-01", 
               "2037-05-31",
               /* valid values */
-              new String[] {"2021-03-15", "  2021-03-15  ", "1973-02-01"},
+              new String[] {"2021-03-15", "  2021-03-14  ", "1973-02-01"},
               /* invalid values */
               new String[] {"2021-03-35", "2021-03-35T12:34:55Z"},
               /* too small value */
               new String[] {"1972-12-31"},        
               /* too big value */
-              new String[] {"2037-06-01", "2038-01-01"});
+              new String[] {"2037-06-01", "2038-01-01"},
+              true /* uniqueness */);
     }
 
 

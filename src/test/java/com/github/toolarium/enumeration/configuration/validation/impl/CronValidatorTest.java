@@ -22,13 +22,14 @@ public class CronValidatorTest extends AbstractValidatorTest {
               null, 
               null,
               /* valid values */
-              new String[] {"* * * * *", "  * * * * *  ", "  1/2 * * * *  "},
+              new String[] {"* * * * *", "  1 * * * *  ", "  1/2 * * * *  "},
               /* invalid values */
               new String[] {"* * * *"},
               /* too small value */
               null,        
               /* too big value */
-              null);
+              null,
+              true /* uniqueness */);
     }
 
 
