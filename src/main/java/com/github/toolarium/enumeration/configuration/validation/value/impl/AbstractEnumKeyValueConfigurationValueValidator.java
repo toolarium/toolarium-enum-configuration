@@ -178,7 +178,31 @@ public abstract class AbstractEnumKeyValueConfigurationValueValidator<D, T> impl
      * @return true if the first is greater than the seconds.
      */
     protected abstract boolean isGreaterThan(T first, T second);
-    
+
+
+    /**
+     * Validate if the first value is greater than the second.
+     *
+     * @param first value
+     * @param second value
+     * @return true if the first is greater than the seconds.
+     */
+    protected boolean isGreaterThanValue(Number first, Number second) {
+        if (first == null) {
+            if (second == null) {
+                return false;
+            }
+            
+            return true;
+        } else if (second == null) {
+            return false;
+        }
+        
+        Long f = first.longValue();
+        Long s = second.longValue();
+        return f.compareTo(s) > 0;
+    }
+
 
     /**
      * @see java.lang.Object#hashCode()

@@ -18,7 +18,7 @@ import java.util.UUID;
  * 
  * @author patrick
  */
-public class UUIDEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<UUID, Long> {
+public class UUIDEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<UUID, Number> {
     private static final long serialVersionUID = 3680551029203917086L;
 
     
@@ -34,10 +34,10 @@ public class UUIDEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public UUID validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public UUID validateValue(EnumKeyValueConfigurationSizing<Number> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         UUID inputUUID = parseValue(inputValue);
-        MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
+        MinMaxValue<Number> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
             return inputUUID;
         }
@@ -58,8 +58,8 @@ public class UUIDEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#createEnumKeyValueConfigurationSizing()
      */
     @Override
-    public EnumKeyValueConfigurationSizing<Long> createEnumKeyValueConfigurationSizing() {
-        return new EnumKeyValueConfigurationSizing<Long>();
+    public EnumKeyValueConfigurationSizing<Number> createEnumKeyValueConfigurationSizing() {
+        return new EnumKeyValueConfigurationSizing<Number>();
     }
 
 
@@ -80,22 +80,12 @@ public class UUIDEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
         return 36L;
     }
 
-    
+
     /**
      * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator#isGreaterThan(java.lang.Object, java.lang.Object)
      */
     @Override
-    protected boolean isGreaterThan(Long first, Long second) {
-        if (first == null) {
-            if (second == null) {
-                return true;
-            }
-            
-            return false;
-        } else if (second == null) {
-            return false;
-        }
-        
-        return first.compareTo(second) > 0;
+    protected boolean isGreaterThan(Number first, Number second) {
+        return isGreaterThanValue(first, second);
     }
 }

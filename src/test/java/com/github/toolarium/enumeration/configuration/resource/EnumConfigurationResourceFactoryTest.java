@@ -11,8 +11,12 @@ import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
+import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -265,6 +269,60 @@ public class EnumConfigurationResourceFactoryTest {
         assertEquals(set2, e.selectMandatoryConfigurationListWithMissingDefaultValue());
         
         Assert.assertEquals(e, writeAndRead(e));
+    }
+
+    
+    /**
+     * Validate sample 
+     * 
+     * @throws ValidationException in case of a validation error
+     */
+    @Test
+    void validateEnumKeyValueConfigurationWithNumber() throws ValidationException {
+        EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
+        EnumKeyValueConfigurationSizing<Integer> cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
+        enumKeyValueConfiguration.setCardinality(cardinality);
+        enumKeyValueConfiguration.setConfidential(false);
+        enumKeyValueConfiguration.setKey("DELAY");
+        enumKeyValueConfiguration.setDefaultValue("2");
+        enumKeyValueConfiguration.setDescription("Defines the delay of an echo.");
+        enumKeyValueConfiguration.setEnumerationValue("");
+        enumKeyValueConfiguration.setExampleValue("2");
+        enumKeyValueConfiguration.setValidFrom(Instant.now());
+        enumKeyValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
+        
+        enumKeyValueConfiguration.setDataType(EnumKeyValueConfigurationDataType.NUMBER);
+        EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); //define Integer value
+        enumKeyValueConfiguration.setValueSize(valueSize);
+
+        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+    }
+
+    
+    /**
+     * Validate sample 
+     * 
+     * @throws ValidationException in case of a validation error
+     */
+    @Test
+    void validateEnumKeyValueConfigurationWithNumber2() throws ValidationException {
+        EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
+        EnumKeyValueConfigurationSizing<Integer> cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
+        enumKeyValueConfiguration.setCardinality(cardinality);
+        enumKeyValueConfiguration.setConfidential(false);
+        enumKeyValueConfiguration.setKey("DELAY");
+        enumKeyValueConfiguration.setDefaultValue("2");
+        enumKeyValueConfiguration.setDescription("Defines the delay of an echo.");
+        enumKeyValueConfiguration.setEnumerationValue("");
+        enumKeyValueConfiguration.setExampleValue("2");
+        enumKeyValueConfiguration.setValidFrom(Instant.now());
+        enumKeyValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
+        
+        enumKeyValueConfiguration.setDataType(EnumKeyValueConfigurationDataType.NUMBER);
+        EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Integer>(0, 10); //define Integer value
+        enumKeyValueConfiguration.setValueSize(valueSize);
+
+        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
     }
 
     

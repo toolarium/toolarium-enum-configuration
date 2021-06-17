@@ -19,7 +19,7 @@ import java.util.Base64;
  * 
  * @author patrick
  */
-public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<EnumKeyValueConfigurationBinaryObject, Long> {
+public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<EnumKeyValueConfigurationBinaryObject, Number> {
     private static final long serialVersionUID = 545511902630603231L;
 
     
@@ -35,10 +35,10 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public EnumKeyValueConfigurationBinaryObject validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public EnumKeyValueConfigurationBinaryObject validateValue(EnumKeyValueConfigurationSizing<Number> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
         EnumKeyValueConfigurationBinaryObject inputBinaryObject = parseValue(inputValue);
-        MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
+        MinMaxValue<Number> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
             return inputBinaryObject;
         }
@@ -74,14 +74,14 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
             throw new ValidationException("Could not decode file content: " + ex.getMessage() + "\n -> [" + inputValue + "]!");
         }
         
-        if (length.compareTo(minMaxValue.getMin()) < 0) {
+        if (isGreaterThan(minMaxValue.getMin(), length)) {
             throw new ValidationException("Too small: invalid size of file, should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
         }
-    
-        if (length.compareTo(minMaxValue.getMax()) > 0) {
+        
+        if (isGreaterThan(length, minMaxValue.getMax())) {
             throw new ValidationException("Too big: invalid size of file, should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ", encoded size: " + length + ")!");
         }
-        
+
         return inputBinaryObject;
     }
 
@@ -90,8 +90,8 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#createEnumKeyValueConfigurationSizing()
      */
     @Override
-    public EnumKeyValueConfigurationSizing<Long> createEnumKeyValueConfigurationSizing() {
-        return new EnumKeyValueConfigurationSizing<Long>();
+    public EnumKeyValueConfigurationSizing<Number> createEnumKeyValueConfigurationSizing() {
+        return new EnumKeyValueConfigurationSizing<Number>();
     }
 
     
@@ -111,23 +111,13 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
     public Long getMaxSize() {
         return Long.MAX_VALUE;
     }
-    
+
 
     /**
      * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator#isGreaterThan(java.lang.Object, java.lang.Object)
      */
     @Override
-    protected boolean isGreaterThan(Long first, Long second) {
-        if (first == null) {
-            if (second == null) {
-                return false;
-            }
-            
-            return true;
-        } else if (second == null) {
-            return false;
-        }
-        
-        return first.compareTo(second) > 0;
+    protected boolean isGreaterThan(Number first, Number second) {
+        return isGreaterThanValue(first, second);
     }
 }

@@ -17,7 +17,7 @@ import com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyC
  * 
  * @author patrick
  */
-public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<Long, Long> {
+public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<Long, Number> {
     private static final long serialVersionUID = -8613240212933792109L;
 
 
@@ -33,10 +33,10 @@ public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public Long validateValue(EnumKeyValueConfigurationSizing<Long> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public Long validateValue(EnumKeyValueConfigurationSizing<Number> valueSize, String inputValue) throws EmptyValueException, ValidationException {
     
         Long inputNumber = parseValue(inputValue);
-        MinMaxValue<Long> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
+        MinMaxValue<Number> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
             return inputNumber;
         }
@@ -49,11 +49,11 @@ public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumK
             throw new EmptyValueException("Empty value: invalid size, should be at least [" + valueSize.getMinSizeAsString() + "]!");
         }
 
-        if (inputNumber.compareTo(minMaxValue.getMin()) < 0) {
+        if (inputNumber.compareTo(minMaxValue.getMin().longValue()) < 0) {
             throw new ValidationException("Too small: invalid size of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
         }
     
-        if (inputNumber.compareTo(minMaxValue.getMax()) > 0) {
+        if (inputNumber.compareTo(minMaxValue.getMax().longValue()) > 0) {
             throw new ValidationException("Too big: invalid size of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
         }
         
@@ -65,8 +65,8 @@ public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#createEnumKeyValueConfigurationSizing()
      */
     @Override
-    public EnumKeyValueConfigurationSizing<Long> createEnumKeyValueConfigurationSizing() {
-        return new EnumKeyValueConfigurationSizing<Long>();
+    public EnumKeyValueConfigurationSizing<Number> createEnumKeyValueConfigurationSizing() {
+        return new EnumKeyValueConfigurationSizing<Number>();
     }
 
 
@@ -87,22 +87,12 @@ public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumK
         return Long.MAX_VALUE;
     }
 
-    
+
     /**
      * @see com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator#isGreaterThan(java.lang.Object, java.lang.Object)
      */
     @Override
-    protected boolean isGreaterThan(Long first, Long second) {
-        if (first == null) {
-            if (second == null) {
-                return false;
-            }
-            
-            return true;
-        } else if (second == null) {
-            return false;
-        }
-        
-        return first.compareTo(second) > 0;
+    protected boolean isGreaterThan(Number first, Number second) {
+        return isGreaterThanValue(first, second);
     }
 }
