@@ -17,6 +17,7 @@ import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -276,9 +277,10 @@ public class EnumConfigurationResourceFactoryTest {
      * Validate sample 
      * 
      * @throws ValidationException in case of a validation error
+     * @throws IOException In case of an I/O error 
      */
     @Test
-    void validateEnumKeyValueConfigurationWithNumber() throws ValidationException {
+    void validateEnumKeyValueConfigurationWithNumber() throws ValidationException, IOException {
         EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
         EnumKeyValueConfigurationSizing<Integer> cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
         enumKeyValueConfiguration.setCardinality(cardinality);
@@ -290,12 +292,31 @@ public class EnumConfigurationResourceFactoryTest {
         enumKeyValueConfiguration.setExampleValue("2");
         enumKeyValueConfiguration.setValidFrom(Instant.now());
         enumKeyValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
-        
         enumKeyValueConfiguration.setDataType(EnumKeyValueConfigurationDataType.NUMBER);
-        EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); //define Integer value
+        //EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); // define long value
+        EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), "0", "10"); 
         enumKeyValueConfiguration.setValueSize(valueSize);
-
         EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+
+        // persiste and store 
+        EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration = new EnumConfiguration<EnumKeyValueConfiguration>("sample");
+        enumConfiguration.add(enumKeyValueConfiguration);
+        EnumConfigurations enumConfigurations = new EnumConfigurations();
+        enumConfigurations.add(enumConfiguration);
+        ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, outputstream);
+        
+        // restore
+        EnumConfigurations restoredEnumConfigurations =  EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
+        @SuppressWarnings("unchecked")
+        EnumConfiguration<EnumKeyValueConfiguration> restoredEnumConfiguration = (EnumConfiguration<EnumKeyValueConfiguration>)restoredEnumConfigurations.get("sample");
+        
+        EnumKeyValueConfiguration restoredEnumKeyValueConfiguration = restoredEnumConfiguration.getKeyList().iterator().next();
+        //@SuppressWarnings("unchecked")
+        //EnumKeyValueConfigurationSizing<Long> restoredValueSize = (EnumKeyValueConfigurationSizing<Long>)restoredEnumKeyValueConfiguration.getValueSize();
+        // differences: integer
+        //assertEquals(valueSize.getMaxSize().getClass(), restoredValueSize.getMaxSize().getClass());
+        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(restoredEnumKeyValueConfiguration);
     }
 
     

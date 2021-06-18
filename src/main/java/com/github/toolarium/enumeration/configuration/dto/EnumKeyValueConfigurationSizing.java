@@ -113,7 +113,7 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
         this.minSize = minSize;
         
         if (minSizeAsString == null) {
-            this.minSizeAsString = "" + minSize; 
+            setMinSizeAsString("" + minSize); 
         }
     }
 
@@ -159,7 +159,7 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
         this.maxSize = maxSize;
         
         if (maxSizeAsString == null) {
-            this.maxSizeAsString = "" + minSize; 
+            setMaxSizeAsString("" + maxSize); 
         }
     }
 
@@ -212,10 +212,11 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
             return false;
         }
         
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+               
         @SuppressWarnings("unchecked")
         EnumKeyValueConfigurationSizing<T> other = (EnumKeyValueConfigurationSizing<T>) obj;
         /*
