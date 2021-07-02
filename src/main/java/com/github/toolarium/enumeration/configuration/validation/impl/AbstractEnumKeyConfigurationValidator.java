@@ -57,7 +57,7 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         
         return validate(enumKeyValueConfiguration.getDataType(), 
                         enumKeyValueConfiguration.getCardinality(),
-                        enumKeyValueConfiguration.uniqueness(),
+                        enumKeyValueConfiguration.isUniqueness(),
                         enumKeyValueConfiguration.getValueSize(),
                         enumKeyValueConfiguration.getEnumerationValue(),
                         input);
@@ -100,21 +100,21 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         
         validateDefaultValue(enumKeyValueConfiguration.getDataType(), 
                              enumKeyValueConfiguration.getCardinality(),
-                             enumKeyValueConfiguration.uniqueness(),
+                             enumKeyValueConfiguration.isUniqueness(),
                              enumKeyValueConfiguration.getValueSize(),
                              enumKeyValueConfiguration.getEnumerationValue(),
                              enumKeyValueConfiguration.getDefaultValue());
         
         validateExampleValue(enumKeyValueConfiguration.getDataType(), 
                              enumKeyValueConfiguration.getCardinality(), 
-                             enumKeyValueConfiguration.uniqueness(),
+                             enumKeyValueConfiguration.isUniqueness(),
                              enumKeyValueConfiguration.getValueSize(), 
                              enumKeyValueConfiguration.getEnumerationValue(),
                              enumKeyValueConfiguration.getExampleValue());
         
         validateEnumerationValue(enumKeyValueConfiguration.getDataType(), 
                                  enumKeyValueConfiguration.getCardinality(), 
-                                 enumKeyValueConfiguration.uniqueness(),
+                                 enumKeyValueConfiguration.isUniqueness(),
                                  enumKeyValueConfiguration.getValueSize(), 
                                  enumKeyValueConfiguration.getEnumerationValue());
         

@@ -22,7 +22,7 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
     private String enumerationValue;
     private EnumKeyValueConfigurationSizing<?> valueSize;
     private EnumKeyValueConfigurationSizing<Integer> cardinality;
-    private boolean uniqueness;
+    private boolean isUniqueness;
 
   
     /**
@@ -36,7 +36,7 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         enumerationValue = "";
         valueSize = null;
         cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
-        uniqueness = false;
+        isUniqueness = false;
     }
     
         
@@ -187,18 +187,18 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
      * 
      * @return True if it is unique; otherwise false, which means that the same value can occur more than once.
      */
-    public boolean uniqueness() {
-        return uniqueness;
+    public boolean isUniqueness() {
+        return isUniqueness;
     }
 
     
     /**
      * Specifies that the input value is unique. This is only relevant if you have a cardinality.
      * 
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once.
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once.
      */
-    public void setUniqueness(boolean uniqueness) {
-        this.uniqueness = uniqueness;
+    public void setUniqueness(boolean isUniqueness) {
+        this.isUniqueness = isUniqueness;
     }
 
     
@@ -241,7 +241,7 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         }
 
         result = prime * result;
-        if (uniqueness) {
+        if (isUniqueness) {
             result += 1231;
         } else {
             result += 1237;
@@ -317,7 +317,7 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
             return false;
         }
 
-        if (uniqueness != other.uniqueness) {
+        if (isUniqueness != other.isUniqueness) {
             return false;
         }
 
@@ -338,7 +338,7 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
                + ", enumerationValue=" + getEnumerationValue()
                + ", valueSize=" + getValueSize() 
                + ", cardinality=" + getCardinality() 
-               + ", uniqueness=" + uniqueness()
+               + ", isUniqueness=" + isUniqueness()
                + ", mandatory=" + isMandatory()
                + ", confidential=" + isConfidential()
                + ", validFrom=" + getValidFrom() 
