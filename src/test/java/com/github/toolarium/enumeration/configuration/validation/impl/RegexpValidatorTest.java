@@ -28,6 +28,6 @@ public class RegexpValidatorTest extends AbstractValidatorTest {
               new String[] {"[b-"},
               null, /* too small values */
               null  /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 }

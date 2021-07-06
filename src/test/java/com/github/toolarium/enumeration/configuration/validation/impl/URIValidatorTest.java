@@ -29,7 +29,7 @@ public class URIValidatorTest extends AbstractValidatorTest {
               new String[] {"httds://www.sbb.ch\\files"},
               null, /* too small values */
               null  /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

@@ -30,7 +30,7 @@ public class CertificateValidatorTest extends AbstractValidatorTest {
               null,        
               /* too big value */
               null,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

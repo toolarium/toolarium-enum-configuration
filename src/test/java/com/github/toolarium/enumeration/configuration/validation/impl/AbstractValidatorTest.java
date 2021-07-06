@@ -262,9 +262,9 @@ public abstract class AbstractValidatorTest {
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
      * @param validValues the valid values
-     * @param uniqueness true for uniquness
+     * @param isUniqueness true for uniquness
      */
-    public void testCardinality(String minValueSize, String maxValueSize, String[] validValues, boolean uniqueness) {
+    public void testCardinality(String minValueSize, String maxValueSize, String[] validValues, boolean isUniqueness) {
         
         //protected void isValid(String input, String inputCardinality, String minValueSize, String maxValueSize, boolean isOptional) {
         
@@ -272,16 +272,16 @@ public abstract class AbstractValidatorTest {
         assertTrue(validValues.length > 2);
         
         // check if valid values are unique
-        if (uniqueness) {
+        if (isUniqueness) {
             assertTrue(areUnique(validValues));
         }
         
         // test no value
-        isValid("", "0..1", uniqueness, minValueSize, maxValueSize, null);
-        isInValid("", "1..1", uniqueness, minValueSize, maxValueSize, null);
-        isValid("", "0..0", uniqueness, minValueSize, maxValueSize, null);
-        isValid("", "0", uniqueness, minValueSize, maxValueSize, null);
-        isInValid("", "1", uniqueness, minValueSize, maxValueSize, null);
+        isValid("", "0..1", isUniqueness, minValueSize, maxValueSize, null);
+        isInValid("", "1..1", isUniqueness, minValueSize, maxValueSize, null);
+        isValid("", "0..0", isUniqueness, minValueSize, maxValueSize, null);
+        isValid("", "0", isUniqueness, minValueSize, maxValueSize, null);
+        isInValid("", "1", isUniqueness, minValueSize, maxValueSize, null);
 
         List<String> list = new ArrayList<String>(); 
         for (String validValue : validValues) {
@@ -293,19 +293,19 @@ public abstract class AbstractValidatorTest {
         //String[] validValueList = list.toArray(String[]::new);
 
         // test max cardinality
-        isValid(validValueList, "" + validValues.length, uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "*", uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "0..*", uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "1..*", uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "" + (validValues.length - 1) + ".." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "" + (validValues.length - 1) + "..*", uniqueness, minValueSize, maxValueSize, null);
-        isValid(validValueList, "" + validValues.length + ".." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + validValues.length, isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "*", isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "0..*", isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "1..*", isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + (validValues.length - 1) + ".." + validValues.length, isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + (validValues.length - 1) + "..*", isUniqueness, minValueSize, maxValueSize, null);
+        isValid(validValueList, "" + validValues.length + ".." + validValues.length, isUniqueness, minValueSize, maxValueSize, null);
 
         // test too long cardinality elements
-        isInValid(validValueList, "" + (validValues.length - 1), uniqueness, minValueSize, maxValueSize, null);
+        isInValid(validValueList, "" + (validValues.length - 1), isUniqueness, minValueSize, maxValueSize, null);
 
         // test too short cardinality elements
-        isInValid("[" + validValues[0] + "]", "2.." + validValues.length, uniqueness, minValueSize, maxValueSize, null);
+        isInValid("[" + validValues[0] + "]", "2.." + validValues.length, isUniqueness, minValueSize, maxValueSize, null);
     }
 
     
@@ -438,11 +438,11 @@ public abstract class AbstractValidatorTest {
      *
      * @param input the input to check
      * @param inputCardinality the input cardinality
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isValid(String input, String inputCardinality, boolean uniqueness, String enumerationValue) {
-        isValid(input, inputCardinality, uniqueness, minValueSize, maxValueSize, enumerationValue);
+    protected void isValid(String input, String inputCardinality, boolean isUniqueness, String enumerationValue) {
+        isValid(input, inputCardinality, isUniqueness, minValueSize, maxValueSize, enumerationValue);
     }
 
     
@@ -453,15 +453,15 @@ public abstract class AbstractValidatorTest {
      * @param inputCardinality the input cardinality
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isValid(String input, String inputCardinality, boolean uniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
+    protected void isValid(String input, String inputCardinality, boolean isUniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
         try {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, uniqueness, valueSize, enumerationValue, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
         } catch (ValidationException ex) {
             fail(ExceptionUtil.getInstance().prepareExceptionWithStacktraceInMessage(ex));
         }
@@ -483,11 +483,11 @@ public abstract class AbstractValidatorTest {
      *
      * @param input the input to check
      * @param inputCardinality the input cardinality
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isInValid(String input, String inputCardinality, boolean uniqueness, String enumerationValue) {
-        isInValid(input, inputCardinality, uniqueness, minValueSize, maxValueSize, enumerationValue);
+    protected void isInValid(String input, String inputCardinality, boolean isUniqueness, String enumerationValue) {
+        isInValid(input, inputCardinality, isUniqueness, minValueSize, maxValueSize, enumerationValue);
     }
 
     
@@ -508,17 +508,17 @@ public abstract class AbstractValidatorTest {
      *
      * @param input the input to check
      * @param inputCardinality the input cardinality
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
      * @param enumerationValue In case the input has to be inside the enumeration
      */
-    protected void isInValid(String input, String inputCardinality, boolean uniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
+    protected void isInValid(String input, String inputCardinality, boolean isUniqueness, String minValueSize, String maxValueSize, String enumerationValue) {
         try {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, uniqueness, valueSize, enumerationValue, input);
+            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
             fail("Input [" + input + "], cardinality [" + inputCardinality + "], min: " + minValueSize + ", max: " + maxValueSize);
         } catch (ValidationException ex) {
             // NOP

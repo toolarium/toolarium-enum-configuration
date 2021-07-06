@@ -28,7 +28,7 @@ public class EmailValidatorTest extends AbstractValidatorTest {
               new String[] {"mymail"},
               null, /* too small values */
               null  /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

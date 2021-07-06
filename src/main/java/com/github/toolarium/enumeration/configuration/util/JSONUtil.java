@@ -19,13 +19,13 @@ import java.util.List;
 
 /**
  * Simple JSON util
- * 
+ *
  * @author patrick
  */
 public final class JSONUtil {
     private ObjectMapper objectMapper;
 
-    
+
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      */
@@ -33,7 +33,7 @@ public final class JSONUtil {
         static final JSONUtil INSTANCE = new JSONUtil();
     }
 
-    
+
     /**
      * Constructor
      */
@@ -41,7 +41,7 @@ public final class JSONUtil {
         // NOP
     }
 
-    
+
     /**
      * Get the instance
      *
@@ -51,10 +51,10 @@ public final class JSONUtil {
         return HOLDER.INSTANCE;
     }
 
-       
+
     /**
      * Reads an object from an input stream.
-     * 
+     *
      * @param <T> the generic type
      * @param type the class
      * @param inputstream the input stream
@@ -65,7 +65,7 @@ public final class JSONUtil {
         if (inputstream == null) {
             return null;
         }
-        
+
         try {
             return getMapper().readValue(inputstream, type);
         } catch (JsonMappingException | JsonParseException e) {
@@ -82,11 +82,11 @@ public final class JSONUtil {
             throw e;
         }
     }
-    
+
 
     /**
      * Writes an object to an output stream.
-     * 
+     *
      * @param <T> the generic type
      * @param type the object to write
      * @param outputStream the output stream
@@ -96,7 +96,7 @@ public final class JSONUtil {
         if (outputStream == null || type == null) {
             return;
         }
-                
+
         try {
             getMapper().writerWithDefaultPrettyPrinter().writeValue(outputStream, type);
         } catch (JsonMappingException | JsonParseException e) {
@@ -106,12 +106,12 @@ public final class JSONUtil {
         }
     }
 
-    
+
     /**
      * Convert a list of strings into a JSON array
      *
      * @param list the string list
-     * @return the list as json array 
+     * @return the list as json array
      * @throws IllegalArgumentException In case of invalid json format
      */
     public String convert(List<String> list) throws IllegalArgumentException {
@@ -127,7 +127,7 @@ public final class JSONUtil {
         }
     }
 
-    
+
     /**
      * Convert a JSON array into a list of strings
      *
@@ -136,16 +136,16 @@ public final class JSONUtil {
      * @throws IllegalArgumentException In case of invalid json format
      */
     public List<String> convert(String json) throws IllegalArgumentException {
-        
+
         if (json == null) {
             return null;
         }
-        
+
         try {
             if (json.indexOf('[') < 0 &&  json.indexOf(']') < 0) {
                 return Arrays.asList(json);
-            }            
-            
+            }
+
             String[] elements = getMapper().readValue(json, String[].class);
             if (elements != null && elements.length > 0) {
                 return Arrays.asList(elements);
@@ -155,12 +155,12 @@ public final class JSONUtil {
             ex.setStackTrace(e.getStackTrace());
             throw ex;
         }
-        
+
         return null;
     }
 
 
-    
+
     /**
      * Get the object mapper
      *
@@ -169,7 +169,7 @@ public final class JSONUtil {
     private ObjectMapper getMapper() {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());            
+            objectMapper.registerModule(new JavaTimeModule());
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             objectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

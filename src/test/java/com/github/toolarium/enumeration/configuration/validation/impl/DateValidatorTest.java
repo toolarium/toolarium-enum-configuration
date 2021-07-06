@@ -31,7 +31,7 @@ public class DateValidatorTest extends AbstractValidatorTest {
               new String[] {"1972-12-31"},        
               /* too big value */
               new String[] {"2037-06-01", "2038-01-01"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

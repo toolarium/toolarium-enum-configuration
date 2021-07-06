@@ -34,7 +34,7 @@ public class NumberValidatorTest extends AbstractValidatorTest {
               new String[] {ZERO_STRING, "-1", "-12123232"},
               /* too big value */
               new String[] {"124", "125", "321321321321"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
     
     

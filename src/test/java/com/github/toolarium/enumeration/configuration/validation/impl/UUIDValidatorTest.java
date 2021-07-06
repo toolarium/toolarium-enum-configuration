@@ -28,7 +28,7 @@ public class UUIDValidatorTest extends AbstractValidatorTest {
               new String[] {"f81d4fae-7dec-11d0-00a0c91e6bf6", "fsdsf", "https://www.google.com"},
               new String[] {"f81d4fa"}, /* too small values */
               new String[] {"f81d4fae-7dec-11d0-a765-00a0c91e6bf6-f81d4fae-7dec-11d0-a765-00a0c91e6bf6"} /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

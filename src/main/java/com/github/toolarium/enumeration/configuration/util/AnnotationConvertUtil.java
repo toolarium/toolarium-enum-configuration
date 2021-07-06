@@ -136,7 +136,7 @@ public final class AnnotationConvertUtil {
         enumKeyValueConfiguration.setExampleValue(enumKeyValueConfigurationAnnotation.exampleValue());
         enumKeyValueConfiguration.setEnumerationValue(enumKeyValueConfigurationAnnotation.enumerationValue());
         enumKeyValueConfiguration.setCardinality(parseCardinality(enumKeyValueConfigurationAnnotation.cardinality()));
-        enumKeyValueConfiguration.setUniqueness(enumKeyValueConfigurationAnnotation.uniqueness());
+        enumKeyValueConfiguration.setUniqueness(enumKeyValueConfigurationAnnotation.isUniqueness());
         enumKeyValueConfiguration.setConfidential(enumKeyValueConfigurationAnnotation.isConfidential());
         
         if (enumKeyValueConfigurationAnnotation.validFrom() != null && !enumKeyValueConfigurationAnnotation.validFrom().trim().isEmpty()) {

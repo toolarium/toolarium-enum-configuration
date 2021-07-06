@@ -35,7 +35,7 @@ public class StringValidatorTest extends AbstractValidatorTest {
               new String[] {"m"},        
               /* too big value */
               new String[] {STRING_TOO_LONG_CONTENT, "too big text !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

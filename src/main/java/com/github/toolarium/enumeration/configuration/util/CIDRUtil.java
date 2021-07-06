@@ -16,13 +16,13 @@ import java.util.regex.Pattern;
 
 /**
  * CIDR utility
- * 
+ *
  * @author patrick
  */
 public final class CIDRUtil {
     /** Regular expression: ipv4 address pattern */
     public static final String IPV4_EXPRESSION = "(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
-    
+
     /** Regular expression: ipv6 address pattern */
     public static final String IPV6_EXPRESSION_STD = "(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}";
 
@@ -34,7 +34,7 @@ public final class CIDRUtil {
 
     /** Regular expression: ipv4 address range pattern */
     public static final  String IPV4_RANGE_EXPRESSION = "^([0-9]{1,3}\\.){3}[0-9]{1,3}" + "/([0-9]|[1-2][0-9]|3[0-2])$";
-    
+
     /** Regular expression: ipv6 address range pattern */
     public static final  String IPV6_RANGE_EXPRESSION = "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}"
                                                         + "(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}"
@@ -45,13 +45,13 @@ public final class CIDRUtil {
                                                         + "(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|"
                                                         + "(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:)))(%.+)?s*"
                                                         + "/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$";
-    
+
     private Pattern ipv4Expression;
     private Pattern ipv6Expression;
     private Pattern ipv4RangeExpression;
     private Pattern ipv6RangeExpression;
-    
-    
+
+
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      */
@@ -59,7 +59,7 @@ public final class CIDRUtil {
         static final CIDRUtil INSTANCE = new CIDRUtil();
     }
 
-    
+
     /**
      * Constructor
      */
@@ -68,10 +68,10 @@ public final class CIDRUtil {
         ipv6Expression = Pattern.compile(IPV6_EXPRESSION);
         ipv4RangeExpression = Pattern.compile(IPV4_RANGE_EXPRESSION);
         ipv6RangeExpression = Pattern.compile(IPV6_RANGE_EXPRESSION);
-                
+
     }
 
-    
+
     /**
      * Get the instance
      *
@@ -81,7 +81,7 @@ public final class CIDRUtil {
         return HOLDER.INSTANCE;
     }
 
-    
+
     /**
      * Validate if the host string is instance of ipv4 or ipv6 address
      *
@@ -92,11 +92,11 @@ public final class CIDRUtil {
         if (host == null || host.trim().length() == 0) {
             return false;
         }
-        
+
         if (isIPv4Address(host) || isIPv6Address(host)) {
             return  true;
-        } 
-        
+        }
+
         // try to resolve address
         InetAddress ipAddress = parseAddress(host);
         if (ipAddress != null) {
@@ -105,11 +105,11 @@ public final class CIDRUtil {
                 return true;
             }
         }
-        
+
         return false;
     }
 
-    
+
     /**
      * Validate if the given host is an instance of ipv4 or ipv6 address
      *
@@ -124,7 +124,7 @@ public final class CIDRUtil {
         if (isIPv4Range(host) || isIPv6Range(host)) {
             return true;
         }
-        
+
         // try to resolve address
         InetAddress ipAddress = parseAddress(host);
         if (ipAddress != null) {
@@ -133,11 +133,11 @@ public final class CIDRUtil {
                 return true;
             }
         }
-        
+
         return false;
     }
 
-    
+
     /**
      * Validate if the given host is an instance of ipv4
      *
@@ -163,11 +163,11 @@ public final class CIDRUtil {
         if (host == null || host.trim().length() == 0) {
             return false;
         }
-        
+
         return ipv6Expression.matcher(host).matches();
     }
 
-    
+
     /**
      * Check if the host string is a valid IP address (cidr notation)
      *
@@ -178,15 +178,11 @@ public final class CIDRUtil {
         if (host == null || host.trim().length() == 0) {
             return false;
         }
-        
-        if (isIPv4Range(host) || isIPv6Range(host)) {
-            return true;
-        }
 
-        return false;
+        return isIPv4Range(host) || isIPv6Range(host);
     }
 
-    
+
     /**
      * Check if the host string is instance of IPv4 range (cidr notation)
      *
@@ -201,7 +197,7 @@ public final class CIDRUtil {
         return ipv4RangeExpression.matcher(host).matches();
     }
 
-    
+
     /**
      * Check if the host string is instance of IPv6 range (cidr notation)
      *
@@ -216,7 +212,7 @@ public final class CIDRUtil {
         return ipv6RangeExpression.matcher(host).matches();
     }
 
-    
+
     /**
      * Check if the address is an ip address or an ip address range. IPv4 and IPv6 are supported.
      *
@@ -287,11 +283,11 @@ public final class CIDRUtil {
         //log.debug("Check remote address [" + remoteAddress + "] in host range [" + hostRangeAddress + "]: " + result);
         return result;
     }
-    
-    
+
+
     /**
      * Parse CIDR expression
-     * 
+     *
      * @param cidrExpression the CIDR expression
      * @return the processed CIDR
      * @throws UnknownHostException In case of invalid address
@@ -302,7 +298,7 @@ public final class CIDRUtil {
             throw new UnknownHostException("Invalid CIDR format: [" + cidrExpression + "]!");
         }
 
-        final String cidr = cidrExpression.trim(); 
+        final String cidr = cidrExpression.trim();
         int index = cidr.indexOf("/");
         String addressPart = cidr.substring(0, index);
         String networkPart = cidr.substring(index + 1);
@@ -311,7 +307,7 @@ public final class CIDRUtil {
 
 
     /**
-     * Prepare CIDR 
+     * Prepare CIDR
      *
      * @param inetAddress the internet address
      * @param prefixLength the prefix length
@@ -343,7 +339,7 @@ public final class CIDRUtil {
         return new CIDR(InetAddress.getByAddress(startIpArr), InetAddress.getByAddress(endIpArr));
     }
 
-    
+
     /**
      * Prepare byte array
      *
@@ -369,11 +365,11 @@ public final class CIDRUtil {
         for (int i = 0; i < newArr.size(); i++) {
             ret[i] = newArr.get(i);
         }
-        
+
         return ret;
     }
-    
-    
+
+
     /**
      * Parse the ip address
      *
@@ -387,20 +383,20 @@ public final class CIDRUtil {
             return null;
         }
     }
-    
+
     /**
      * CIDR
-     * 
+     *
      * @author patrick
      */
-    class CIDR {
-        private InetAddress startAddress;
-        private InetAddress endAddress;
-    
-        
+    public class CIDR {
+        private final InetAddress startAddress;
+        private final InetAddress endAddress;
+
+
         /**
          * Constructor for CIDR
-         * 
+         *
          * @param startAddress the start address
          * @param endAddress the end address
          */
@@ -408,8 +404,8 @@ public final class CIDRUtil {
             this.startAddress = startAddress;
             this.endAddress = endAddress;
         }
-        
-        
+
+
         /**
          * The network address
          *
@@ -419,7 +415,7 @@ public final class CIDRUtil {
             return this.startAddress.getHostAddress();
         }
 
-        
+
         /**
          * The broadcast address
          *
@@ -428,8 +424,8 @@ public final class CIDRUtil {
         public String getBroadcastAddress() {
             return this.endAddress.getHostAddress();
         }
-    
-        
+
+
         /**
          * Check if a given address is in range
          *
@@ -442,11 +438,11 @@ public final class CIDRUtil {
             BigInteger start = new BigInteger(1, this.startAddress.getAddress());
             BigInteger end = new BigInteger(1, this.endAddress.getAddress());
             BigInteger target = new BigInteger(1, address.getAddress());
-    
+
             int st = start.compareTo(target);
             int te = target.compareTo(end);
-    
-            return (st == -1 || st == 0) && (te == -1 || te == 0);
+
+            return (st < 0 || st == 0) && (te < 0 || te == 0);
         }
     }
 }

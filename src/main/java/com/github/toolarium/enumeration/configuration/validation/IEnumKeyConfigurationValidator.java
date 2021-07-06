@@ -70,7 +70,7 @@ public interface IEnumKeyConfigurationValidator {
      * @param <T> the size type
      * @param dataType the data type 
      * @param cardinality the cardinality
-     * @param uniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
      * @param valueSize the value size
      * @param enumerationValue In case the input has to be inside the enumeration
      * @param input the input to validate
@@ -79,7 +79,7 @@ public interface IEnumKeyConfigurationValidator {
      */
     <D,T> Collection<D> validate(EnumKeyValueConfigurationDataType dataType, 
                                  EnumKeyValueConfigurationSizing<Integer> cardinality,
-                                 boolean uniqueness,
+                                 boolean isUniqueness,
                                  EnumKeyValueConfigurationSizing<T> valueSize,
                                  String enumerationValue,
                                  String input) 

@@ -31,7 +31,7 @@ public class TimestampValidatorTest extends AbstractValidatorTest {
               new String[] {"1972-12-31T00:00:00.0Z"},        
               /* too big value */
               new String[] {"2037-06-01T00:00:00.0Z", "2038-01-01T00:00:00.0Z"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

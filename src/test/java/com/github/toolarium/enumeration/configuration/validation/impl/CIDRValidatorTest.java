@@ -28,7 +28,7 @@ public class CIDRValidatorTest extends AbstractValidatorTest {
               new String[] {"10.2.0.0"},
               null, /* too small values */
               null  /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

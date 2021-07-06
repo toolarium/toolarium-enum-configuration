@@ -30,7 +30,7 @@ public class BooleanValidatorTest extends AbstractValidatorTest {
               null,        
               /* too big value */
               null,
-              false /* uniqueness */);
+              false /* isUniqueness */);
     }
 
 

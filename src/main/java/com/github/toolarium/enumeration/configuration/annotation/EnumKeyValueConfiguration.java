@@ -168,7 +168,7 @@ public @interface EnumKeyValueConfiguration {
      * 
      * @return True if it is unique; otherwise false, which means that the same value can occur more than once.
      */
-    boolean uniqueness() default false;
+    boolean isUniqueness() default false;
 
     
     /**

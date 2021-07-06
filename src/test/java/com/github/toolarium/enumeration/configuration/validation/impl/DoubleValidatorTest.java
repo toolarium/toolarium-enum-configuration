@@ -30,7 +30,7 @@ public class DoubleValidatorTest extends AbstractValidatorTest {
               new String[] {"0.999"},        
               /* too big value */
               new String[] {"123.001", "124.0", "125", "321321321321"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

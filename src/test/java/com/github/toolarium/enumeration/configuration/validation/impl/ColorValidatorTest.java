@@ -27,7 +27,7 @@ public class ColorValidatorTest extends AbstractValidatorTest {
               new String[] {"12B356", "KFB356"},
               null, /* too small values */
               null  /* too big values */,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

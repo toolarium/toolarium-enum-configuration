@@ -30,7 +30,7 @@ public class TimeValidatorTest extends AbstractValidatorTest {
               new String[] {"00:00:00"},        
               /* too big value */
               new String[] {"23:10", "23:00:2"},
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

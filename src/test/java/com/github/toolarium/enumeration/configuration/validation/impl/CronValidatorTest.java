@@ -29,7 +29,7 @@ public class CronValidatorTest extends AbstractValidatorTest {
               null,        
               /* too big value */
               null,
-              true /* uniqueness */);
+              true /* isUniqueness */);
     }
 
 

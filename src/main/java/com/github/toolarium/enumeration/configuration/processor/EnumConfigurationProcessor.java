@@ -385,7 +385,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                                 }
                                 break;
                                 
-                            case "uniqueness": 
+                            case "isUniqueness": 
                                 enumKeyValueConfiguration.setUniqueness("true".equalsIgnoreCase(("" + value).trim()));
                                 break;
                                 
