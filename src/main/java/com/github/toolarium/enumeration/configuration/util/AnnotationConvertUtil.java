@@ -156,6 +156,7 @@ public final class AnnotationConvertUtil {
      *
      * @param inputCardinality the cardinality
      * @return the parsed cardinality
+     * @throws IllegalArgumentException In case of invalid cardinality.
      */
     public EnumKeyValueConfigurationSizing<Integer> parseCardinality(String inputCardinality) {
 
@@ -219,6 +220,7 @@ public final class AnnotationConvertUtil {
      * @param dataType the data type
      * @param input the string input, either number or *. In case it's null it will return null 
      * @return the parsed result
+     * @throws IllegalArgumentException In case of invalid size.
      */
     public <T> T parseSizeValue(EnumKeyValueConfigurationDataType dataType, String input) {
         if (input == null || input.trim().isEmpty()) {

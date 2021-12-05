@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <fileset-config file-format-version="1.2.0" simple-config="true" sync-formatter="false">
-     <local-check-config name="toolarium-enum-configuration" location="D:/projects/toolarium/toolarium-enum-configuration/conf/checkstyle/checkstyle.xml" type="external" description="">
+     <local-check-config name="toolarium-enum-configuration" location="C:/development/projects/toolarium/toolarium-enum-configuration/conf/checkstyle/checkstyle.xml" type="external" description="">
           <additional-data name="protect-config-file" value="true"/>
      </local-check-config>
      <fileset name="all" enabled="true" check-config-name="toolarium-enum-configuration" local="true">

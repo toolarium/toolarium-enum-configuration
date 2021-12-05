@@ -219,6 +219,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
      * @param input the input to parse
      * @return the CIDR
      * @throws URISyntaxException in case its not a CIDR
+     * @throws IllegalArgumentException In case of invalid range.
      */
     protected String getCIDR(String input) throws URISyntaxException {
         String value = checkBase(input);
