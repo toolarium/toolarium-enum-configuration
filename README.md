@@ -4,7 +4,7 @@
 
 # toolarium-enum-configuration
 
-Defines the toolarium enumeration configuration.
+Defines the toolarium enumeration configuration or in short enum configuration.
 
 ## Getting Started
 
