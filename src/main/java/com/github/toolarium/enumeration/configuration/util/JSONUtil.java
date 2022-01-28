@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -114,7 +115,7 @@ public final class JSONUtil {
      * @return the list as json array
      * @throws IllegalArgumentException In case of invalid json format
      */
-    public String convert(List<String> list) throws IllegalArgumentException {
+    public String convert(Collection<String> list) throws IllegalArgumentException {
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -158,7 +159,6 @@ public final class JSONUtil {
 
         return null;
     }
-
 
 
     /**
