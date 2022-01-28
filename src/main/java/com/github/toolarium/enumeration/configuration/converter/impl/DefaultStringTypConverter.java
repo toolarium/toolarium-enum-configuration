@@ -48,4 +48,38 @@ public class DefaultStringTypConverter extends AbstractStringTypeConverter {
             throw ExceptionUtil.getInstance().throwsException(e, ValidationException.class, true);
         }
     }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter#format(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, java.lang.Object)
+     */
+    @Override
+    public String format(EnumKeyValueConfigurationDataType dataType, Object input) throws ValidationException {
+        try {
+            switch (dataType) {
+                case NUMBER:      return getNumberAsString(input); 
+                case DOUBLE:      return getDoubleAsString(input);
+                /*
+                case BOOLEAN:     return getObjectsString(input); 
+                case DATE:        return getObjectsString(input); 
+                case TIME:        return getObjectsString(input);
+                case TIMESTAMP:   return getObjectsString(input);
+                case REGEXP:      return getObjectsString(input);
+                case UUID:        return getObjectsString(input);
+                case URI:         return getObjectsString(input);
+                case CIDR:        return getObjectsString(input);                
+                case EMAIL:       return getObjectsString(input);
+                case CRON:        return getObjectsString(input);
+                case COLOR:       return getObjectsString(input);
+                case CERTIFICATE: return getObjectsString(input);
+                case BINARY:      return getObjectsString(input);
+                */
+                case STRING:
+                default:
+                    return getObjectsString(input);
+            }
+        } catch (Exception e) {
+            throw ExceptionUtil.getInstance().throwsException(e, ValidationException.class, true);
+        }
+    }
 }

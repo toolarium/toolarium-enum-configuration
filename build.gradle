@@ -15,9 +15,15 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.1'
 
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.1'
+
     // utilities
-    testImplementation 'com.google.guava:guava:0.30-jre'
+    testImplementation 'com.google.guava:guava:31.0.1-jre'
     testImplementation 'com.google.truth:truth:1.1.2'
     testImplementation 'com.google.testing.compile:compile-testing:0.19'
     testRuntimeOnly "org.junit.platform:junit-platform-commons:1.7.0"
+    
+    // logging
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'    
 }

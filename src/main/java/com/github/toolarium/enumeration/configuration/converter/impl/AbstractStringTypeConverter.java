@@ -69,6 +69,34 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
 
 
     /**
+     * Get the number as string
+     * 
+     * @param value the input 
+     * @return the number as string
+     * @throws NumberFormatException in case its not a number
+     */
+    protected String getNumberAsString(Object value) throws NumberFormatException {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Short) {
+            return Short.toString((Short)value);
+        }
+
+        if (value instanceof Integer) {
+            return Integer.toString((Integer)value);
+        }
+
+        if (value instanceof Long) {
+            return Long.toString((Long)value);
+        }
+
+        return "" + value;
+    }
+
+
+    /**
      * Get the double
      * 
      * @param input the input to parse
@@ -80,8 +108,32 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
         if (value == null) {
             return null;
         }
-        
+
         return Double.valueOf(value);
+    }
+
+
+    /**
+     * Get the double as string
+     * 
+     * @param value the input
+     * @return the double as string
+     * @throws NumberFormatException in case its not a double
+     */
+    protected String getDoubleAsString(Object value) throws NumberFormatException {
+        if (value == null) {
+            return null;
+        }
+        
+        if (value instanceof Float) {
+            return Float.toString((Float)value);
+        }
+
+        if (value instanceof Double) {
+            return Double.toString((Double)value);
+        }
+
+        return "" + value;
     }
 
 
@@ -319,6 +371,21 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
         }
 
         return value;
+    }
+
+    
+    /**
+     * Get the object as string
+     * 
+     * @param value the input 
+     * @return the object
+     */
+    protected String getObjectsString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        
+        return value.toString();
     }
 
     

@@ -26,4 +26,15 @@ public interface IStringTypeConverter {
      * @throws ValidationException In case of a validation error
      */
     <T> T convert(EnumKeyValueConfigurationDataType dataType, String input) throws ValidationException;
+    
+    
+    /**
+     * Format
+     *
+     * @param dataType the data type 
+     * @param input the input to validate
+     * @return the result
+     * @throws ValidationException In case of a validation error
+     */
+    String format(EnumKeyValueConfigurationDataType dataType, Object input) throws ValidationException;
 }
