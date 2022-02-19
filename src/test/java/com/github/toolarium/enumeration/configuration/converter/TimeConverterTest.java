@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class TimeConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for TimeValidatorTest
+     * Constructor for TimeConverterTest
      */
     TimeConverterTest() {
         super(EnumKeyValueConfigurationDataType.TIME);
@@ -31,6 +31,6 @@ public class TimeConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(LocalTime.parse("13:15:18.009"), "13:15:18.009");
-        assertException("Text '33:15:18.009' could not be parsed: Invalid value for HourOfDay (valid values 0 - 23): 33", "33:15:18.009");
+        assertException("Invalid value [33:15:18.009], it can not be converted into a TIME data type: Text '33:15:18.009' could not be parsed: Invalid value for HourOfDay (valid values 0 - 23): 33.", "33:15:18.009");
     }
 }

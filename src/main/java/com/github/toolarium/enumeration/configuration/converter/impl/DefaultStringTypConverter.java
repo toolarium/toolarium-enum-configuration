@@ -17,6 +17,7 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
  * @author patrick
  */
 public class DefaultStringTypConverter extends AbstractStringTypeConverter {
+    
     /**
      * @see com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter#convert(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, java.lang.String)
      */
@@ -45,10 +46,10 @@ public class DefaultStringTypConverter extends AbstractStringTypeConverter {
                     return (T) inputToTest;
             }
         } catch (Exception e) {
-            throw ExceptionUtil.getInstance().throwsException(e, ValidationException.class, true);
+            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, prepareExceptionMessage(dataType, inputToTest, e), e.getStackTrace());
         }
     }
-
+    
     
     /**
      * @see com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter#format(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, java.lang.Object)

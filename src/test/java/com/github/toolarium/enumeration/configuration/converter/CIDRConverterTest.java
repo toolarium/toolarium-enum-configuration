@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class CIDRConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for CIDRValidatorTest
+     * Constructor for CIDRConverterTest
      */
     CIDRConverterTest() {
         super(EnumKeyValueConfigurationDataType.CIDR);
@@ -31,6 +31,6 @@ public class CIDRConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue("10.2.0.0/16", "10.2.0.0/16");        
-        assertException("Invalid value: [10.2.0.0].", "10.2.0.0");
+        assertException("Invalid value [10.2.0.0], it can not be converted into a CIDR data type.", "10.2.0.0");
     }
 }

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class NumberConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for NumberValidatorTest
+     * Constructor for NumberConverterTest
      */
     NumberConverterTest() {
         super(EnumKeyValueConfigurationDataType.NUMBER);
@@ -31,6 +31,6 @@ public class NumberConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(12345678901234L, "12345678901234");
-        assertException("For input string: \"123'45678901234\"", "123'45678901234");
+        assertException("Invalid value [123'45678901234], it can not be converted into a NUMBER data type.", "123'45678901234");
     }
 }

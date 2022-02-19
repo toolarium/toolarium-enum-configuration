@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class TimestampConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for TimestampValidatorTest
+     * Constructor for TimestampConverterTest
      */
     TimestampConverterTest() {
         super(EnumKeyValueConfigurationDataType.TIMESTAMP);
@@ -32,6 +32,6 @@ public class TimestampConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(Instant.parse("2021-03-15T12:34:55Z"), "2021-03-15T12:34:55Z");
-        assertException("Text '2021-33-35T12:34:55Z' could not be parsed at index 0", "2021-33-35T12:34:55Z");
+        assertException("Invalid value [2021-33-35T12:34:55Z], it can not be converted into a TIMESTAMP data type: Text '2021-33-35T12:34:55Z' could not be parsed at index 0.", "2021-33-35T12:34:55Z");
     }
 }

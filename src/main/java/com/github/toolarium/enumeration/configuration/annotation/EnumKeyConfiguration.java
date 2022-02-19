@@ -1,5 +1,5 @@
 /*
- * EnumNameConfiguration.java
+ * EnumKeyConfiguration.java
  *
  * Copyright by toolarium, all rights reserved.
  */

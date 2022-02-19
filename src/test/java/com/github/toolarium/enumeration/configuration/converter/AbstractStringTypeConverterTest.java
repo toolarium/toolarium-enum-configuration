@@ -1,5 +1,5 @@
 /*
- * StringTypeConverterTest.java
+ * AbstractStringTypeConverterTest.java
  *
  * Copyright by toolarium, all rights reserved.
  */
@@ -23,7 +23,8 @@ public abstract class AbstractStringTypeConverterTest {
     
     
     /**
-     * Constructor for AbstractValidatorTest
+     * Constructor for AbstractStringTypeConverterTest
+     * 
      * @param enumKeyValueConfigurationDataType the data type
      */
     AbstractStringTypeConverterTest(EnumKeyValueConfigurationDataType enumKeyValueConfigurationDataType) {

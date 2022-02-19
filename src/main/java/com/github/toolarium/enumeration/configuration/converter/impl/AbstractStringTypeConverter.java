@@ -6,9 +6,10 @@
 package com.github.toolarium.enumeration.configuration.converter.impl;
 
 import com.github.toolarium.enumeration.configuration.converter.IStringTypeConverter;
-import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
+import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.util.CIDRUtil;
-import com.github.toolarium.enumeration.configuration.util.DateUtil;
+import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -58,7 +59,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
      * @return the number
      * @throws NumberFormatException in case its not a number
      */
-    protected Long getNumber(String input) throws NumberFormatException {
+    protected Number getNumber(String input) throws NumberFormatException {
         String value = checkBase(input);
         if (value == null) {
             return null;
@@ -92,7 +93,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
             return Long.toString((Long)value);
         }
 
-        return "" + value;
+        return getObjectsString(value);
     }
 
 
@@ -133,7 +134,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
             return Double.toString((Double)value);
         }
 
-        return "" + value;
+        return getObjectsString(value);
     }
 
 
@@ -391,48 +392,47 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
     
     /**
      * Get the binary content.
-     * Format: <code>[name]|[timestamp]|[mime-type]|[content base64 encoded].</code> 
-     * The name, timestamp (as RFC 3339), mimetype are optional, only base64 content is a valid content.,
-     * e.g. <code>myfile.txt|2021-03-15T08:59:22.123Z|text/plain|VGV4dAo=</code> or <code>myfile.txt|||VGV4dAo=</code> or <code>VGV4dAo=</code>   
+     * Format: <code>[name]|[mime-type]|[timestamp]|[content base64 encoded].</code>
+     * The name, mime-type and timestamp (according to RFC 3339) are optional values. If they are present, they must be separated by a pipe character (|).
+     * Only the content is not optional and must be either empty or a valid base64 content, 
+     * e.g. <code>myfile.txt|text/plain|2021-03-15T08:59:22.123Z|VGV4dAo=</code> or <code>myfile.txt|||VGV4dAo=</code> or <code>VGV4dAo=</code>.   
      * 
      * @param input the input to parse
      * @return the file
      * @throws IllegalArgumentException in case its not a file
      */
-    protected EnumKeyValueConfigurationBinaryObject getBinary(String input) throws IllegalArgumentException {
+    protected IEnumKeyValueConfigurationBinaryObject getBinary(String input) throws IllegalArgumentException {
         if (checkBase(input) == null) {
             return null;
         }
         
-        EnumKeyValueConfigurationBinaryObject result = new EnumKeyValueConfigurationBinaryObject();
-        if (input.indexOf('|') < 0) {
-            result.setData(input);
-            return result;
-        }
+        return EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(input);
+    }
+
+
+    /**
+     * Prepare exception message
+     *
+     * @param dataType the data type
+     * @param inputToTest the input to test
+     * @param e the exception
+     * @return the message
+     */
+    protected String prepareExceptionMessage(EnumKeyValueConfigurationDataType dataType, String inputToTest, Exception e) {
+        StringBuilder msg = new StringBuilder();
+        msg.append("Invalid value [");
+        msg.append(inputToTest);
+        msg.append("], it can not be converted into a ");
+        msg.append(dataType);
+        msg.append(" data type");
         
-        String[] binaryData = input.split("\\|");
-        if (binaryData.length <= 1) {
-            result.setData(input);
-        } else {
-            result.setName(binaryData[0]);
-            
-            if (binaryData.length > 2) {
-                if (binaryData[1] != null && !binaryData[1].trim().isEmpty()) {
-                    try {
-                        result.setTimestamp(DateUtil.getInstance().parseTimestamp(binaryData[1]));
-                    } catch (Exception ex) {
-                        throw new IllegalArgumentException("Invalid timestamp [" + binaryData[1] + "]!");
-                    }
-                }
-                
-                if (binaryData.length > 3) {
-                    result.setMimetype(binaryData[2].trim());
-                }
-            }
-            
-            result.setData(binaryData[binaryData.length - 1]);
+        if (e instanceof DateTimeParseException || e instanceof PatternSyntaxException || e instanceof URISyntaxException) {
+            msg.append(": ");
+            msg.append(e.getMessage());
         }
+     
+        msg.append(".");
+        return msg.toString();
         
-        return result;
     }
 }

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class BooleanConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for BooleanValidatorTest
+     * Constructor for BooleanConverterTest
      */
     BooleanConverterTest() {
         super(EnumKeyValueConfigurationDataType.BOOLEAN);
@@ -49,7 +49,7 @@ public class BooleanConverterTest extends AbstractStringTypeConverterTest {
         assertValue(Boolean.FALSE, "  False  ");
         assertValue(Boolean.FALSE, "  No  ");
         
-        assertException("Invalid value: [trus].", "trus");
-        assertException("Invalid value: [ja].", "ja");
+        assertException("Invalid value [trus], it can not be converted into a BOOLEAN data type.", "trus");
+        assertException("Invalid value [ja], it can not be converted into a BOOLEAN data type.", "ja");
     }
 }

@@ -32,6 +32,7 @@ import com.github.toolarium.enumeration.configuration.validation.value.impl.UUID
  * @author patrick
  */
 public final class EnumKeyValueConfigurationValueValidatorFactory {
+    
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      */
@@ -60,12 +61,13 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
      * Create an {@link IEnumKeyConfigurationValueValidator}.
      *
      * @param dataType the enum data type
+     * @param maxValue the max value or null if no max value is available
      * @return the resolved type
      */
-    public IEnumKeyConfigurationValueValidator<?, ?> createEnumKeyValueConfigurationValueValidator(EnumKeyValueConfigurationDataType dataType) {
+    public IEnumKeyConfigurationValueValidator<?, ?> createEnumKeyValueConfigurationValueValidator(EnumKeyValueConfigurationDataType dataType, String maxValue) {
         try {
             switch (dataType) {
-                case NUMBER:      return new NumberEnumKeyValueConfigurationValueValidator(); 
+                case NUMBER:      return new NumberEnumKeyValueConfigurationValueValidator();
                 case DOUBLE:      return new DoubleEnumKeyValueConfigurationValueValidator(); 
                 case BOOLEAN:     return new BooleanEnumKeyValueConfigurationValueValidator(); 
                 case DATE:        return new DateEnumKeyValueConfigurationValueValidator(); 
@@ -104,7 +106,7 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
      */
     @SuppressWarnings("unchecked")
     public <D, T> EnumKeyValueConfigurationSizing<T> createEnumKeyValueConfigurationSizing(EnumKeyValueConfigurationDataType dataType, String minValue, String maxValue) throws ValidationException {
-        IEnumKeyConfigurationValueValidator<D, T> type = (IEnumKeyConfigurationValueValidator<D, T>)EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
+        IEnumKeyConfigurationValueValidator<D, T> type = (IEnumKeyConfigurationValueValidator<D, T>)EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType, maxValue);
         EnumKeyValueConfigurationSizing<T> result = type.createValueSize(minValue, maxValue); 
         return result; 
     }

@@ -17,6 +17,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
+/**
+ * Test the string enum key value configuration value validator
+ * 
+ * @author patrick
+ */
 public class EnumKeyValueConfigurationValueValidatorTest {
     private static final String ONE_STRING = "1";
 

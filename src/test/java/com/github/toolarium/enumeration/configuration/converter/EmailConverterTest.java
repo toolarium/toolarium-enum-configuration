@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class EmailConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for MailValidatorTest
+     * Constructor for EmailConverterTest
      */
     EmailConverterTest() {
         super(EnumKeyValueConfigurationDataType.EMAIL);
@@ -31,6 +31,6 @@ public class EmailConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue("my@mail", "my@mail");
-        assertException("Invalid value: [mymail].", "mymail");
+        assertException("Invalid value [mymail], it can not be converted into a EMAIL data type.", "mymail");
     }
 }

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class UUIDConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for UUIDValidatorTest
+     * Constructor for UUIDConverterTest
      */
     UUIDConverterTest() {
         super(EnumKeyValueConfigurationDataType.UUID);
@@ -31,6 +31,6 @@ public class UUIDConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(UUID.fromString("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"), "f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
-        assertException("Invalid UUID string: httds://www.sbb.ch", "httds://www.sbb.ch");
+        assertException("Invalid value [httds://www.sbb.ch], it can not be converted into a UUID data type.", "httds://www.sbb.ch");
     }
 }

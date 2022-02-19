@@ -61,10 +61,22 @@ public enum EnumKeyValueConfigurationDataType implements Serializable {
     CERTIFICATE,
     
     /** 
-     * A binary content which represents as example an entire file, 
-     * format: <code>[name]|[timestamp]|[mime-type]|[content base64 encoded].</code> 
-     * The name, timestamp (as RFC 3339), mimetype are optional, only base64 content is a valid content.,
-     * e.g. <code>myfile.txt|2021-03-15T08:59:22.123Z|text/plain|VGV4dAo=</code> or <code>myfile.txt|||VGV4dAo=</code> or <code>VGV4dAo=</code>   
+     * A binary content which represents as example an entire file:
+     * Format: <code>[name]|[timestamp]|{mime-type}[content base64 encoded].</code>
+     * The name, timestamp (according to RFC 3339), mime-type and the content  (base64 encoded content) are optional values. If the name, timestamp or content are present, 
+     * they must be separated by a pipe character (|). The mime-type can be declared as header of the content. If there is no pipe character it's assumed its the content part.  
+     * e.g. <code>myfile.txt|2021-03-15T08:59:22.123Z|{text/plain}VGV4dAo=</code> 
+     *   or <code>myfile.txt|2021-03-15T08:59:22.123Z|{text/plain}</code> 
+     *   or <code>myfile.txt|2021-03-15T08:59:22.123Z|VGV4dAo=</code> 
+     *   or <code>2021-03-15T08:59:22.123Z|{text/plain}VGV4dAo=</code>
+     *   or <code>2021-03-15T08:59:22.123Z|{text/plain}</code>
+     *   or <code>2021-03-15T08:59:22.123Z|VGV4dAo=</code>
+     *   or <code>myfile.txt|{text/plain}VGV4dAo=</code>
+     *   or <code>myfile.txt|{text/plain}</code>  
+     *   or <code>myfile.txt|VGV4dAo=</code> 
+     *   or <code>{text/plain}VGV4dAo=</code>
+     *   or <code>{text/plain}</code>  
+     *   or <code>VGV4dAo=</code>  
      */
     BINARY;
 }

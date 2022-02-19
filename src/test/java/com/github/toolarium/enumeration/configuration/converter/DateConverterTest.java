@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class DateConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for DateValidatorTest
+     * Constructor for DateConverterTest
      */
     DateConverterTest() {
         super(EnumKeyValueConfigurationDataType.DATE);
@@ -32,6 +32,6 @@ public class DateConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(LocalDate.parse("2021-03-15"), "2021-03-15");
-        assertException("Text '2021-43-15' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 43", "2021-43-15");
+        assertException("Invalid value [2021-43-15], it can not be converted into a DATE data type: Text '2021-43-15' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 43.", "2021-43-15");
     }
 }

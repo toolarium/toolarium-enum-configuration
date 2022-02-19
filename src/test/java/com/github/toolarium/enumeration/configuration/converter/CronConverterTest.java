@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class CronConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for CronValidatorTest
+     * Constructor for CronConverterTest
      */
     CronConverterTest() {
         super(EnumKeyValueConfigurationDataType.CRON);
@@ -33,6 +33,6 @@ public class CronConverterTest extends AbstractStringTypeConverterTest {
         assertValue("* * * * *", "  * * * * *  ");
         assertValue("* * * * *", "  * * * * *  ");
         assertValue("1/2 * * * *", "  1/2 * * * *  ");
-        assertException("Invalid cron entry [* * * *]!", "* * * *");
+        assertException("Invalid value [* * * *], it can not be converted into a CRON data type.", "* * * *");
     }
 }

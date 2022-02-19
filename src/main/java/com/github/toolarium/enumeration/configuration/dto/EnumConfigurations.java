@@ -1,5 +1,5 @@
 /*
- * EnumConfigurationResourceFactory.java
+ * EnumConfigurations.java
  *
  * Copyright by toolarium, all rights reserved.
  */

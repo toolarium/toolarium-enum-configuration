@@ -1,5 +1,5 @@
 /*
- * AbstractValidatorTEst.java
+ * AbstractValidatorTest.java
  *
  * Copyright by toolarium, all rights reserved.
  */
@@ -43,6 +43,7 @@ public abstract class AbstractValidatorTest {
     
     /**
      * Constructor for AbstractValidatorTest
+     * 
      * @param enumKeyValueConfigurationDataType the data type
      * @param minValueSize the min value size
      * @param maxValueSize the max value size
@@ -406,7 +407,7 @@ public abstract class AbstractValidatorTest {
     @SuppressWarnings("unchecked")
     protected <T> T getValidatorMinValueSize() {
         AbstractEnumKeyValueConfigurationValueValidator<?, T> validator = (AbstractEnumKeyValueConfigurationValueValidator<?, T>) EnumKeyValueConfigurationValueValidatorFactory
-                .getInstance().createEnumKeyValueConfigurationValueValidator(enumKeyValueConfigurationDataType);
+                .getInstance().createEnumKeyValueConfigurationValueValidator(enumKeyValueConfigurationDataType, maxValueSize);
         return validator.getMinSize();
     }
 

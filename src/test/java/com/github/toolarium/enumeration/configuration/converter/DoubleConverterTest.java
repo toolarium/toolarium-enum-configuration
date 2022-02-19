@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class DoubleConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for DoubleValidatorTest
+     * Constructor for DoubleConverterTest
      */
     DoubleConverterTest() {
         super(EnumKeyValueConfigurationDataType.DOUBLE);
@@ -31,6 +31,6 @@ public class DoubleConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue(12.34567d, "12.34567");
-        assertException("For input string: \"1A2.34567\"", "1A2.34567");
+        assertException("Invalid value [1A2.34567], it can not be converted into a DOUBLE data type.", "1A2.34567");
     }
 }

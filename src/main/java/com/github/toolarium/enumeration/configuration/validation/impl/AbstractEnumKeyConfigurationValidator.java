@@ -388,11 +388,11 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                 }
                 
                 if (cardinality.getMinSize() != null && length < cardinality.getMinSize().intValue()) {
-                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize is [" + cardinality.getMinSize() + "]! ");
+                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize is [" + cardinality.getMinSize() + "].");
                 }
 
                 if (cardinality.getMaxSize() != null && length > cardinality.getMaxSize().intValue()) {
-                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the maxSize is [" + cardinality.getMaxSize() + "]! ");
+                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the maxSize is [" + cardinality.getMaxSize() + "].");
                 }
                 
                 if (inputList != null) {
@@ -445,8 +445,13 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
             throw new ValidationException("Invalid dataType in [" + inputType + "]! ");
         }
 
+        String maxSize = null;
+        if (valueSize != null && valueSize.getMaxSize() != null) {
+            maxSize = valueSize.getMaxSize().toString();
+        }
+        
         @SuppressWarnings("unchecked")
-        IEnumKeyConfigurationValueValidator<D, T> validator = (IEnumKeyConfigurationValueValidator<D, T>) EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType);
+        IEnumKeyConfigurationValueValidator<D, T> validator = (IEnumKeyConfigurationValueValidator<D, T>) EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationValueValidator(dataType, maxSize);
         return validator.validateValue(valueSize, input);
     }    
 }

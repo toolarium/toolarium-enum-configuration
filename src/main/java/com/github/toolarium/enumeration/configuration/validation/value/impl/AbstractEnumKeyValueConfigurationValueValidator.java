@@ -112,7 +112,7 @@ public abstract class AbstractEnumKeyValueConfigurationValueValidator<D, T> impl
         try {
             return StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(valueDataType, input);
         } catch (Exception e) {
-            throw new ValidationException("Invalid value [" + input + "] (" + e.getMessage() + ")!");
+            throw new ValidationException(e.getMessage(), e);
         }
     }    
 

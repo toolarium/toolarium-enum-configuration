@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 public class StringConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for StringValidatorTest
+     * Constructor for StringConverterTest
      */
     StringConverterTest() {
         super(EnumKeyValueConfigurationDataType.STRING);

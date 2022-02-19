@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class RegexpConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for RegexpValidatorTest
+     * Constructor for RegexpConverterTest
      */
     RegexpConverterTest() {
         super(EnumKeyValueConfigurationDataType.REGEXP);
@@ -31,6 +31,6 @@ public class RegexpConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue("^.*[a-b]*$", "^.*[a-b]*$");
-        assertException("Illegal character range near index 3\n[b-", "[b-");
+        assertException("Invalid value [[b-], it can not be converted into a REGEXP data type: Illegal character range near index 3\n[b-.", "[b-");
     }
 }

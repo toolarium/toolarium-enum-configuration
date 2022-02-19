@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class ColorConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for ColorValidatorTest
+     * Constructor for ColorConverterTest
      */
     ColorConverterTest() {
         super(EnumKeyValueConfigurationDataType.COLOR);
@@ -30,6 +30,6 @@ public class ColorConverterTest extends AbstractStringTypeConverterTest {
     @Test
     public void testConvert() {
         assertValue("#12B356", "#12B356");
-        assertException("Invalid value: [#KFB356].", "#KFB356");
+        assertException("Invalid value [#KFB356], it can not be converted into a COLOR data type.", "#KFB356");
     }
 }

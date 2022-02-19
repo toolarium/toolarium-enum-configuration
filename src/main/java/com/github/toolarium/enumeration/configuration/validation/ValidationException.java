@@ -1,5 +1,5 @@
 /*
- * ValidationExcepption.java
+ * ValidationException.java
  *
  * Copyright by toolarium, all rights reserved.
  */
@@ -16,9 +16,21 @@ public class ValidationException extends Exception {
     
     /**
      * Constructor for ValidationException
+     * 
      * @param message the message
      */
     public ValidationException(String message) {
         super(message);
+    }
+
+
+    /**
+     * Constructor for ValidationException
+     * 
+     * @param message the message
+     * @param e the nested exception
+     */
+    public ValidationException(String message, Exception e) {
+        super(message, e);
     }
 }

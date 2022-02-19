@@ -16,7 +16,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 public class EmailValidatorTest extends AbstractValidatorTest {
 
     /**
-     * Constructor for MailValidatorTest
+     * Constructor for EmailValidatorTest
      */
     EmailValidatorTest() {
         super(EnumKeyValueConfigurationDataType.EMAIL,

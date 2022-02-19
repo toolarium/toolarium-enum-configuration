@@ -34,7 +34,7 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     @EnumKeyValueConfiguration(description = "An number array example.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\"]")
     ARRAY_SAMPLE, 
 
-    @EnumKeyValueConfiguration(description = "My value B.", dataType = DataType.BINARY, exampleValue = "myfile.txt|||VGV4dAo=")
+    @EnumKeyValueConfiguration(description = "My value B.", dataType = DataType.BINARY, exampleValue = "myfile.txt|VGV4dAo=")
     VALUE_B,
 
     @EnumKeyValueConfiguration(description = "My value C.", dataType = DataType.NUMBER, minValue = "100", exampleValue = "123", cardinality = "0..1")
@@ -56,5 +56,8 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     SAMPLE1,
     
     @EnumKeyConfiguration(description = "The system configuration.")
-    DD;
+    DD,
+    
+    @EnumKeyValueConfiguration(description = "An number array example.",  dataType = DataType.BINARY, defaultValue = "defaultname.txt|{plain/text}", exampleValue = "ICBteSBmaWxlIGNvbnRlbnQyICA=")
+    BINARY_SAMPLE;
 }

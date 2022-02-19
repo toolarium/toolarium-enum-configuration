@@ -5,9 +5,9 @@
  */
 package com.github.toolarium.enumeration.configuration.validation.value.impl;
 
-import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
+import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator;
@@ -19,7 +19,7 @@ import java.util.Base64;
  * 
  * @author patrick
  */
-public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<EnumKeyValueConfigurationBinaryObject, Number> {
+public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumKeyValueConfigurationValueValidator<IEnumKeyValueConfigurationBinaryObject, Number> {
     private static final long serialVersionUID = 545511902630603231L;
 
     
@@ -27,7 +27,7 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * Constructor for BinaryEnumKeyValueConfigurationValueValidator
      */
     public BinaryEnumKeyValueConfigurationValueValidator() {
-        super(EnumKeyValueConfigurationDataType.BINARY, EnumKeyValueConfigurationBinaryObject.class, EnumKeyValueConfigurationDataType.NUMBER);
+        super(EnumKeyValueConfigurationDataType.BINARY, IEnumKeyValueConfigurationBinaryObject.class, EnumKeyValueConfigurationDataType.NUMBER);
     }
     
 
@@ -35,9 +35,9 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
      * @see com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator#validateValue(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String)
      */
     @Override
-    public EnumKeyValueConfigurationBinaryObject validateValue(EnumKeyValueConfigurationSizing<Number> valueSize, String inputValue) throws EmptyValueException, ValidationException {
+    public IEnumKeyValueConfigurationBinaryObject validateValue(EnumKeyValueConfigurationSizing<Number> valueSize, String inputValue) throws EmptyValueException, ValidationException {
         
-        EnumKeyValueConfigurationBinaryObject inputBinaryObject = parseValue(inputValue);
+        IEnumKeyValueConfigurationBinaryObject inputBinaryObject = parseValue(inputValue);
         MinMaxValue<Number> minMaxValue = preapreMinMaxValue(valueSize, inputValue);
         if (minMaxValue == null) {
             return inputBinaryObject;

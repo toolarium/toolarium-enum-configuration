@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 public class CertificateConverterTest extends AbstractStringTypeConverterTest {
 
     /**
-     * Constructor for CertificateValidatorTest
+     * Constructor for CertificateConverterTest
      */
     CertificateConverterTest() {
         super(EnumKeyValueConfigurationDataType.CERTIFICATE);
@@ -32,6 +32,6 @@ public class CertificateConverterTest extends AbstractStringTypeConverterTest {
     public void testConvert() {
         assertValue("-- my certificate --", "-- my certificate --");
 
-        assertException("Invalid value: [123].", "123");
+        assertException("Invalid value [123], it can not be converted into a CERTIFICATE data type.", "123");
     }
 }
