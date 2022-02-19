@@ -70,6 +70,17 @@ public interface IEnumConfigurationStore {
      * @param value the value
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be written
      */
+    <T extends Enum<T>> void writeConfigurationValue(String configurationKey, Object value) throws EnumConfigurationStoreException;
+
+    
+    /**
+     * Write a configuration value.
+     *
+     * @param <T> the generic configuration name  
+     * @param configurationKey the configuration key
+     * @param value the value
+     * @throws EnumConfigurationStoreException in case the enum configuration cannot be written
+     */
     <T extends Enum<T>> void writeConfigurationValue(T configurationKey, Object value) throws EnumConfigurationStoreException;
 
     

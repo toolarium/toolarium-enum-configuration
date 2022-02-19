@@ -14,16 +14,20 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
+import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationResourceResolver;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.dto.EnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
+import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -42,6 +46,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
     private static final String CONFIGURATION_KEY_SEPARATOR = "#";
     private static final String INVALID_INPUT_CONFIGURATION_KEY_NAME = "Invalid input configuration key name!";
     
+    private IEnumConfigurationResourceResolver enumConfigurationResourceResolver;
     private EnumConfigurations loadedEnumConfigurations;
     private String configurationKeySeparator;
     private boolean supportReturnDefaultValueIfMissing;
@@ -52,6 +57,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * Constructor for AbstractBaseEnumConfigurationStore
      */
     public AbstractBaseEnumConfigurationStore() {
+        enumConfigurationResourceResolver = null;
         loadedEnumConfigurations = null;
         configurationKeySeparator = CONFIGURATION_KEY_SEPARATOR;
         supportReturnDefaultValueIfMissing = true;
@@ -126,6 +132,23 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
 
 
     /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValue(java.lang.String, java.lang.Object)
+     */
+    @Override
+    public <T extends Enum<T>> void writeConfigurationValue(String inputConfigurationKeyName, Object configurationValue) throws EnumConfigurationStoreException {
+        if (inputConfigurationKeyName == null || inputConfigurationKeyName.isBlank()) {
+            LOG.debug(INVALID_INPUT_CONFIGURATION_KEY_NAME);
+            return;
+        }
+
+        String configurationKeyName = inputConfigurationKeyName.trim();
+        String value = convertObjectToString(configurationKeyName, getEnumKeyValueConfiguration(configurationKeyName, ignoreCase), configurationValue);
+        validate(configurationKeyName, value);
+        writeConfiguration(configurationKeyName, value);
+    }
+
+
+    /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueList(java.lang.String[])
      */
     @Override
@@ -176,14 +199,24 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         return supportReturnDefaultValueIfMissing;
     }
 
-
+    
     /**
      * Defines if the configuration store returns the default value in case of a missing value.
      *
      * @param supportReturnDefaultValueIfMissing true if it will return the default value in case of a missing value.
      */
-    protected void setSupportReturnDefaultValueIfMissing(boolean supportReturnDefaultValueIfMissing) {
+    public void setSupportReturnDefaultValueIfMissing(boolean supportReturnDefaultValueIfMissing) {
         this.supportReturnDefaultValueIfMissing = supportReturnDefaultValueIfMissing;
+    }
+
+
+    /**
+     * Sets the {@link IEnumConfigurationResourceResolver}.
+     *
+     * @param enumConfigurationResourceResolver the resolver
+     */
+    public void setEnumConfigurationResourceResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver) {
+        this.enumConfigurationResourceResolver = enumConfigurationResourceResolver;
     }
 
     
@@ -396,12 +429,75 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
 
     
     /**
+     * Convert an object into a string
+     * 
+     * @param <T> the generic type
+     * @param enumKeyValueConfiguration the enum key / value configuration 
+     * @param configurationValue the configuration value
+     * @return the converted string
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends Enum<T>> String convertObjectToString(String configurationName, EnumKeyValueConfiguration enumKeyValueConfiguration, Object configurationValue) {
+        String value;
+        if (configurationValue.getClass().isArray() || configurationValue.getClass().isAssignableFrom(Collection.class)) {
+            List<String> list = new ArrayList<>();
+
+            
+            EnumConfigurationStoreException ex = null;
+            if (configurationValue.getClass().isArray()) {
+
+                Object[] array = (Object[])configurationValue;
+                for (int i = 0; i < array.length; i++) {
+                    try {
+                        list.add(StringTypeConverterFactory.getInstance().getStringTypeConverter().format(enumKeyValueConfiguration.getDataType(), array[i]));
+                    } catch (ValidationException e) {
+                        String msg = "Invalid configuration";
+                        if (ex == null) {
+                            ex = new EnumConfigurationStoreException(msg, e);
+                        }
+                        
+                        ex.add(configurationName, "" + array[i]);
+                        LOG.warn(msg + " found for key [" + configurationName + "]: " + e.getMessage());
+                    }
+                }
+            } else if (configurationValue.getClass().isAssignableFrom(Collection.class)) {
+                for (Object object : (Collection<Object>) configurationValue) {
+                    try {
+                        list.add(StringTypeConverterFactory.getInstance().getStringTypeConverter().format(enumKeyValueConfiguration.getDataType(), object));
+                    } catch (ValidationException e) {
+                        String msg = "Invalid configuration";
+                        if (ex == null) {
+                            ex = new EnumConfigurationStoreException(msg, e);
+                        }
+                        ex.add(configurationName, "" + object);
+                        LOG.warn(msg + " found for key [" + configurationName + "]: " + e.getMessage());
+                    }
+                }
+            } 
+
+            if (ex != null) {
+                throw ex;
+            }
+            
+            value = JSONUtil.getInstance().convert(list);
+        } else {
+            value = configurationValue.toString();
+        }
+        return value;
+    }
+
+    
+    /**
      * Get the enum configuration resource input stream
      * 
      * @return the enum configuration resource input stream or null
      * @throws EnumConfigurationStoreException In case of not accessible resource
      */
     protected InputStream getEnumConfigurationResourceInputStream() throws EnumConfigurationStoreException {
-        throw new EnumConfigurationStoreException("Not supported resource input stream!");
+        if (enumConfigurationResourceResolver == null) {
+            throw new EnumConfigurationStoreException("Not supported resource input stream!");
+        }
+        
+        return enumConfigurationResourceResolver.getEnumConfigurationResourceStream();
     }
 }

@@ -84,12 +84,11 @@ public final class EnumUtil {
     /**
      * Get the {@link EnumKeyValueConfiguration} from an enumeration configuration
      *
-     * @param <T> the generic type
      * @param e the enumeration value
      * @return the parsed content
      * @throws IllegalArgumentException In case the annotation could not be resolved
      */
-    public <T extends Enum<T>> EnumKeyValueConfiguration getEnumKeyValueConfigurationAnnotationInformation(T e) throws IllegalArgumentException {
+    public EnumKeyValueConfiguration getEnumKeyValueConfigurationAnnotationInformation(Enum<?> e) throws IllegalArgumentException {
         if (e == null) {
             return null;
         }

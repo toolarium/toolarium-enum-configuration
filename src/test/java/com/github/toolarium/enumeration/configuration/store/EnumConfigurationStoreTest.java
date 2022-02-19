@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.processor.MyEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
+import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Assertions;
