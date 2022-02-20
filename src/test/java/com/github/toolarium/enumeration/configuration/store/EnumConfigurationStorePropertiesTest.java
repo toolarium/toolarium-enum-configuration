@@ -13,9 +13,7 @@ import com.github.toolarium.enumeration.configuration.annotation.EnumConfigurati
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;
 import com.github.toolarium.enumeration.configuration.processor.MyEnumConfiguration;
-import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
-
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +30,7 @@ public class EnumConfigurationStorePropertiesTest {
      */
     @Test
     public void readProperties() {
-        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         
         // read by type and assume we have default values
         assertEquals(11L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
@@ -64,15 +62,15 @@ public class EnumConfigurationStorePropertiesTest {
         assertEquals(24L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
 
         // read all properties
-        String reference = "{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hostname=my-host, "
-                          + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first=24, "
-                          + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
+        String reference = "{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[\"33\", \"44\"], " 
                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17, "
-                          + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[\"33\", \"44\"], " 
                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hint=my hint, "
+                          + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hostname=my-host, "
+                          + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
+                          + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first=24, "
                           + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=33}";
         assertEquals(reference, configurationStore.getProperties().toString());
-
+        
         // verify
         assertEquals(24L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
         assertEquals(33L, configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
@@ -85,7 +83,7 @@ public class EnumConfigurationStorePropertiesTest {
         Properties properties = configurationStore.readConfigurationValueList(new MyEnumConfiguration[] {MyEnumConfiguration.PORT, MyEnumConfiguration.DATE});
         assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
                     + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17}",
-                     properties.toString());
+                    properties.toString());
 
         // read by value by string
         assertEquals("8082", configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port").getValue());
@@ -94,18 +92,41 @@ public class EnumConfigurationStorePropertiesTest {
         properties = configurationStore.readConfigurationValueList("com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port", 
                                                                    "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second");
         assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
-                   + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=33}",
-                     properties.toString());
+                    + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=33}",
+                    properties.toString());
         
         Properties newProperties = new Properties();
         newProperties.setProperty("com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port", "0815");
         newProperties.setProperty("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second", "21");
-        configurationStore.writeConfigurationValueList(properties);
+        configurationStore.writeConfigurationValueList(newProperties);
+
+        String reference2 = "{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[\"33\", \"44\"], " 
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17, "
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hint=my hint, "
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hostname=my-host, "
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=0815, "
+                           + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first=24, "
+                           + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=21}";
+        assertEquals(reference2, configurationStore.getProperties().toString());
         
+        Properties deletedProperties = configurationStore.writeConfigurationValueList(newProperties, true);
         assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=0815, "
-                + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=21}",
-                configurationStore.getProperties().toString());
+                    + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=21}",
+                    configurationStore.getProperties().toString());
+
+        String reference3 = "{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[\"33\", \"44\"], " 
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17, "
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hint=my hint, "
+                           + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#hostname=my-host, "
+                           + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first=24}";
+        assertEquals(reference3, deletedProperties.toString());
         
+        // default value
+        assertEquals(11L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
+        
+        // last set value
+        assertEquals(21L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+
     }
 
 

@@ -13,6 +13,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.SortedProperties;
 import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationResourceResolver;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore;
@@ -26,6 +27,7 @@ import com.github.toolarium.enumeration.configuration.validation.ValidationExcep
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +51,6 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
     private IEnumConfigurationResourceResolver enumConfigurationResourceResolver;
     private EnumConfigurations loadedEnumConfigurations;
     private String configurationKeySeparator;
-    private boolean supportReturnDefaultValueIfMissing;
     private boolean ignoreCase;
 
     
@@ -60,7 +61,6 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         enumConfigurationResourceResolver = null;
         loadedEnumConfigurations = null;
         configurationKeySeparator = CONFIGURATION_KEY_SEPARATOR;
-        supportReturnDefaultValueIfMissing = true;
         ignoreCase = true;
     }
 
@@ -69,7 +69,22 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValue(java.lang.String)
      */
     @Override
-    public <D> IEnumConfigurationValue<D> readConfigurationValue(String inputConfigurationKeyName) throws EnumConfigurationStoreException {
+    public <D> IEnumConfigurationValue<D> readConfigurationValue(String configurationKey) throws EnumConfigurationStoreException {
+        return readConfigurationValue(configurationKey, true);
+    }
+    
+
+    /**
+     * Read a configuration value. 
+     * In case of missing value a possible defined default value from the enum configuration annotation will be returned. 
+     *
+     * @param <D> the configuration value type
+     * @param inputConfigurationKeyName The unique configuration key, started by the name in lower case and dot notation, separated by <code>#</code> and the key.
+     * @param supportReturnDefaultValueIfMissing true to support default value
+     * @return value the value
+     * @throws EnumConfigurationStoreException in case the enum configuration cannot be read 
+     */
+    protected <D> IEnumConfigurationValue<D> readConfigurationValue(String inputConfigurationKeyName, boolean supportReturnDefaultValueIfMissing) throws EnumConfigurationStoreException {
         if (inputConfigurationKeyName == null || inputConfigurationKeyName.isBlank()) {
             LOG.debug(INVALID_INPUT_CONFIGURATION_KEY_NAME);
             return null;
@@ -79,7 +94,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         String value = loadConfiguration(configurationKeyName);
         EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(inputConfigurationKeyName, ignoreCase);
 
-        if (value == null && supportReturnDefaultValueIfMissing() && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
+        if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
             value = enumKeyValueConfiguration.getDefaultValue();
         }
 
@@ -112,6 +127,15 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         }
 
         return result; 
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueIgnoreDefault(java.lang.String)
+     */
+    @Override
+    public <D> IEnumConfigurationValue<D> readConfigurationValueIgnoreDefault(String configurationKey) throws EnumConfigurationStoreException {
+        return readConfigurationValue(configurationKey, false);
     }
 
     
@@ -171,45 +195,117 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         return result;
     }
 
+
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueListIgnoreDefault(java.lang.String[])
+     */
+    @Override
+    public Properties readConfigurationValueListIgnoreDefault(String... configurationKeyNames) throws EnumConfigurationStoreException {
+        if (configurationKeyNames == null || configurationKeyNames.length == 0) {
+            LOG.debug("Invalid input configuration key names!");
+            return null;
+        }
+        
+        Properties result = new Properties();
+        if (configurationKeyNames != null && configurationKeyNames.length > 0) {
+            for (String inputConfigurationKeyName : configurationKeyNames) {
+                if (inputConfigurationKeyName != null && !inputConfigurationKeyName.isBlank()) {
+                    String configurationKeyName = inputConfigurationKeyName.trim();
+                    result.setProperty(configurationKeyName, readConfigurationValueIgnoreDefault(configurationKeyName).toString());
+                }
+            }
+        }
+        
+        return result;
+    }
+
     
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValueList(java.util.Properties)
      */
     @Override
     public void writeConfigurationValueList(Properties configuration) throws EnumConfigurationStoreException {
+        writeConfigurationValueList(configuration, false);
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValueList(java.util.Properties, boolean)
+     */
+    @Override
+    public Properties writeConfigurationValueList(Properties configuration, boolean removeEntriesWithMissingKey) throws EnumConfigurationStoreException {
         if (configuration == null || configuration.size() <= 0) {
             LOG.debug("Invalid input configuration!");
-            return;
+            return null;
+        }
+
+        Set<String> keySetToDelete = null;
+        if (removeEntriesWithMissingKey) {
+            keySetToDelete = readKeys();
         }
 
         for (Map.Entry<Object, Object> e: configuration.entrySet()) {
             String configurationKeyName = ("" + e.getKey()).trim();
             if (configurationKeyName != null && !configurationKeyName.isBlank()) {
+
+                // remove the updated key from set
+                if (removeEntriesWithMissingKey && keySetToDelete != null) {
+                    keySetToDelete.remove(configurationKeyName);
+                }
+                
                 writeConfigurationValue(configurationKeyName, "" + e.getValue());
             }
         }
+
+        if (!removeEntriesWithMissingKey || keySetToDelete == null || keySetToDelete.isEmpty()) {
+            return null;
+        }
+
+        String[] arrayOfString = Arrays.copyOf(keySetToDelete.toArray(), keySetToDelete.size(), String[].class);
+        return deleteConfigurationValueList(arrayOfString);
     }
 
     
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#supportReturnDefaultValueIfMissing()
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#deleteConfigurationValue(java.lang.String)
      */
     @Override
-    public boolean supportReturnDefaultValueIfMissing() {
-        return supportReturnDefaultValueIfMissing;
+    public <D> IEnumConfigurationValue<D> deleteConfigurationValue(String inputConfigurationKeyName) throws EnumConfigurationStoreException {
+        if (inputConfigurationKeyName == null || inputConfigurationKeyName.isBlank()) {
+            LOG.debug(INVALID_INPUT_CONFIGURATION_KEY_NAME);
+            return null;
+        }
+
+        IEnumConfigurationValue<D> result = readConfigurationValueIgnoreDefault(inputConfigurationKeyName);
+        deleteConfiguration(inputConfigurationKeyName.trim());
+        return result;
+    }
+
+
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#deleteConfigurationValueList(java.lang.String[])
+     */
+    @Override
+    public Properties deleteConfigurationValueList(String... configurationKeyNames) throws EnumConfigurationStoreException {
+        if (configurationKeyNames == null || configurationKeyNames.length == 0) {
+            LOG.debug("Invalid input configuration key names!");
+            return null;
+        }
+
+        Properties result = new SortedProperties();
+        if (configurationKeyNames != null && configurationKeyNames.length > 0) {
+            for (String inputConfigurationKeyName : configurationKeyNames) {
+                if (inputConfigurationKeyName != null && !inputConfigurationKeyName.isBlank()) {
+                    String configurationKeyName = inputConfigurationKeyName.trim();
+                    result.setProperty(configurationKeyName, deleteConfiguration(configurationKeyName));
+                }
+            }
+        }
+        
+        return result;
     }
 
     
-    /**
-     * Defines if the configuration store returns the default value in case of a missing value.
-     *
-     * @param supportReturnDefaultValueIfMissing true if it will return the default value in case of a missing value.
-     */
-    public void setSupportReturnDefaultValueIfMissing(boolean supportReturnDefaultValueIfMissing) {
-        this.supportReturnDefaultValueIfMissing = supportReturnDefaultValueIfMissing;
-    }
-
-
     /**
      * Sets the {@link IEnumConfigurationResourceResolver}.
      *
@@ -289,6 +385,26 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * @throws EnumConfigurationStoreException In case of a load exception
      */
     protected abstract <D> void writeConfiguration(String configurationKeyName, String configurationValue) throws EnumConfigurationStoreException;
+
+    
+    /**
+     * Delete the configuration from a source. The configurationKeyName and the value are pure string based.
+     * 
+     * @param <D> the configuration value type
+     * @param configurationKeyName the unique configuration key
+     * @return the deleted configuration value
+     * @throws EnumConfigurationStoreException In case of a load exception
+     */
+    protected abstract <D> String deleteConfiguration(String configurationKeyName) throws EnumConfigurationStoreException;
+
+    
+    /**
+     * Read all keys.
+     * 
+     * @return the unique configuration key list
+     * @throws EnumConfigurationStoreException In case of a load exception
+     */
+    protected abstract Set<String> readKeys() throws EnumConfigurationStoreException;
 
 
     /**
@@ -432,6 +548,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * Convert an object into a string
      * 
      * @param <T> the generic type
+     * @param configurationName the configuration name
      * @param enumKeyValueConfiguration the enum key / value configuration 
      * @param configurationValue the configuration value
      * @return the converted string

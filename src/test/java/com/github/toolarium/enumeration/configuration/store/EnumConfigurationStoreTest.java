@@ -34,10 +34,10 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
      */
     @Test
     public void readWriteSimpleString() {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         
         // read not existing value
-        assertNull(new PropertiesEnumConfigurationStore(false).readConfigurationValue(MyEnumConfiguration.HOSTNAME));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.HOSTNAME));
         assertEquals("hostname", configurationStore.readConfigurationValue(MyEnumConfiguration.HOSTNAME).getValue());
         
         // write value
@@ -57,9 +57,9 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
      */
     @Test
     public void readWriteNumber() {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
 
-        assertNull(new PropertiesEnumConfigurationStore(false).readConfigurationValue(MyEnumConfiguration.VALUE_C));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.VALUE_C));
         assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_C));
 
         // read not existing value
@@ -90,9 +90,9 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
      */
     @Test
     public void readWriteArray() {
-        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
 
-        assertNull(new PropertiesEnumConfigurationStore(false).readConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.ARRAY_SAMPLE));
         assertEquals("[\"1\", \"2\" ]", configurationStore.readConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE).toString());
 
         // read not existing value
@@ -144,9 +144,9 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
      */
     @Test
     public void readWriteDate() {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
 
-        assertNull(new PropertiesEnumConfigurationStore(false).readConfigurationValue(MyEnumConfiguration.DATE));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.DATE));
         assertEquals("2021-03-01", configurationStore.readConfigurationValue(MyEnumConfiguration.DATE).toString());
 
         // read not existing value
@@ -177,10 +177,10 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
      */
     @Test
     public void readBinaryDate() {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(true);
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         String timestamp = "2021-03-15T08:59:22.123Z";
 
-        assertNull(new PropertiesEnumConfigurationStore(false).readConfigurationValue(MyEnumConfiguration.BINARY_SAMPLE));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.BINARY_SAMPLE));
         assertEquals("defaultname.txt|{plain/text}", configurationStore.readConfigurationValue(MyEnumConfiguration.BINARY_SAMPLE).toString());
         String content = timestamp + "|" + MESSAGE_ENCODED;
         configurationStore.writeConfigurationValue(MyEnumConfiguration.BINARY_SAMPLE, content);

@@ -54,6 +54,22 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      */
     @Override
     public <D, T extends Enum<T>> IEnumConfigurationValue<D> readConfigurationValue(T configurationKey) throws EnumConfigurationStoreException {
+        return readConfigurationValue(configurationKey, true);
+    }
+    
+    
+    /**
+     * Read a configuration value.
+     * In case of missing value a possible defined default value from the enum configuration annotation will be returned. 
+     *
+     * @param <D> the configuration value type
+     * @param <T> the generic configuration name
+     * @param configurationKey the configuration key
+     * @param supportReturnDefaultValueIfMissing true to support default value
+     * @return value the value
+     * @throws EnumConfigurationStoreException in case the enum configuration cannot be read 
+     */
+    protected <D, T extends Enum<T>> IEnumConfigurationValue<D> readConfigurationValue(T configurationKey, boolean supportReturnDefaultValueIfMissing) throws EnumConfigurationStoreException {
         if (configurationKey == null) {
             LOG.debug("Invalid input configuration key!");
             return null;
@@ -63,7 +79,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         String value = loadConfiguration(configurationKeyName);
         EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
 
-        if (value == null && supportReturnDefaultValueIfMissing() && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
+        if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
             value = enumKeyValueConfiguration.getDefaultValue();
         }
 
@@ -100,6 +116,55 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
 
     
     /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueIgnoreDefault(java.lang.Enum)
+     */
+    @Override
+    public <D, T extends Enum<T>> IEnumConfigurationValue<D> readConfigurationValueIgnoreDefault(T configurationKey) throws EnumConfigurationStoreException {
+        return readConfigurationValue(configurationKey, false);
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueList(java.lang.Enum[])
+     */
+    @Override
+    public <T extends Enum<T>> Properties readConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException {
+        if (configurationKeys == null || configurationKeys.length == 0) {
+            LOG.debug("Invalid input configuration keys!");
+            return null;
+        }
+        
+        Properties result = new Properties();
+        for (T configurationKey : configurationKeys) {
+            String configurationName = convertConfiguration(configurationKey);
+            result.setProperty(configurationName, readConfigurationValue(configurationKey).toString());
+        }
+        
+        return result;
+    }
+
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueListIgnoreDefault(java.lang.Enum[])
+     */
+    @Override
+    public <T extends Enum<T>> Properties readConfigurationValueListIgnoreDefault(T[] configurationKeys) throws EnumConfigurationStoreException {
+        if (configurationKeys == null || configurationKeys.length == 0) {
+            LOG.debug("Invalid input configuration keys!");
+            return null;
+        }
+        
+        Properties result = new Properties();
+        for (T configurationKey : configurationKeys) {
+            String configurationName = convertConfiguration(configurationKey);
+            result.setProperty(configurationName, readConfigurationValueIgnoreDefault(configurationKey).toString());
+        }
+        
+        return result;
+    }
+
+
+    /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValue(java.lang.Enum, java.lang.String)
      */
     @Override
@@ -131,22 +196,37 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
     }
 
 
-
-   
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueList(java.lang.Enum[])
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#deleteConfigurationValue(java.lang.Enum)
      */
     @Override
-    public <T extends Enum<T>> Properties readConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException {
+    public <D, T extends Enum<T>> IEnumConfigurationValue<D> deleteConfigurationValue(T configurationKey) throws EnumConfigurationStoreException {
+        if (configurationKey == null) {
+            LOG.debug("Invalid input configuration key!");
+            return null;
+        }
+
+        IEnumConfigurationValue<D> result = readConfigurationValueIgnoreDefault(configurationKey);
+        String configurationKeyName = convertConfiguration(configurationKey);
+        deleteConfiguration(configurationKeyName);
+        return result;
+    }
+
+
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#deleteConfigurationValueList(java.lang.Enum[])
+     */
+    @Override
+    public <T extends Enum<T>> Properties deleteConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException {
         if (configurationKeys == null || configurationKeys.length == 0) {
             LOG.debug("Invalid input configuration keys!");
             return null;
         }
-        
+
         Properties result = new Properties();
         for (T configurationKey : configurationKeys) {
             String configurationName = convertConfiguration(configurationKey);
-            result.setProperty(configurationName, readConfigurationValue(configurationKey).toString());
+            result.setProperty(configurationName, deleteConfiguration(configurationName));
         }
         
         return result;
