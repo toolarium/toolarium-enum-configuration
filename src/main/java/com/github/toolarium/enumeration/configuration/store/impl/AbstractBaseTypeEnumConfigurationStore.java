@@ -246,6 +246,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      * @return the configuration key
      * @throws EnumConfigurationStoreException In case of an invalid configuration key
      */
+    /*
     protected <T extends Enum<T>> T convertConfiguration(String configurationKeyName) {
         if (configurationKeyName == null || configurationKeyName.isBlank()) {
             throw new EnumConfigurationStoreException("Invalid configuration name!");
@@ -267,6 +268,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         
         return configurationKey;
     }
+    */
 
     
     /**

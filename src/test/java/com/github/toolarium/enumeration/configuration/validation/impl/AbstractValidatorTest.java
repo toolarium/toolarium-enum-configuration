@@ -7,6 +7,7 @@ package com.github.toolarium.enumeration.configuration.validation.impl;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
@@ -342,6 +343,16 @@ public abstract class AbstractValidatorTest {
     }
 
     
+    /**
+     * Test compare
+     */
+    @Test
+    public void testCompare() {
+        assertTrue(EnumKeyConfigurationValidatorFactory.getInstance().getValidator().equals(EnumKeyConfigurationValidatorFactory.getInstance().getValidator()));
+        assertEquals(EnumKeyConfigurationValidatorFactory.getInstance().getValidator().hashCode(), EnumKeyConfigurationValidatorFactory.getInstance().getValidator().hashCode());
+    }
+    
+
     /**
      * Check if the value1 is too small in comparison to value2
      *

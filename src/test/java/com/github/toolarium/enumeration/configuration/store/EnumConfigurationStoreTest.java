@@ -20,6 +20,7 @@ import com.github.toolarium.enumeration.configuration.store.exception.EnumConfig
 import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
 import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import org.junit.jupiter.api.Assertions;
@@ -300,14 +301,22 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         assertEquals(Long.valueOf(103), value2.getValue());
         assertEquals("[103, 104]", value2.getValueList().toString());
         assertEquals(Long.valueOf(104), value2.getValue());
-        
+
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, Arrays.asList("105", "106"));
+        IEnumConfigurationValue<String> value3 = configurationStore.readConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE);
+        assertNotNull(value3);
+        assertEquals("[105, 106]", value3.toString());
+        assertEquals(Long.valueOf(105), value3.getValue());
+        assertEquals("[105, 106]", value3.getValueList().toString());
+        assertEquals(Long.valueOf(106), value3.getValue());
+
         EnumConfigurationStoreException exception3 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, new String[] {"105", "a"});
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, new String[] {"107", "a"});
         });
         // Invalid configuration found for key [com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample]: [input] Invalid value [a], it can not be converted into a NUMBER data type.
         assertEquals(HEADER + "array_sample]: [input] Invalid value [a], it can not be converted into a NUMBER data type.", exception3.getMessage());
         
-        assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[ \"103\", \"104\" ]}", "" + configurationStore.getProperties());
+        assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[105, 106]}", "" + configurationStore.getProperties());
     }
 
     

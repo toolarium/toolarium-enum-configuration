@@ -156,7 +156,7 @@ public final class ClassPathUtil {
             } else if (file.getName().endsWith(".class")) {
                 try {
                     classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-                } catch (ClassNotFoundException e) {
+                } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
                     // NOP
                 }
             }
