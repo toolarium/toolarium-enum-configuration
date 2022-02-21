@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Vector;
+import java.util.TreeSet;
 
 
 /**
@@ -44,16 +44,8 @@ public class SortedProperties extends Properties {
      * @see java.util.Properties#keys()
      */
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes" })
-    public synchronized Enumeration keys() {
-        Enumeration<Object> keysEnum = super.keys();
-        Vector<String> keyList = new Vector<String>();
-        while (keysEnum.hasMoreElements()) {
-            keyList.add((String) keysEnum.nextElement());
-        }
-        
-        Collections.sort(keyList);
-        return keyList.elements();
+    public synchronized Enumeration<Object> keys() {
+        return Collections.enumeration(new TreeSet<>(super.keySet()));
     }
 
     
@@ -76,17 +68,17 @@ public class SortedProperties extends Properties {
      */
     @Override
     public synchronized String toString() {
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("{");
+        StringBuilder builder = new StringBuilder().append("{");
         int counter = 0; 
         for (Map.Entry<Object, Object> entry : entrySet()) {
             if (counter > 0) {
                 builder.append(", ");
             }
-            builder.append("" + entry.getKey() + "=" + entry.getValue());
+            
+            builder.append("" + entry.getKey()).append("=").append(entry.getValue());
             counter++;
         }
+        
         builder.append("}");
         return builder.toString();
     }

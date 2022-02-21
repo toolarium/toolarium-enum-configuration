@@ -31,7 +31,7 @@
   </appender>
 
   <!-- By default only local project logs in debug -->
-  <logger name="com.github" level="INFO"/>
+  <logger name="com.github" level="DEBUG"/>
   <logger name="com.github.toolarium.enum.configuration" level="DEBUG"/>
   
   <root level="WARN"> 

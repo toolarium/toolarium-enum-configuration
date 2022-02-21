@@ -40,7 +40,7 @@ public class EnumConfigurationStorePropertiesTest {
 
         // read by string and assume we have default values
         assertEquals(11L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
-        assertEquals(22L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(22L, configurationStore.readConfigurationValue(" com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
         assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#third"));
         assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#hostname"));
 
@@ -81,8 +81,8 @@ public class EnumConfigurationStorePropertiesTest {
         
         // read by some values by type
         Properties properties = configurationStore.readConfigurationValueList(new MyEnumConfiguration[] {MyEnumConfiguration.PORT, MyEnumConfiguration.DATE});
-        assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
-                    + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17}",
+        assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#date=2022-02-17, "
+                    + "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082}",
                     properties.toString());
 
         // read by value by string
@@ -90,7 +90,7 @@ public class EnumConfigurationStorePropertiesTest {
 
         // read by some values by string types
         properties = configurationStore.readConfigurationValueList("com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port", 
-                                                                   "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second");
+                                                                   " com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second");
         assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#port=8082, "
                     + "com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second=33}",
                     properties.toString());
@@ -123,9 +123,23 @@ public class EnumConfigurationStorePropertiesTest {
         
         // default value
         assertEquals(11L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first"));
         
         // last set value
         assertEquals(21L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(21L, configurationStore.readConfigurationValueIgnoreDefault("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+
+        // read defaul value
+        assertEquals(21L, configurationStore.readConfigurationValueIgnoreDefault(MyConfigTest.SECOND).getValue());
+
+        // remove
+        assertEquals(21L, configurationStore.deleteConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+
+        // default value
+        assertEquals(22L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+     
+        assertEquals("0815", configurationStore.deleteConfigurationValue(MyEnumConfiguration.PORT).getValue());
+        assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.PORT));
 
     }
 

@@ -10,6 +10,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.SortedProperties;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.util.ClassPathUtil;
@@ -129,15 +130,16 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      */
     @Override
     public <T extends Enum<T>> Properties readConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeys == null || configurationKeys.length == 0) {
             LOG.debug("Invalid input configuration keys!");
-            return null;
+            return result;
         }
         
-        Properties result = new Properties();
         for (T configurationKey : configurationKeys) {
-            String configurationName = convertConfiguration(configurationKey);
-            result.setProperty(configurationName, readConfigurationValue(configurationKey).toString());
+            String configurationKeyName = convertConfiguration(configurationKey);
+            IEnumConfigurationValue<?> value = readConfigurationValue(configurationKey);
+            result.setProperty(configurationKeyName, handlingNullObject(value));
         }
         
         return result;
@@ -149,15 +151,16 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      */
     @Override
     public <T extends Enum<T>> Properties readConfigurationValueListIgnoreDefault(T[] configurationKeys) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeys == null || configurationKeys.length == 0) {
             LOG.debug("Invalid input configuration keys!");
-            return null;
+            return result;
         }
         
-        Properties result = new Properties();
         for (T configurationKey : configurationKeys) {
-            String configurationName = convertConfiguration(configurationKey);
-            result.setProperty(configurationName, readConfigurationValueIgnoreDefault(configurationKey).toString());
+            String configurationKeyName = convertConfiguration(configurationKey);
+            IEnumConfigurationValue<?> value = readConfigurationValueIgnoreDefault(configurationKey);
+            result.setProperty(configurationKeyName, handlingNullObject(value));
         }
         
         return result;
@@ -175,12 +178,14 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
         
         IEnumConfigurationValue<D> val = validate(configurationKey, value);
-        writeConfiguration(convertConfiguration(configurationKey), val.toString());
+        if (val != null) {
+            writeConfiguration(convertConfiguration(configurationKey), val.toString());
+        }
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValue(java.lang.Enum, com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue)
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#writeConfigurationValue(java.lang.Enum, java.lang.Object)
      */
     @Override
     public <T extends Enum<T>> void writeConfigurationValue(T configurationKey, Object configurationValue) throws EnumConfigurationStoreException {
@@ -189,10 +194,10 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             return;
         }
         
-        String configurationName = convertConfiguration(configurationKey);
-        String value = convertObjectToString(configurationName, EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(configurationKey), configurationValue);
+        String configurationKeyName = convertConfiguration(configurationKey);
+        String value = convertObjectToString(configurationKeyName, EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(configurationKey), configurationValue);
         validate(configurationKey, value);
-        writeConfiguration(configurationName, value);
+        writeConfiguration(configurationKeyName, value);
     }
 
 
@@ -218,15 +223,15 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      */
     @Override
     public <T extends Enum<T>> Properties deleteConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeys == null || configurationKeys.length == 0) {
             LOG.debug("Invalid input configuration keys!");
-            return null;
+            return result;
         }
 
-        Properties result = new Properties();
         for (T configurationKey : configurationKeys) {
-            String configurationName = convertConfiguration(configurationKey);
-            result.setProperty(configurationName, deleteConfiguration(configurationName));
+            String configurationKeyName = convertConfiguration(configurationKey);
+            result.setProperty(configurationKeyName, handlingNullObject(deleteConfiguration(configurationKeyName)));
         }
         
         return result;
@@ -318,7 +323,6 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         } catch (ValidationException e) {
             String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + e.getMessage();
             LOG.debug(msg);
-            
             EnumConfigurationStoreException ex = new EnumConfigurationStoreException(msg, e);
             ex.add(configurationKeyName, value);
             throw ex;

@@ -441,6 +441,15 @@ public abstract class AbstractEnumKeyValueConfigurationValueValidator<D, T> impl
 
 
         /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "MinMaxValue [minOriginal=" + minOriginal + ", min=" + min + ", maxOriginal=" + maxOriginal + ", max=" + max + "]";
+        }
+
+
+        /**
          * Get enclosing instance
          *
          * @return the enclosing instance

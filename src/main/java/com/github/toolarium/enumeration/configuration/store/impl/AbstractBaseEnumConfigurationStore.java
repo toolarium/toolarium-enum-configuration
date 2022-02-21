@@ -92,7 +92,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
 
         String configurationKeyName = inputConfigurationKeyName.trim();
         String value = loadConfiguration(configurationKeyName);
-        EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(inputConfigurationKeyName, ignoreCase);
+        EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKeyName, ignoreCase);
 
         if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
             value = enumKeyValueConfiguration.getDefaultValue();
@@ -177,17 +177,18 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      */
     @Override
     public Properties readConfigurationValueList(String... configurationKeyNames) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeyNames == null) {
             LOG.debug("Invalid input configuration key names!");
-            return null;
+            return result;
         }
         
-        Properties result = new Properties();
         if (configurationKeyNames != null && configurationKeyNames.length > 0) {
             for (String inputConfigurationKeyName : configurationKeyNames) {
                 if (inputConfigurationKeyName != null && !inputConfigurationKeyName.isBlank()) {
                     String configurationKeyName = inputConfigurationKeyName.trim();
-                    result.setProperty(configurationKeyName, readConfigurationValue(configurationKeyName).toString());
+                    IEnumConfigurationValue<?> value = readConfigurationValue(configurationKeyName);
+                    result.setProperty(configurationKeyName, handlingNullObject(value));
                 }
             }
         }
@@ -201,17 +202,18 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      */
     @Override
     public Properties readConfigurationValueListIgnoreDefault(String... configurationKeyNames) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeyNames == null || configurationKeyNames.length == 0) {
             LOG.debug("Invalid input configuration key names!");
-            return null;
+            return result;
         }
         
-        Properties result = new Properties();
         if (configurationKeyNames != null && configurationKeyNames.length > 0) {
             for (String inputConfigurationKeyName : configurationKeyNames) {
                 if (inputConfigurationKeyName != null && !inputConfigurationKeyName.isBlank()) {
                     String configurationKeyName = inputConfigurationKeyName.trim();
-                    result.setProperty(configurationKeyName, readConfigurationValueIgnoreDefault(configurationKeyName).toString());
+                    IEnumConfigurationValue<?> value = readConfigurationValueIgnoreDefault(configurationKeyName);
+                    result.setProperty(configurationKeyName, handlingNullObject(value));
                 }
             }
         }
@@ -234,9 +236,9 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      */
     @Override
     public Properties writeConfigurationValueList(Properties configuration, boolean removeEntriesWithMissingKey) throws EnumConfigurationStoreException {
-        if (configuration == null || configuration.size() <= 0) {
+        if (configuration == null || configuration.isEmpty()) {
             LOG.debug("Invalid input configuration!");
-            return null;
+            return new SortedProperties();
         }
 
         Set<String> keySetToDelete = null;
@@ -248,17 +250,20 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
             String configurationKeyName = ("" + e.getKey()).trim();
             if (configurationKeyName != null && !configurationKeyName.isBlank()) {
 
-                // remove the updated key from set
-                if (removeEntriesWithMissingKey && keySetToDelete != null) {
-                    keySetToDelete.remove(configurationKeyName);
-                }
-                
-                writeConfigurationValue(configurationKeyName, "" + e.getValue());
+                String valueStr = "" + e.getValue();
+                if (valueStr != null && !valueStr.isEmpty()) {
+                    // remove the updated key from set
+                    if (removeEntriesWithMissingKey && keySetToDelete != null) {
+                        keySetToDelete.remove(configurationKeyName);
+                    }
+                    
+                    writeConfigurationValue(configurationKeyName, valueStr);
+                } 
             }
         }
 
         if (!removeEntriesWithMissingKey || keySetToDelete == null || keySetToDelete.isEmpty()) {
-            return null;
+            return new SortedProperties();
         }
 
         String[] arrayOfString = Arrays.copyOf(keySetToDelete.toArray(), keySetToDelete.size(), String[].class);
@@ -287,17 +292,17 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      */
     @Override
     public Properties deleteConfigurationValueList(String... configurationKeyNames) throws EnumConfigurationStoreException {
+        Properties result = new SortedProperties();
         if (configurationKeyNames == null || configurationKeyNames.length == 0) {
             LOG.debug("Invalid input configuration key names!");
-            return null;
+            return result;
         }
 
-        Properties result = new SortedProperties();
         if (configurationKeyNames != null && configurationKeyNames.length > 0) {
             for (String inputConfigurationKeyName : configurationKeyNames) {
                 if (inputConfigurationKeyName != null && !inputConfigurationKeyName.isBlank()) {
                     String configurationKeyName = inputConfigurationKeyName.trim();
-                    result.setProperty(configurationKeyName, deleteConfiguration(configurationKeyName));
+                    result.setProperty(configurationKeyName, handlingNullObject(deleteConfiguration(configurationKeyName)));
                 }
             }
         }
@@ -426,6 +431,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
 
         String configurationKeyName = inputConfigurationKeyName;
         if (loadedEnumConfigurations == null) {
+            LOG.debug("Try to resolve configuration key [" + inputConfigurationKeyName + "]...");
             InputStream enumConfigurationResourceInputStream = getEnumConfigurationResourceInputStream();
             if (enumConfigurationResourceInputStream != null) {
                 LOG.debug("Load enum configuration information for key [" + configurationKeyName + "]...");
@@ -616,5 +622,20 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         }
         
         return enumConfigurationResourceResolver.getEnumConfigurationResourceStream();
+    }
+
+
+    /**
+     * Handling of null objects
+     *
+     * @param obj the object
+     * @return the string
+     */
+    protected String handlingNullObject(Object obj) {
+        if (obj != null) {
+            return obj.toString();
+        }
+
+        return "";
     }
 }

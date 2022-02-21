@@ -7,14 +7,21 @@ package com.github.toolarium.enumeration.configuration.store;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
+import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
+import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
+import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.processor.MyEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
+import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +33,174 @@ import org.junit.jupiter.api.Test;
  */
 public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
 
+    private static final String BRACE_START = "{";
+    private static final String BRACE_END = "}";
+    private static final String EQUALS = "=";
+    private static final String SEPARATOR = ", ";
+    
     // values
     private static final String MESSAGE_ENCODED = "ICBteSBmaWxlIGNvbnRlbnQgIA=="; // "  my file content  " 
+    private static final String FIRST  = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#first";
+    private static final String SECOND = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#second";
+    private static final String DATE   = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#date";
+    private static final String PORT   = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#port";
+
     
+    /**
+     * Test read, write and delete value
+     */
+    @Test
+    public void readWriteDeleteConfigurationValue() {
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        
+        // readConfigurationValue(String configurationKey)
+        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        // readConfigurationValueIgnoreDefault(String configurationKey) 
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
+
+        // readConfigurationValue(T configurationKey)
+        assertEquals(11L, configurationStore.readConfigurationValue(FIRST).getValue());
+        // readConfigurationValueIgnoreDefault(T configurationKey)
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(FIRST));
+        
+        // writeConfigurationValue(T configurationKey, Object value)
+        configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, 12);
+        assertEquals(12L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(12L, configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
+        
+        // writeConfigurationValue(T configurationKey, String value)
+        configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, "13");
+        assertEquals(13L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(13L, configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
+
+        // deleteConfigurationValue(T configurationKey)   
+        assertEquals(13L, configurationStore.deleteConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
+
+        // writeConfigurationValue(String configurationKey, String value)
+        configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, 14);
+        assertEquals(14L, configurationStore.readConfigurationValue(FIRST).getValue());
+        assertEquals(14L, configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
+
+        // deleteConfigurationValue(String configurationKey)   
+        assertEquals(14L, configurationStore.deleteConfigurationValue(FIRST).getValue());
+        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
+
+        // void writeConfigurationValue(String configurationKey, Object value)
+        configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, "15");
+        assertEquals(15L, configurationStore.readConfigurationValue(FIRST).getValue());
+        assertEquals(15L, configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
+    }
+
+    
+    /**
+     * Test empty strings: in this case getValue is not null but the internal value is null!
+     */
+    @Test
+    public void testEmptyStrings() {
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        assertNull(configurationStore.readConfigurationValue(SimpleConfigTest.EMPTY_STRING));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.EMPTY_STRING));
+        
+        // write empty string
+        configurationStore.writeConfigurationValue(SimpleConfigTest.EMPTY_STRING, "");
+        assertNull(configurationStore.readConfigurationValue(SimpleConfigTest.EMPTY_STRING).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.EMPTY_STRING).getValue());
+
+        // write empty string where the configuration has a default value
+        assertEquals("a", configurationStore.readConfigurationValue(SimpleConfigTest.EMPTY_STRING_WITH_DEFAULT).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.EMPTY_STRING_WITH_DEFAULT));
+        configurationStore.writeConfigurationValue(SimpleConfigTest.EMPTY_STRING_WITH_DEFAULT, "");
+        assertNull(configurationStore.readConfigurationValue(SimpleConfigTest.EMPTY_STRING_WITH_DEFAULT).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.EMPTY_STRING_WITH_DEFAULT).getValue());
+    }
+    
+    
+    /**
+     * Test read, write and delete value list
+     */
+    @Test
+    public void readWriteDeleteConfigurationValueList() {
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        
+        // Properties readConfigurationValueList(T[] configurationKeys)
+        Properties properties = configurationStore.readConfigurationValueList(new SimpleConfigTest[] {SimpleConfigTest.PORT, SimpleConfigTest.DATE});
+        assertEquals(BRACE_START + DATE + EQUALS + "2021-03-01" + SEPARATOR + PORT + EQUALS + BRACE_END, properties.toString());
+        
+        // Properties readConfigurationValueList(String... configurationKeys)
+        properties = configurationStore.readConfigurationValueList(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + "2021-03-01" + SEPARATOR + PORT + EQUALS + BRACE_END, properties.toString());
+
+        // Properties readConfigurationValueListIgnoreDefault(T[] configurationKeys)
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(new SimpleConfigTest[] {SimpleConfigTest.PORT, SimpleConfigTest.DATE});
+        assertEquals(BRACE_START + DATE + EQUALS + SEPARATOR + PORT + EQUALS + BRACE_END, properties.toString());
+        
+        // Properties readConfigurationValueListIgnoreDefault(String... configurationKeys)
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + SEPARATOR + PORT + EQUALS + BRACE_END, properties.toString());
+
+        // writeConfigurationValueList(Properties configuration)
+        String port = "8082";
+        String date = "2022-02-18";
+        properties = new Properties();
+        properties.setProperty(DATE, date); 
+        properties.setProperty(PORT, port);
+        configurationStore.writeConfigurationValueList(properties);
+        
+        properties = configurationStore.readConfigurationValueList(new SimpleConfigTest[] {SimpleConfigTest.PORT, SimpleConfigTest.DATE});
+        assertEquals(EnumKeyValueConfigurationBinaryObjectParser.BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + BRACE_END, properties.toString());
+
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(new SimpleConfigTest[] {SimpleConfigTest.PORT, SimpleConfigTest.DATE});
+        assertEquals(BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + BRACE_END, properties.toString());
+        
+        properties = configurationStore.readConfigurationValueList(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + EnumKeyValueConfigurationBinaryObjectParser.BRACE_END, properties.toString());
+       
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + BRACE_END, properties.toString());
+
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + BRACE_END, properties.toString());
+
+        // Properties readConfigurationValueList(String... configurationKeys)
+        properties = configurationStore.readConfigurationValueListIgnoreDefault(PORT, DATE);
+        assertEquals(BRACE_START + DATE + EQUALS + date + SEPARATOR + PORT + EQUALS + port + BRACE_END, properties.toString());
+
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.SECOND));
+
+        properties = new Properties();
+        properties.setProperty(FIRST, "12"); 
+        properties.setProperty(SECOND, "13");
+        properties = configurationStore.writeConfigurationValueList(properties, true);
+        assertEquals(12L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(13L, configurationStore.readConfigurationValue(SimpleConfigTest.SECOND).getValue());
+        assertEquals(date, "" + properties.remove(DATE));
+        assertEquals(port, "" + properties.remove(PORT));
+        assertTrue(properties.isEmpty());
+
+        // Properties deleteConfigurationValueList(T[] configurationKeys)
+        properties = configurationStore.deleteConfigurationValueList(new SimpleConfigTest[] {SimpleConfigTest.FIRST, SimpleConfigTest.SECOND});
+        assertEquals("12", "" + properties.remove(FIRST));
+        assertEquals("13", "" + properties.remove(SECOND));
+        assertTrue(properties.isEmpty());
+
+        properties = new Properties();
+        properties.setProperty(FIRST, "12"); 
+        properties.setProperty(SECOND, "13");
+        properties = configurationStore.writeConfigurationValueList(properties, true);
+        assertTrue(properties.isEmpty());
+
+        // Properties deleteConfigurationValueList(String... configurationKeys)
+        properties = configurationStore.deleteConfigurationValueList(FIRST, SECOND);
+        assertEquals("12", "" + properties.remove(FIRST));
+        assertEquals("13", "" + properties.remove(SECOND));
+        assertTrue(properties.isEmpty());
+    }
+    
+
     /**
      * Test string read / write
      */
@@ -37,14 +209,14 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         
         // read not existing value
-        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.HOSTNAME));
-        assertEquals("hostname", configurationStore.readConfigurationValue(MyEnumConfiguration.HOSTNAME).getValue());
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.HOSTNAME));
+        assertEquals("hostname", configurationStore.readConfigurationValue(SimpleConfigTest.HOSTNAME).getValue());
         
         // write value
-        configurationStore.writeConfigurationValue(MyEnumConfiguration.HOSTNAME, "my-host");
+        configurationStore.writeConfigurationValue(SimpleConfigTest.HOSTNAME, "my-host");
         
         // get back and verify
-        IEnumConfigurationValue<String> value = configurationStore.readConfigurationValue(MyEnumConfiguration.HOSTNAME);
+        IEnumConfigurationValue<String> value = configurationStore.readConfigurationValue(SimpleConfigTest.HOSTNAME);
         assertNotNull(value);
         assertEquals("my-host", value.toString());
         assertEquals("my-host", value.getValue());
@@ -194,5 +366,33 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         
         assertEquals(MESSAGE_ENCODED, object.getData());
         assertEquals("[" + "defaultname.txt|" + timestamp + "|{plain/text}" + MESSAGE_ENCODED + "]", value.getValueList().toString());        
+    }
+
+
+    @EnumConfiguration(description = "The description")
+    public enum SimpleConfigTest implements IEnumConfiguration {
+        @EnumKeyValueConfiguration(description =  "First description.", dataType = DataType.NUMBER, defaultValue = "11", exampleValue = "42")
+        FIRST,
+        
+        @EnumKeyValueConfiguration(description =  "Second description.", dataType = DataType.NUMBER, defaultValue = "22", exampleValue = "42")
+        SECOND,
+        
+        @EnumKeyValueConfiguration(description =  "Third description.", exampleValue = "third")
+        THIRD,
+
+        @EnumKeyValueConfiguration(description = "The port.", exampleValue = "8080")
+        PORT,
+
+        @EnumKeyValueConfiguration(description = "This is the date.", dataType = DataType.DATE, defaultValue = "2021-03-01", exampleValue = "2021-01-01", minValue = "2000-01-01", maxValue = "2036-12-31")
+        DATE,
+
+        @EnumKeyValueConfiguration(description =  "Third description.", defaultValue = "", exampleValue = "my entry", cardinality = "0..*")
+        EMPTY_STRING,
+
+        @EnumKeyValueConfiguration(description =  "Third description.", defaultValue = "a", exampleValue = "my entry", cardinality = "0..*")
+        EMPTY_STRING_WITH_DEFAULT,
+
+        @EnumKeyValueConfiguration(description =  "Hostname description.", defaultValue = "hostname", exampleValue = "second host")
+        HOSTNAME;
     }
 }

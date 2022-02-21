@@ -74,9 +74,9 @@ public class PropertiesEnumConfigurationStore extends AbstractBaseTypeEnumConfig
         keySet = result;
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractConfigurationStore#loadConfiguration(java.lang.String)
+     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractBaseEnumConfigurationStore#loadConfiguration(java.lang.String)
      */
     @Override
     protected String loadConfiguration(String configurationKeyName) throws EnumConfigurationStoreException {
@@ -87,14 +87,14 @@ public class PropertiesEnumConfigurationStore extends AbstractBaseTypeEnumConfig
         return properties.getProperty(configurationKeyName);
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractConfigurationStore#writeConfiguration(java.lang.String, java.lang.String)
+     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractBaseEnumConfigurationStore#writeConfiguration(java.lang.String, java.lang.String)
      */
     @Override
     protected <D> void writeConfiguration(String configurationKeyName, String configurationValue) throws EnumConfigurationStoreException {
         if (configurationKeyName != null && !configurationKeyName.isBlank()) {
-            LOG.debug("Store [" + configurationKeyName + "], [" + configurationValue + "]");
+            LOG.debug("Write [" + configurationKeyName + "]");
             
             if (!keySet.contains(configurationKeyName)) {
                 keySet.add(configurationKeyName);
@@ -114,10 +114,11 @@ public class PropertiesEnumConfigurationStore extends AbstractBaseTypeEnumConfig
             return null;
         }
 
+        LOG.debug("Delete [" + configurationKeyName + "]");
         String value = loadConfiguration(configurationKeyName);
         properties.remove(configurationKeyName);
         
-        if (!keySet.contains(configurationKeyName)) {
+        if (keySet.contains(configurationKeyName)) {
             keySet.remove(configurationKeyName);
         }
 
