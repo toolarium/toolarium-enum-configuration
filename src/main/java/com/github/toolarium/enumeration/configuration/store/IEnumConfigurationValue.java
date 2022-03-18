@@ -12,14 +12,14 @@ import java.util.Collection;
  *  
  * @author patrick
  */
-public interface IEnumConfigurationValue<D> {
+public interface IEnumConfigurationValue<G> {
 
     /**
      * Get the value. In case of a list it will be the first element.
      *
      * @return the value. In case of a list it will be the first element.
      */
-    D getValue();
+    <D> D getValue();
     
     
     /**
@@ -27,7 +27,7 @@ public interface IEnumConfigurationValue<D> {
      *
      * @return the value list
      */
-    Collection<D> getValueList();
+    <D> Collection<D> getValueList();
     
     
     /**

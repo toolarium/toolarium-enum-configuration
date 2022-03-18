@@ -33,14 +33,17 @@ public class EnumConfigurationStorePropertiesTest {
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         
         // read by type and assume we have default values
-        assertEquals(11L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
-        assertEquals(22L, configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
+        Long val = configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue();
+        assertEquals(Long.valueOf(11), val);
+
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.THIRD));
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.HOSTNAME));
 
         // read by string and assume we have default values
-        assertEquals(11L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
-        assertEquals(22L, configurationStore.readConfigurationValue(" com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
+        assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue(" com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
         assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#third"));
         assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#hostname"));
 
@@ -55,11 +58,11 @@ public class EnumConfigurationStorePropertiesTest {
 
         // write values by string
         configurationStore.writeConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first", "23");
-        assertEquals(23L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(23), configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
 
         // write values by object
         configurationStore.writeConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first", 24);
-        assertEquals(24L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(24), configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
 
         // read all properties
         String reference = "{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[\"33\", \"44\"], " 
@@ -72,8 +75,8 @@ public class EnumConfigurationStorePropertiesTest {
         assertEquals(reference, configurationStore.getProperties().toString());
         
         // verify
-        assertEquals(24L, configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
-        assertEquals(33L, configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
+        assertEquals(Long.valueOf(24), configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(33), configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.THIRD));
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.HOSTNAME));
         assertEquals("my-host", configurationStore.readConfigurationValue(MyEnumConfiguration.HOSTNAME).getValue());
@@ -122,21 +125,21 @@ public class EnumConfigurationStorePropertiesTest {
         assertEquals(reference3, deletedProperties.toString());
         
         // default value
-        assertEquals(11L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());
         assertNull(configurationStore.readConfigurationValueIgnoreDefault("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first"));
         
         // last set value
-        assertEquals(21L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
-        assertEquals(21L, configurationStore.readConfigurationValueIgnoreDefault("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(Long.valueOf(21), configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(Long.valueOf(21), configurationStore.readConfigurationValueIgnoreDefault("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
 
         // read defaul value
-        assertEquals(21L, configurationStore.readConfigurationValueIgnoreDefault(MyConfigTest.SECOND).getValue());
+        assertEquals(Long.valueOf(21), configurationStore.readConfigurationValueIgnoreDefault(MyConfigTest.SECOND).getValue());
 
         // remove
-        assertEquals(21L, configurationStore.deleteConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(Long.valueOf(21), configurationStore.deleteConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
 
         // default value
-        assertEquals(22L, configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
      
         assertEquals("0815", configurationStore.deleteConfigurationValue(MyEnumConfiguration.PORT).getValue());
         assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.PORT));

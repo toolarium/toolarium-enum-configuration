@@ -55,44 +55,44 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
         
         // readConfigurationValue(String configurationKey)
-        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
         // readConfigurationValueIgnoreDefault(String configurationKey) 
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
 
         // readConfigurationValue(T configurationKey)
-        assertEquals(11L, configurationStore.readConfigurationValue(FIRST).getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(FIRST).getValue());
         // readConfigurationValueIgnoreDefault(T configurationKey)
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(FIRST));
         
         // writeConfigurationValue(T configurationKey, Object value)
         configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, 12);
-        assertEquals(12L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
-        assertEquals(12L, configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(12), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(12), configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
         
         // writeConfigurationValue(T configurationKey, String value)
         configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, "13");
-        assertEquals(13L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
-        assertEquals(13L, configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(13), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(13), configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST).getValue());
 
         // deleteConfigurationValue(T configurationKey)   
-        assertEquals(13L, configurationStore.deleteConfigurationValue(SimpleConfigTest.FIRST).getValue());
-        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(13), configurationStore.deleteConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
 
         // writeConfigurationValue(String configurationKey, String value)
         configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, 14);
-        assertEquals(14L, configurationStore.readConfigurationValue(FIRST).getValue());
-        assertEquals(14L, configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
+        assertEquals(Long.valueOf(14), configurationStore.readConfigurationValue(FIRST).getValue());
+        assertEquals(Long.valueOf(14), configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
 
         // deleteConfigurationValue(String configurationKey)   
-        assertEquals(14L, configurationStore.deleteConfigurationValue(FIRST).getValue());
-        assertEquals(11L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(14), configurationStore.deleteConfigurationValue(FIRST).getValue());
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.FIRST));
 
         // void writeConfigurationValue(String configurationKey, Object value)
         configurationStore.writeConfigurationValue(SimpleConfigTest.FIRST, "15");
-        assertEquals(15L, configurationStore.readConfigurationValue(FIRST).getValue());
-        assertEquals(15L, configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
+        assertEquals(Long.valueOf(15), configurationStore.readConfigurationValue(FIRST).getValue());
+        assertEquals(Long.valueOf(15), configurationStore.readConfigurationValueIgnoreDefault(FIRST).getValue());
     }
 
     
@@ -176,8 +176,8 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         properties.setProperty(FIRST, "12"); 
         properties.setProperty(SECOND, "13");
         properties = configurationStore.writeConfigurationValueList(properties, true);
-        assertEquals(12L, configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
-        assertEquals(13L, configurationStore.readConfigurationValue(SimpleConfigTest.SECOND).getValue());
+        assertEquals(Long.valueOf(12), configurationStore.readConfigurationValue(SimpleConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(13), configurationStore.readConfigurationValue(SimpleConfigTest.SECOND).getValue());
         assertEquals(date, "" + properties.remove(DATE));
         assertEquals(port, "" + properties.remove(PORT));
         assertTrue(properties.isEmpty());

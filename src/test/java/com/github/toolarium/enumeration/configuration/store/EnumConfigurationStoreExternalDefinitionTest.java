@@ -80,7 +80,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         IEnumConfigurationValue<String> value = configurationStore.readConfigurationValue(configurationKeyName);
         assertNotNull(value);
         assertEquals("3", value.toString());
-        assertEquals(3L, value.getValue());
+        assertEquals(Long.valueOf(3), value.getValue());
         assertEquals("[3]", value.getValueList().toString());
 
         configurationStore.writeConfigurationValue(configurationKeyName, "4");
@@ -89,7 +89,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         value = configurationStore.readConfigurationValue(configurationKeyName);
         assertNotNull(value);
         assertEquals("4", value.toString());
-        assertEquals(4L, value.getValue());
+        assertEquals(Long.valueOf(4), value.getValue());
         assertEquals("[4]", value.getValueList().toString());
     }
 
@@ -259,7 +259,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         prop.setProperty("sample#delay", "7");
         configurationStore.setProperties(prop);
         
-        assertEquals(7L, configurationStore.readConfigurationValue(configurationKeyName).getValue());
+        assertEquals(Long.valueOf(7), configurationStore.readConfigurationValue(configurationKeyName).getValue());
 
         prop.setProperty("sample#delay", "a");
         configurationStore.setProperties(prop);
