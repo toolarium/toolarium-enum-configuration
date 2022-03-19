@@ -15,6 +15,7 @@ import java.io.InputStream;
  * @author patrick
  */
 public interface IEnumConfigurationResourceResolver {
+    
     /**
      * Gets the input stream of the {@link EnumConfigurations}.
      *
