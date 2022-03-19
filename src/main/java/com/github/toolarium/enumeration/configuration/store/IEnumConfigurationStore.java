@@ -21,7 +21,8 @@ public interface IEnumConfigurationStore {
      * In case of missing value a possible defined default value from the enum configuration annotation will be returned. 
      *
      * @param <D> the configuration value type
-     * @param configurationKey The unique configuration key, started by the name in lower case and dot notation, separated by <code>#</code> and the key. 
+     * @param configurationKey the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return value the value
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -46,7 +47,8 @@ public interface IEnumConfigurationStore {
      * In case of missing the value a possible defined default value in the enum configuration will be ignored.
      * 
      * @param <D> the configuration value type
-     * @param configurationKey The unique configuration key, started by the name in lower case and dot notation, separated by <code>#</code> and the key.
+     * @param configurationKey the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return value the value
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -70,7 +72,8 @@ public interface IEnumConfigurationStore {
      * Write a configuration value.
      *
      * @param <D> the configuration value type
-     * @param configurationKey the configuration key.
+     * @param configurationKey the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @param value the value
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be written 
      */
@@ -93,7 +96,8 @@ public interface IEnumConfigurationStore {
      * Write a configuration value.
      *
      * @param <T> the generic configuration name  
-     * @param configurationKey the configuration key
+     * @param configurationKey the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @param value the value
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be written
      */
@@ -115,7 +119,8 @@ public interface IEnumConfigurationStore {
      * Read a list of configuration values.
      * In case of missing value a possible defined default value from the enum configuration annotation will be returned. 
      *
-     * @param configurationKeys the configuration keys
+     * @param configurationKeys the unique configuration keys (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return the read configuration properties
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -138,7 +143,8 @@ public interface IEnumConfigurationStore {
      * Read a list of configuration values.
      * In case of missing the value a possible defined default value in the enum configuration will be ignored.
      *
-     * @param configurationKeys the configuration keys
+     * @param configurationKeys the unique configuration keys (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return the read configuration properties
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -182,7 +188,8 @@ public interface IEnumConfigurationStore {
      * Deletes a configuration value. 
      *
      * @param <D> the configuration value type
-     * @param configurationKey The unique configuration key, started by the name in lower case and dot notation, separated by <code>#</code> and the key. 
+     * @param configurationKey the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return the deleted configuration value or null
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -204,7 +211,8 @@ public interface IEnumConfigurationStore {
     /**
      * Deletes a list of configuration values.
      *
-     * @param configurationKeys the configuration keys
+     * @param configurationKeys the unique configuration key (by default started by the name in lower case and dot notation, 
+     *        separated by <code>#</code> and the key depending of the IEnumConfigurationKeyResolver). 
      * @return the deleted configuration properties where the key corresponds to a valid configuration key
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
@@ -219,5 +227,13 @@ public interface IEnumConfigurationStore {
      * @return the deleted configuration properties where the key corresponds to a valid configuration key
      * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
      */
-    <T extends Enum<T>> Properties deleteConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException;   
+    <T extends Enum<T>> Properties deleteConfigurationValueList(T[] configurationKeys) throws EnumConfigurationStoreException;
+    
+    
+    /**
+     * Get the configuration key resolver.
+     *
+     * @return the configuration key resolver.
+     */
+    IEnumConfigurationKeyResolver getEnumConfigurationKeyResolver();
 }

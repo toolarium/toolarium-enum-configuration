@@ -13,13 +13,11 @@ import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigura
 import com.github.toolarium.enumeration.configuration.dto.SortedProperties;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
-import com.github.toolarium.enumeration.configuration.util.ClassPathUtil;
 import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,8 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBaseEnumConfigurationStore {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractBaseTypeEnumConfigurationStore.class);
-    private Map<Object, String> configurationKeyMap;
-    private Map<String, Object> configurationKeyNameMap;
     private Map<Object, EnumKeyValueConfiguration> enumKeyValueConfigurationMap;
 
     
@@ -44,8 +40,6 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
      */
     public AbstractBaseTypeEnumConfigurationStore() {
         super();
-        configurationKeyMap = new ConcurrentHashMap<Object, String>();
-        configurationKeyNameMap = new ConcurrentHashMap<String, Object>();
         enumKeyValueConfigurationMap = new ConcurrentHashMap<Object, EnumKeyValueConfiguration>();
     }
 
@@ -76,7 +70,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             return null;
         }
         
-        String configurationKeyName = convertConfiguration(configurationKey);
+        String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
         String value = loadConfiguration(configurationKeyName);
         EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
 
@@ -137,7 +131,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
         
         for (T configurationKey : configurationKeys) {
-            String configurationKeyName = convertConfiguration(configurationKey);
+            String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
             IEnumConfigurationValue<?> value = readConfigurationValue(configurationKey);
             result.setProperty(configurationKeyName, handlingNullObject(value));
         }
@@ -158,7 +152,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
         
         for (T configurationKey : configurationKeys) {
-            String configurationKeyName = convertConfiguration(configurationKey);
+            String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
             IEnumConfigurationValue<?> value = readConfigurationValueIgnoreDefault(configurationKey);
             result.setProperty(configurationKeyName, handlingNullObject(value));
         }
@@ -179,7 +173,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         
         IEnumConfigurationValue<D> val = validate(configurationKey, value);
         if (val != null) {
-            writeConfiguration(convertConfiguration(configurationKey), val.toString());
+            writeConfiguration(getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey), val.toString());
         }
     }
 
@@ -194,7 +188,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             return;
         }
         
-        String configurationKeyName = convertConfiguration(configurationKey);
+        String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
         String value = convertObjectToString(configurationKeyName, EnumUtil.getInstance().getEnumKeyValueConfigurationAnnotationInformation(configurationKey), configurationValue);
         validate(configurationKey, value);
         writeConfiguration(configurationKeyName, value);
@@ -212,7 +206,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
 
         IEnumConfigurationValue<D> result = readConfigurationValueIgnoreDefault(configurationKey);
-        String configurationKeyName = convertConfiguration(configurationKey);
+        String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
         deleteConfiguration(configurationKeyName);
         return result;
     }
@@ -230,74 +224,11 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
 
         for (T configurationKey : configurationKeys) {
-            String configurationKeyName = convertConfiguration(configurationKey);
+            String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
             result.setProperty(configurationKeyName, handlingNullObject(deleteConfiguration(configurationKeyName)));
         }
         
         return result;
-    }
-
-    
-    /**
-     * Cache the configuration key name
-     * 
-     * @param <T> the generic type
-     * @param configurationKeyName the configuration key name
-     * @return the configuration key
-     * @throws EnumConfigurationStoreException In case of an invalid configuration key
-     */
-    /*
-    protected <T extends Enum<T>> T convertConfiguration(String configurationKeyName) {
-        if (configurationKeyName == null || configurationKeyName.isBlank()) {
-            throw new EnumConfigurationStoreException("Invalid configuration name!");
-        }
-        
-        // cache converted type
-        @SuppressWarnings("unchecked")
-        T configurationKey = (T)configurationKeyNameMap.get(configurationKeyName);
-        if (configurationKey == null) {
-            configurationKey = convertToConfigurationKey(configurationKeyName);
-            
-            if (configurationKey == null) {
-                return null;
-            }
-            
-            configurationKeyMap.put(configurationKey, configurationKeyName);
-            configurationKeyNameMap.put(configurationKeyName, configurationKey);
-        }
-        
-        return configurationKey;
-    }
-    */
-
-    
-    /**
-     * Cache the configuration key
-     *
-     * @param <T> the generic type
-     * @param configurationKey the configuration key
-     * @return the configuration key name
-     * @throws EnumConfigurationStoreException In case of an invalid configuration key
-     */
-    protected <T extends Enum<T>> String convertConfiguration(T configurationKey) {
-        if (configurationKey == null) {
-            throw new EnumConfigurationStoreException("Invalid configuration key!");
-        }
-        
-        // cache converted type
-        String configurationKeyName = configurationKeyMap.get(configurationKey);
-        if (configurationKeyName == null) {
-            configurationKeyName = convertToConfigurationKeyName(configurationKey);
-            
-            if (configurationKeyName == null) {
-                return null;
-            }
-            
-            configurationKeyMap.put(configurationKey, configurationKeyName);
-            configurationKeyNameMap.put(configurationKeyName, configurationKey);
-        }
-        
-        return configurationKeyName;
     }
 
     
@@ -316,7 +247,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             throw new EnumConfigurationStoreException("Invalid configuration key!");
         }
 
-        String configurationKeyName = convertConfiguration(configurationKey);
+        String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
 
         try {
             EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
@@ -330,67 +261,19 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             throw ex;
         }
     }
+    
 
-    
     /**
-     * Convert the unique configuration key name into an enum configuration key type 
-     *
-     * @param <T> the generic type
-     * @param configurationKeyName the configuration key name
-     * @return the configuration key type
-     */
-    protected <T extends Enum<T>> T convertToConfigurationKey(String configurationKeyName) {
-        if (configurationKeyName == null || configurationKeyName.isBlank()) {
-            return null;
-        }
-        
-        String[] split = splitKeyName(configurationKeyName); 
-        if (split == null || split[0] == null || split[1] == null) {
-            return null;
-        }
-        
-        String className = split[0].trim();
-        String enumName =  split[1].trim();
-        
-        List<Class<?>> classes = ClassPathUtil.getInstance().search(className, false);
-        if (classes != null && !classes.isEmpty()) {
-            for (Class<?> clazz : classes) {
-                @SuppressWarnings("unchecked")
-                T t = EnumUtil.getInstance().valueOf((Class<T>) clazz, enumName);
-                if (t != null) {
-                    return t;
-                }
-            }
-        }
-        
-        return null;
-    }
-
-    
-    /**
-     * Convert configuration key type into a unique configuration key name
-     *
-     * @param <T> the generic type
-     * @param configurationKey the configuration key
-     * @return the configuration key name
-     */
-    protected <T extends Enum<T>> String convertToConfigurationKeyName(T configurationKey) {
-        // in this sample we lowercase the class name. To resolve the class we need some extra effort
-        return combineKeyName(configurationKey.getClass().getName().toLowerCase(), configurationKey.name().toLowerCase());
-    }
-    
-    
-    /**
-     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractBaseEnumConfigurationStore#getEnumKeyValueConfiguration(java.lang.String, boolean)
+     * @see com.github.toolarium.enumeration.configuration.store.impl.AbstractBaseEnumConfigurationStore#getEnumKeyValueConfiguration(java.lang.String)
      */
     @Override
-    protected EnumKeyValueConfiguration getEnumKeyValueConfiguration(String inputConfigurationKeyName, boolean ignoreCase) throws EnumConfigurationStoreException {
+    protected EnumKeyValueConfiguration getEnumKeyValueConfiguration(String inputConfigurationKeyName) throws EnumConfigurationStoreException {
         EnumKeyValueConfiguration enumKeyValueConfiguration = enumKeyValueConfigurationMap.get(inputConfigurationKeyName);
         if (enumKeyValueConfiguration != null) {
             return enumKeyValueConfiguration;
         }
         
-        return super.getEnumKeyValueConfiguration(inputConfigurationKeyName, ignoreCase);
+        return super.getEnumKeyValueConfiguration(inputConfigurationKeyName);
     }
 
     
@@ -409,7 +292,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             throw new EnumConfigurationStoreException("Invalid configuration key!");
         }
 
-        String cacheKey = combineKeyName(configurationKey.getClass().getName(), configurationKey.name()).toLowerCase();
+        String cacheKey = getEnumConfigurationKeyResolver().createConfigurationKeyName(configurationKey.getClass().getName(), configurationKey.name());
         EnumKeyValueConfiguration enumKeyValueConfiguration = enumKeyValueConfigurationMap.get(cacheKey);
         if (enumKeyValueConfiguration == null) {
             try {
@@ -422,7 +305,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
                     LOG.debug("Could not get enum configuration from annotation of key [" + cacheKey + "]: " + e.getMessage(), e);
                 }
 
-                return getEnumKeyValueConfiguration(convertConfiguration(configurationKey), true);
+                return getEnumKeyValueConfiguration(getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey));
             }
         }
         

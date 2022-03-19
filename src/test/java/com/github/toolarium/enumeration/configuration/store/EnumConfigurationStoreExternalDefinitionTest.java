@@ -64,7 +64,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         EnumKeyValueConfiguration enumKeyValueConfiguration = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME, EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME, enumKeyValueConfiguration));
         
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.ARRAY_SAMPLE));
         assertEquals(DEFAULT_VALUE, configurationStore.readConfigurationValue(configurationKeyName).toString());
 
@@ -111,7 +111,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME, enumKeyValueConfiguration));
 
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.ARRAY_SAMPLE));
         assertEquals(enumKeyValueConfiguration.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName).toString());
 
@@ -136,7 +136,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         // Initialize the properties configuration store with external source
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(new EnumConfigurationResourceResolver(new ByteArrayInputStream(new byte[] {})));
         
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValue(configurationKeyName));
         
         // read not existing value
@@ -163,7 +163,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         // Initialize the properties configuration store with external source
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(new EnumConfigurationResourceResolver(new ByteArrayInputStream("abcd = gg".getBytes())));
         
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValue(configurationKeyName));
         
         // read not existing value
@@ -191,7 +191,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         EnumKeyValueConfiguration enumKeyValueConfiguration = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME + "Unknown", EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME, enumKeyValueConfiguration));
 
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName));
         assertNull(configurationStore.readConfigurationValue(configurationKeyName));
         
@@ -220,7 +220,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         EnumKeyValueConfiguration enumKeyValueConfiguration = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME, EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME + "Unknown", enumKeyValueConfiguration));
         
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName));
         assertNull(configurationStore.readConfigurationValue(configurationKeyName));
         
@@ -249,7 +249,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         EnumKeyValueConfiguration enumKeyValueConfiguration = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME, EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME, enumKeyValueConfiguration));
         
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName));
         assertEquals(enumKeyValueConfiguration.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName).toString());
         
@@ -289,7 +289,7 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         
         PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(createEnumConfigurationMock(CLASSNAME, enumKeyValueConfiguration));
 
-        String configurationKeyName = configurationStore.combineKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME).toLowerCase();
+        String configurationKeyName = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME, ENUM_CONFIGURATION_KEY_NAME);
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName));
         assertEquals(enumKeyValueConfiguration.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName).toString());
 
