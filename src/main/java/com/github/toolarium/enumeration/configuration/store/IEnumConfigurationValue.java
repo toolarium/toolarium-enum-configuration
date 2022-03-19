@@ -12,11 +12,12 @@ import java.util.Collection;
  *  
  * @author patrick
  */
-public interface IEnumConfigurationValue<G> {
+public interface IEnumConfigurationValue<P> {
 
     /**
      * Get the value. In case of a list it will be the first element.
-     *
+     * 
+     * @param <D> the generic value type
      * @return the value. In case of a list it will be the first element.
      */
     <D> D getValue();
@@ -25,6 +26,7 @@ public interface IEnumConfigurationValue<G> {
     /**
      * Get the converted value as list
      *
+     * @param <D> the generic value type
      * @return the value list
      */
     <D> Collection<D> getValueList();

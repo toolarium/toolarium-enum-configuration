@@ -15,10 +15,11 @@ import java.util.Iterator;
  * 
  * @author patrick
  */
-public class EnumConfigurationValue<D> implements IEnumConfigurationValue<D> {
+public class EnumConfigurationValue<P> implements IEnumConfigurationValue<P> {
+    //private Class<P> clazz;
     private String configurationValue;
-    private Collection<D> valueList;
-    private Iterator<D> iterator;
+    private Collection<P> valueList;
+    private Iterator<P> iterator;
 
     
     /**
@@ -27,7 +28,8 @@ public class EnumConfigurationValue<D> implements IEnumConfigurationValue<D> {
      * @param configurationValue the configuration value
      * @param valueList the value list
      */
-    public EnumConfigurationValue(String configurationValue, Collection<D> valueList) {
+    public EnumConfigurationValue(String configurationValue, Collection<P> valueList) {
+        //this.clazz = (Class<P>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         this.configurationValue = configurationValue;
         this.valueList = valueList;
         this.iterator = null;
@@ -37,8 +39,9 @@ public class EnumConfigurationValue<D> implements IEnumConfigurationValue<D> {
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue#getValue()
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public D getValue() {
+    public <D> D getValue() {
         if (valueList == null || valueList.isEmpty()) {
             return null;
         }
@@ -47,16 +50,17 @@ public class EnumConfigurationValue<D> implements IEnumConfigurationValue<D> {
             iterator = iterator();
         }
         
-        return iterator.next();
+        return (D) iterator.next();
     }
 
 
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue#getValueList()
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Collection<D> getValueList() {
-        return valueList;
+    public <D> Collection<D> getValueList() {
+        return (Collection<D>) valueList;
     }
 
     
@@ -72,9 +76,11 @@ public class EnumConfigurationValue<D> implements IEnumConfigurationValue<D> {
     /**
      * Get the iterator back
      *
-     * @return the itertaor
+     * @param <D> the generic type
+     * @return the iterator
      */
-    protected Iterator<D> iterator() {
-        return valueList.iterator();
+    @SuppressWarnings("unchecked")
+    protected <D> Iterator<D> iterator() {
+        return (Iterator<D>) valueList.iterator();
     }
 }
