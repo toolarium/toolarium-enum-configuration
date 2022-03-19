@@ -36,7 +36,6 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     
     private Map<Object, String> configurationKeyMap;
     private Map<String, Object> configurationKeyNameMap;
-    private String configurationKeySeparator;
     private EnumConfigurations loadedEnumConfigurations;
     private IEnumConfigurationResourceResolver enumConfigurationResourceResolver;
     private boolean ignoreCase;
@@ -46,7 +45,6 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
      * Constructor for EnumConfigurationKeyResolver
      */
     public EnumConfigurationKeyResolver() {
-        configurationKeySeparator = CONFIGURATION_KEY_SEPARATOR;
         configurationKeyMap = new ConcurrentHashMap<Object, String>();
         configurationKeyNameMap = new ConcurrentHashMap<String, Object>();
         loadedEnumConfigurations = null;
@@ -54,6 +52,23 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
         ignoreCase = true;
     }
     
+    
+    /**
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#createConfigurationKeyName(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String createConfigurationKeyName(String configurationName, String keyName) {
+        if (configurationName == null || configurationName.isBlank()) {
+            return null;
+        }
+
+        if (keyName == null || keyName.isBlank()) {
+            return null;
+        }
+
+        return new StringBuilder(configurationName).append(getConfigurationKeySeparator()).append(keyName).toString().toLowerCase();
+    }
+
 
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#resolveConfigurationKeyName(java.lang.Enum)
@@ -108,23 +123,6 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     }
 
     
-    /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#createConfigurationKeyName(java.lang.String, java.lang.String)
-     */
-    @Override
-    public String createConfigurationKeyName(String configurationName, String keyName) {
-        if (configurationName == null || configurationName.isBlank()) {
-            return null;
-        }
-
-        if (keyName == null || keyName.isBlank()) {
-            return null;
-        }
-
-        return new StringBuilder(configurationName).append(configurationKeySeparator).append(keyName).toString().toLowerCase();
-    }
-
-
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#getEnumKeyValueConfiguration(java.lang.String)
      * 
@@ -230,14 +228,14 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
 
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#setEnumConfigurationResourceResolver(com.github.toolarium.enumeration.configuration.store.IEnumConfigurationResourceResolver)
+     * Sets the resource resolver
+     * 
+     * @param enumConfigurationResourceResolver the resource resolver
      */
-    @Override
     public void setEnumConfigurationResourceResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver) {
         this.enumConfigurationResourceResolver = enumConfigurationResourceResolver;
     }
 
-    
     
     /**
      * Convert the unique configuration key name into an enum configuration key type 
@@ -299,7 +297,7 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
         }
 
         String configurationKeyName = inputConfigurationKeyName.trim();
-        String[] split = configurationKeyName.split(configurationKeySeparator);
+        String[] split = configurationKeyName.split(getConfigurationKeySeparator());
         if (split.length < 2) {
             return null;
         }
@@ -310,6 +308,12 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     }
 
 
-
-
+    /**
+     * Get the configuration key separator
+     *
+     * @return the configuration key separator
+     */
+    protected String getConfigurationKeySeparator() {
+        return CONFIGURATION_KEY_SEPARATOR;
+    }
 }

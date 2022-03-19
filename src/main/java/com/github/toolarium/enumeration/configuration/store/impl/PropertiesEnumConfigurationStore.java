@@ -44,8 +44,9 @@ public class PropertiesEnumConfigurationStore extends AbstractBaseTypeEnumConfig
      */
     public PropertiesEnumConfigurationStore(IEnumConfigurationResourceResolver enumConfigurationResourceResolver) {
         this();
-        
-        getEnumConfigurationKeyResolver().setEnumConfigurationResourceResolver(enumConfigurationResourceResolver);
+        EnumConfigurationKeyResolver enumConfigurationKeyResolver = new EnumConfigurationKeyResolver();
+        enumConfigurationKeyResolver.setEnumConfigurationResourceResolver(enumConfigurationResourceResolver);
+        setEnumConfigurationKeyResolver(enumConfigurationKeyResolver);
     }
 
     
