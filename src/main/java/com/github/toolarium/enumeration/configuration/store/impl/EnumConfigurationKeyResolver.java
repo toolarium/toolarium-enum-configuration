@@ -45,13 +45,34 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
      * Constructor for EnumConfigurationKeyResolver
      */
     public EnumConfigurationKeyResolver() {
+        this(null, true);
+    }
+
+    
+    /**
+     * Constructor for EnumConfigurationKeyResolver
+     * 
+     * @param enumConfigurationResourceResolver the enum configuration resource resolver
+     */
+    public EnumConfigurationKeyResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver) {
+        this(enumConfigurationResourceResolver, true);
+    }
+
+    
+    /**
+     * Constructor for EnumConfigurationKeyResolver
+     * 
+     * @param enumConfigurationResourceResolver the enum configuration resource resolver
+     * @param ignoreCase true or false
+     */
+    public EnumConfigurationKeyResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver, boolean ignoreCase) {
         configurationKeyMap = new ConcurrentHashMap<Object, String>();
         configurationKeyNameMap = new ConcurrentHashMap<String, Object>();
         loadedEnumConfigurations = null;
-        enumConfigurationResourceResolver = null;
-        ignoreCase = true;
+        this.enumConfigurationResourceResolver = enumConfigurationResourceResolver;
+        this.ignoreCase = ignoreCase;
     }
-    
+
     
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationKeyResolver#createConfigurationKeyName(java.lang.String, java.lang.String)
@@ -140,7 +161,12 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
         String configurationKeyName = inputConfigurationKeyName;
         if (loadedEnumConfigurations == null) {
             LOG.debug("Try to resolve configuration key [" + inputConfigurationKeyName + "]...");
-            InputStream enumConfigurationResourceInputStream = getEnumConfigurationResourceInputStream();
+            
+            if (enumConfigurationResourceResolver == null) {
+                throw new EnumConfigurationStoreException("Not supported resource input stream!");
+            }
+            
+            InputStream enumConfigurationResourceInputStream = enumConfigurationResourceResolver.getEnumConfigurationResourceStream();
             if (enumConfigurationResourceInputStream != null) {
                 LOG.debug("Load enum configuration information for key [" + configurationKeyName + "]...");
 
@@ -213,27 +239,12 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
 
     
     /**
-     * Get the enum configuration resource input stream
-     * 
-     * @return the enum configuration resource input stream or null
-     * @throws EnumConfigurationStoreException In case of not accessible resource
+     * Clear cache
      */
-    protected InputStream getEnumConfigurationResourceInputStream() throws EnumConfigurationStoreException {
-        if (enumConfigurationResourceResolver == null) {
-            throw new EnumConfigurationStoreException("Not supported resource input stream!");
-        }
-        
-        return enumConfigurationResourceResolver.getEnumConfigurationResourceStream();
-    }
-
-
-    /**
-     * Sets the resource resolver
-     * 
-     * @param enumConfigurationResourceResolver the resource resolver
-     */
-    public void setEnumConfigurationResourceResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver) {
-        this.enumConfigurationResourceResolver = enumConfigurationResourceResolver;
+    public void clearCache() {
+        configurationKeyMap.clear();
+        configurationKeyNameMap.clear();
+        loadedEnumConfigurations = null;
     }
 
     
