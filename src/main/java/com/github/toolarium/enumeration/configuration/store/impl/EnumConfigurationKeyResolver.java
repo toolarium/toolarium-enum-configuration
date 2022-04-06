@@ -36,7 +36,7 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     
     private Map<Object, String> configurationKeyMap;
     private Map<String, Object> configurationKeyNameMap;
-    private EnumConfigurations loadedEnumConfigurations;
+    private Map<String, EnumConfigurations> loadedEnumConfigurationsMap;
     private IEnumConfigurationResourceResolver enumConfigurationResourceResolver;
     private boolean ignoreCase;
 
@@ -68,7 +68,7 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     public EnumConfigurationKeyResolver(IEnumConfigurationResourceResolver enumConfigurationResourceResolver, boolean ignoreCase) {
         configurationKeyMap = new ConcurrentHashMap<Object, String>();
         configurationKeyNameMap = new ConcurrentHashMap<String, Object>();
-        loadedEnumConfigurations = null;
+        loadedEnumConfigurationsMap = new ConcurrentHashMap<String, EnumConfigurations>();
         this.enumConfigurationResourceResolver = enumConfigurationResourceResolver;
         this.ignoreCase = ignoreCase;
     }
@@ -159,26 +159,31 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
         }
 
         String configurationKeyName = inputConfigurationKeyName;
+        String[] configurationKeyNameSplit = splitKeyName(configurationKeyName);
+        
+        EnumConfigurations loadedEnumConfigurations = loadedEnumConfigurationsMap.get(configurationKeyNameSplit[0]);
         if (loadedEnumConfigurations == null) {
-            LOG.debug("Try to resolve configuration key [" + inputConfigurationKeyName + "]...");
+            LOG.debug("Try to resolve configuration key [" + configurationKeyNameSplit[0] + "]...");
             
             if (enumConfigurationResourceResolver == null) {
                 throw new EnumConfigurationStoreException("Not supported resource input stream!");
             }
             
-            InputStream enumConfigurationResourceInputStream = enumConfigurationResourceResolver.getEnumConfigurationResourceStream();
+            InputStream enumConfigurationResourceInputStream = enumConfigurationResourceResolver.getEnumConfigurationResourceStream(configurationKeyNameSplit[0], ignoreCase);
             if (enumConfigurationResourceInputStream != null) {
-                LOG.debug("Load enum configuration information for key [" + configurationKeyName + "]...");
+                LOG.debug("Load enum configuration information for key [" + configurationKeyNameSplit[0] + "]...");
 
                 try {
                     loadedEnumConfigurations = EnumConfigurationResourceFactory.getInstance().load(enumConfigurationResourceInputStream);
                     if (loadedEnumConfigurations != null) {
                         LOG.info("Successful load enum configuration [" + loadedEnumConfigurations.getName() + " v" + loadedEnumConfigurations.getVersion() + "].");
+                        loadedEnumConfigurationsMap.put(configurationKeyNameSplit[0], loadedEnumConfigurations);
+                        
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Loaded enum configuration information: " + loadedEnumConfigurations);
                         }
                     } else {
-                        LOG.warn("Could not load enum configuration information for key [" + configurationKeyName + "]!");
+                        LOG.warn("Could not load enum configuration information for key [" + configurationKeyNameSplit[0] + "]!");
                     }
 
                     try {
@@ -188,22 +193,23 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
                     }
                     
                 } catch (IOException ioex) {
-                    LOG.warn("Could not load enum configuration information for key [" + configurationKeyName + "], invalid content:\n" + ioex.getMessage());
+                    LOG.warn("Could not load enum configuration information for key [" + configurationKeyNameSplit[0] + "], invalid content:\n" + ioex.getMessage());
                 }
             }
+        } else {
+            LOG.debug("Found configuration " + configurationKeyNameSplit[0] + "] in cache.");
         }
         
         EnumKeyValueConfiguration enumKeyValueConfiguration = null;
         if (loadedEnumConfigurations != null) {
-            String[] configurationKeyNameSplit = splitKeyName(configurationKeyName);
-            
+            LOG.debug("Select configuration [" + configurationKeyNameSplit[0] + "]...");
             EnumConfiguration<EnumKeyValueConfiguration> loadedEnumConfiguration = null;
             if (ignoreCase) {
                 Set<EnumConfiguration<? extends EnumKeyConfiguration>> set = loadedEnumConfigurations.getEnumConfigurationList();
                 if (set != null) {
                     for (EnumConfiguration<? extends EnumKeyConfiguration> e : set) {
                         if (e.getName().equalsIgnoreCase(configurationKeyNameSplit[0])) {
-                            //@SuppressWarnings("unchecked")
+                            LOG.debug("Configuration key [" + configurationKeyName + "] found (" + e.getName() + ").");
                             loadedEnumConfiguration = (EnumConfiguration<EnumKeyValueConfiguration>)e;
                             break;
                         }
@@ -211,6 +217,9 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
                 }
             } else {
                 loadedEnumConfiguration = (EnumConfiguration<EnumKeyValueConfiguration>)loadedEnumConfigurations.get(configurationKeyNameSplit[0]);
+                if (loadedEnumConfiguration != null) {
+                    LOG.debug("Configuration key [" + configurationKeyName + "] found.");
+                }
             }
             
             if (loadedEnumConfiguration != null) {
@@ -244,7 +253,7 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
     public void clearCache() {
         configurationKeyMap.clear();
         configurationKeyNameMap.clear();
-        loadedEnumConfigurations = null;
+        loadedEnumConfigurationsMap.clear();
     }
 
     

@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
  */
 public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfigurationStoreConstants {
     private static final String ENUM_CONFIGURATION_KEY_NAME = "DELAY";
-    private static final String CLASSNAME = "Sample";
+    private static final String PACKAGENAME = "my.sample";
+    private static final String CLASSNAME = PACKAGENAME + "." + "Sample";
     private static final String DEFAULT_VALUE = "2";
     private static final String ZERO = "0";
     private static final String TEN = "10";
@@ -255,13 +256,17 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         
         configurationStore.writeConfigurationValue(configurationKeyName, "6");
 
-        Properties prop = configurationStore.getProperties(); 
-        prop.setProperty("sample#delay", "7");
+        Properties prop = configurationStore.getProperties();
+        assertEquals(1, prop.size());
+        
+        String delayKey = PACKAGENAME + "." + "sample#delay";
+        assertEquals("6", prop.get(delayKey));
+        prop.setProperty(delayKey, "7");
         configurationStore.setProperties(prop);
         
         assertEquals(Long.valueOf(7), configurationStore.readConfigurationValue(configurationKeyName).getValue());
 
-        prop.setProperty("sample#delay", "a");
+        prop.setProperty(delayKey, "a");
         configurationStore.setProperties(prop);
         EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.readConfigurationValue(configurationKeyName).getValue();
@@ -269,6 +274,60 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
         
         // Invalid configuration found for key [sample#delay]: [input] Invalid value [a], it can not be converted into a NUMBER data type.
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid value [a], it can not be converted into a NUMBER data type.", exception.getMessage());
+    }
+
+    
+    /**
+     * Test invalid class of the enum configuration 
+     *
+     * @throws ValidationException In case of a validation error
+     * @throws IOException In case of an I/O error
+     */
+    @Test
+    public void readWriteDataWithMultipleExternalEnumConfigurations() throws ValidationException, IOException {
+        // Initialize the properties configuration store with external source
+        EnumConfigurations enumConfigurations = new EnumConfigurations();
+        EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration1 = new EnumConfiguration<EnumKeyValueConfiguration>(CLASSNAME + 1);
+        EnumKeyValueConfiguration enumKeyValueConfiguration1 = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME, EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
+        enumConfiguration1.add(enumKeyValueConfiguration1);
+        enumConfigurations.add(enumConfiguration1);
+        EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration2 = new EnumConfiguration<EnumKeyValueConfiguration>(CLASSNAME + 2);
+        EnumKeyValueConfiguration enumKeyValueConfiguration2 = createEnumKeyValueConfiguration(ENUM_CONFIGURATION_KEY_NAME, EnumKeyValueConfigurationDataType.NUMBER, ZERO, TEN, DEFAULT_VALUE, DEFAULT_VALUE); 
+        enumConfiguration2.add(enumKeyValueConfiguration2);
+        enumConfigurations.add(enumConfiguration2);
+        ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, outputstream);
+        LOG.debug("Prepared " + enumConfigurations);
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore(new EnumConfigurationResourceResolver(new ByteArrayInputStream(outputstream.toByteArray())));
+
+        Properties prop = configurationStore.getProperties();
+        assertEquals(0, prop.size());
+
+        String configurationKeyName1 = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME + 1, ENUM_CONFIGURATION_KEY_NAME);
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName1));
+        assertEquals(enumKeyValueConfiguration1.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName1).toString());
+        configurationStore.writeConfigurationValue(configurationKeyName1, "8");
+
+        prop = configurationStore.getProperties();
+        assertEquals(1, prop.size());
+
+        String configurationKeyName2 = configurationStore.getEnumConfigurationKeyResolver().createConfigurationKeyName(CLASSNAME + 2, ENUM_CONFIGURATION_KEY_NAME);
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(configurationKeyName2));
+        assertEquals(enumKeyValueConfiguration1.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName2).toString());
+        configurationStore.writeConfigurationValue(configurationKeyName2, "9");
+        
+        prop = configurationStore.getProperties();
+        assertEquals(2, prop.size());
+        
+        String delayKey1 = PACKAGENAME + "." + "sample1#delay";
+        assertEquals("8", prop.get(delayKey1));
+        prop.setProperty(delayKey1, "10");
+
+        String delayKey2 = PACKAGENAME + "." + "sample2#delay";
+        assertEquals("9", prop.get(delayKey2));
+        prop.setProperty(delayKey1, "11");
+
+        configurationStore.setProperties(prop);
     }
 
     

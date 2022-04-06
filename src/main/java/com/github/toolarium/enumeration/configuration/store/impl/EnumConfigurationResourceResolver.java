@@ -33,10 +33,10 @@ public class EnumConfigurationResourceResolver implements IEnumConfigurationReso
     
     
     /**
-     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationResourceResolver#getEnumConfigurationResourceStream()
+     * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationResourceResolver#getEnumConfigurationResourceStream(java.lang.String, boolean)
      */
     @Override
-    public InputStream getEnumConfigurationResourceStream() {
+    public InputStream getEnumConfigurationResourceStream(String configurationName, boolean ignoreCase) {
         try {
             if (stream != null) {
                 stream.reset();

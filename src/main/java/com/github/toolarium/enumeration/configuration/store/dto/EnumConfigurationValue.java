@@ -47,7 +47,7 @@ public class EnumConfigurationValue<P> implements IEnumConfigurationValue<P> {
         }
         
         if (iterator == null) {
-            iterator = iterator();
+            newIterator();
         }
         
         return (D) iterator.next();
@@ -74,13 +74,9 @@ public class EnumConfigurationValue<P> implements IEnumConfigurationValue<P> {
     
     
     /**
-     * Get the iterator back
-     *
-     * @param <D> the generic type
-     * @return the iterator
+     * Initialise iterator back
      */
-    @SuppressWarnings("unchecked")
-    protected <D> Iterator<D> iterator() {
-        return (Iterator<D>) valueList.iterator();
+    public void newIterator() {
+        iterator = (Iterator<P>) valueList.iterator();
     }
 }

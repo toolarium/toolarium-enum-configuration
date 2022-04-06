@@ -19,7 +19,9 @@ public interface IEnumConfigurationResourceResolver {
     /**
      * Gets the input stream of the {@link EnumConfigurations}.
      *
+     * @param configurationName the configuration name, e.g. my.sample.SampleEnum
+     * @param ignoreCase true to ignore case sensitivity on configuration name
      * @return the stream
      */
-    InputStream getEnumConfigurationResourceStream();
+    InputStream getEnumConfigurationResourceStream(String configurationName, boolean ignoreCase);
 }
