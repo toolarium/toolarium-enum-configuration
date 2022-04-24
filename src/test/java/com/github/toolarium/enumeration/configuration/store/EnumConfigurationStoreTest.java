@@ -14,11 +14,15 @@ import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.processor.MyEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
+import com.github.toolarium.enumeration.configuration.store.impl.EnumConfigurationKeyResolver;
 import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
 import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -32,7 +36,7 @@ import org.junit.jupiter.api.Test;
  * 
  * @author patrick
  */
-public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
+public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
 
     private static final String BRACE_START = "{";
     private static final String BRACE_END = "}";
@@ -377,6 +381,64 @@ public class EnumConfigurationStoreTest implements IEnumConfigurationStoreConsta
         assertEquals("[" + "defaultname.txt|" + timestamp + "|{plain/text}" + MESSAGE_ENCODED + "]", value.getValueList().toString());        
     }
 
+    
+    /**
+     * Test number
+     */
+    @Test
+    public void writenNullDataObject() {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+
+        EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY, (Object)null);
+        });
+
+        assertEquals(HEADER + "delay]: [input] Missing [input], its mandatory and not optional (cardinality: EnumKeyValueConfigurationSizing [minSize=1, maxSize=1])!", exception.getMessage());
+    }
+
+    
+    /**
+     * Test number
+     */
+    @Test
+    public void readBinaryDataWithoutDefaultValue() {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        String timestamp = "2021-03-15T08:59:22.123Z";
+
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.BINARY_WITHOUT_DEFAULT_SAMPLE));
+        assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.BINARY_WITHOUT_DEFAULT_SAMPLE));
+        String content = timestamp + "|" + MESSAGE_ENCODED;
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.BINARY_WITHOUT_DEFAULT_SAMPLE, content);
+
+        // get back and verify
+        IEnumConfigurationValue<IEnumKeyValueConfigurationBinaryObject> value = configurationStore.readConfigurationValue(MyEnumConfiguration.BINARY_WITHOUT_DEFAULT_SAMPLE);
+        assertNotNull(value);
+        assertEquals(content, value.toString());
+        
+        IEnumKeyValueConfigurationBinaryObject object = value.getValue();
+        
+        assertEquals(MESSAGE_ENCODED, object.getData());
+        assertEquals("[" + content + "]", value.getValueList().toString());        
+    }
+
+    
+    /**
+     * Test read, write and delete value list
+     * @throws IOException In case of an I/O error 
+     * @throws ValidationException In case of a validation error
+     */
+    @Test
+    public void readInvalidKey() throws ValidationException, IOException {
+        com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = createEnumKeyValueConfiguration("FIRST", EnumKeyValueConfigurationDataType.NUMBER, "0", "10", "0", "0"); 
+        EnumConfigurationKeyResolver resolver = new EnumConfigurationKeyResolver(createEnumConfigurationMock("com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest", enumKeyValueConfiguration));
+
+        com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration result = resolver.getEnumKeyValueConfiguration(FIRST);
+        assertEquals(result.getKey(), "FIRST");
+
+        result = resolver.getEnumKeyValueConfiguration("com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest");
+        assertNull(result);
+    }
+    
 
     @EnumConfiguration(description = "The description")
     public enum SimpleConfigTest implements IEnumConfiguration {

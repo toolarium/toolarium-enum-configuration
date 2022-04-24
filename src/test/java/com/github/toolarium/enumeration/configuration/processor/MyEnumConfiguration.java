@@ -59,5 +59,11 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     DD,
     
     @EnumKeyValueConfiguration(description = "An number array example.",  dataType = DataType.BINARY, defaultValue = "defaultname.txt|{plain/text}", exampleValue = "ICBteSBmaWxlIGNvbnRlbnQyICA=")
-    BINARY_SAMPLE;
+    BINARY_SAMPLE,
+    
+    @EnumKeyValueConfiguration(description = "An number array example.",  dataType = DataType.BINARY, exampleValue = "ICBteSBmaWxlIGNvbnRlbnQyICA=")
+    BINARY_WITHOUT_DEFAULT_SAMPLE,
+    
+    @EnumKeyValueConfiguration(description = "Defines the delay of an echo.", defaultValue = "2", exampleValue = "3", dataType = DataType.NUMBER, minValue = "0", maxValue = "10")
+    DELAY;
 }

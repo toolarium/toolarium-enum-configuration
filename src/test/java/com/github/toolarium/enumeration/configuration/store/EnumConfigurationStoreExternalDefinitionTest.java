@@ -19,15 +19,11 @@ import com.github.toolarium.enumeration.configuration.resource.EnumConfiguration
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.store.impl.EnumConfigurationResourceResolver;
 import com.github.toolarium.enumeration.configuration.store.impl.PropertiesEnumConfigurationStore;
-import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
-import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Properties;
