@@ -77,6 +77,8 @@ public class EnumConfigurationValue<P> implements IEnumConfigurationValue<P> {
      * Initialise iterator back
      */
     public void newIterator() {
-        iterator = (Iterator<P>) valueList.iterator();
+        if (valueList != null) {
+            iterator = (Iterator<P>) valueList.iterator();
+        }
     }
 }
