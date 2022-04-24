@@ -160,6 +160,9 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
 
         String configurationKeyName = inputConfigurationKeyName;
         String[] configurationKeyNameSplit = splitKeyName(configurationKeyName);
+        if (configurationKeyNameSplit == null || configurationKeyNameSplit.length < 2) {
+            return null;
+        }
         
         EnumConfigurations loadedEnumConfigurations = loadedEnumConfigurationsMap.get(configurationKeyNameSplit[0]);
         if (loadedEnumConfigurations == null) {
