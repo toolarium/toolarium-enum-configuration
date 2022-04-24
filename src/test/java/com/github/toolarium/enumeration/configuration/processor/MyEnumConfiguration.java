@@ -65,5 +65,11 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     BINARY_WITHOUT_DEFAULT_SAMPLE,
     
     @EnumKeyValueConfiguration(description = "Defines the delay of an echo.", defaultValue = "2", exampleValue = "3", dataType = DataType.NUMBER, minValue = "0", maxValue = "10")
-    DELAY;
+    DELAY,
+    
+    @EnumKeyValueConfiguration(description = "Defines the delay precision.", defaultValue = "SECONDS", exampleValue = "MILLITSECONDS", enumerationValue = " SECONDS, MILLITSECONDS ", isUniqueness = true)
+    DELAY_PRECISION_A,
+
+    @EnumKeyValueConfiguration(description = "Defines the delay precision.", defaultValue = "SECONDS", exampleValue = "MILLITSECONDS", enumerationValue = "[ \"SECONDS\", \"MILLITSECONDS\" ]", isUniqueness = true)
+    DELAY_PRECISION_B;
 }

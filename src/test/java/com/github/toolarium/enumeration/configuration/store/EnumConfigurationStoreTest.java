@@ -438,7 +438,65 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         result = resolver.getEnumKeyValueConfiguration("com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest");
         assertNull(result);
     }
+
     
+    /**
+     * Test read, write and delete value list
+     * @throws IOException In case of an I/O error 
+     * @throws ValidationException In case of a validation error
+     */
+    @Test
+    public void validateEnumerationA() throws ValidationException, IOException {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.DELAY_PRECISION_A));
+        assertEquals("SECONDS", configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A).getValue().toString());
+        
+        EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A, "TEST");
+        });
+        assertEquals(HEADER + "delay_precision_a]: [input] Invalid enumeration of [input] for intput [\"TEST\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        
+        // get back and verify
+        IEnumConfigurationValue<IEnumKeyValueConfigurationBinaryObject> value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A);
+        assertNotNull(value);
+        assertEquals("SECONDS", value.toString());
+        
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A, "MILLITSECONDS");
+        value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A);
+        assertNotNull(value);
+        assertEquals("MILLITSECONDS", value.toString());
+    }
+
+    
+    /**
+     * Test read, write and delete value list
+     * @throws IOException In case of an I/O error 
+     * @throws ValidationException In case of a validation error
+     */
+    @Test
+    public void validateEnumerationB() throws ValidationException, IOException {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.DELAY_PRECISION_B));
+        assertEquals("SECONDS", configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B).getValue().toString());
+        
+        EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B, "TEST");
+        }); 
+        assertEquals(HEADER + "delay_precision_b]: [input] Invalid enumeration of [input] for intput [\"TEST\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        
+        // get back and verify
+        IEnumConfigurationValue<IEnumKeyValueConfigurationBinaryObject> value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B);
+        assertNotNull(value);
+        assertEquals("SECONDS", value.toString());
+        
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B, "MILLITSECONDS");
+        value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B);
+        assertNotNull(value);
+        assertEquals("MILLITSECONDS", value.toString());
+    }
+
 
     @EnumConfiguration(description = "The description")
     public enum SimpleConfigTest implements IEnumConfiguration {

@@ -143,7 +143,7 @@ public final class JSONUtil {
         }
 
         try {
-            if (json.indexOf('[') < 0 &&  json.indexOf(']') < 0) {
+            if (!json.startsWith("[") && !json.endsWith("]")) {
                 return Arrays.asList(json);
             }
 

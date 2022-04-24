@@ -312,7 +312,27 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         }
 
         try {
-            return validateValue("enumerationValue", dataType, cardinality, isUniqueness, valueSize, null, enumerationValue);
+            enumerationValue = enumerationValue.trim();
+            List<String> list = null;
+            if (enumerationValue.startsWith("[") && enumerationValue.endsWith("]")) {
+                list = JSONUtil.getInstance().convert(enumerationValue);
+            } else {
+                list = new ArrayList<>();
+                for (String e : enumerationValue.split(",")) {
+                    list.add(e.trim());
+                }
+            }
+            
+            Collection<D> result = null;
+            for (String e :  list) {
+                Collection<D> validateValue = validateValue("enumerationValue", dataType, cardinality, isUniqueness, valueSize, null, e);
+                if (result == null) {
+                    result = validateValue;
+                } else {
+                    result.addAll(validateValue);
+                }
+            }
+            return result;
         } catch (ValidationException ex) {
             throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[enumerationValue] " + ex.getMessage(), ex.getStackTrace());
         }
@@ -371,6 +391,18 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
 
             try {
                 D value = validateValue(inputType, dataType, valueSize, input);
+                if (enumarationValues != null && !enumarationValues.contains(value)) {
+                    String validValues = enumarationValues.toString();
+                    if (validValues.startsWith("[") && validValues.length() > 1) {
+                        validValues = validValues.substring(1);
+                    }
+                    if (validValues.endsWith("]") && validValues.length() > 1) {
+                        validValues = validValues.substring(0, validValues.length() - 1);
+                    }
+                    
+                    throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [\"" + input + "\"], allowed values are: " + validValues);
+                }
+                
                 collection.add(value);
             } catch (EmptyValueException ex) {
                 if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
@@ -400,7 +432,15 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                         try {
                             D value = validateValue(inputType, dataType, valueSize, in);
                             if (enumarationValues != null && !enumarationValues.contains(value)) {
-                                throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [" + input + "], allowed values are: " + enumerationValue);
+                                String validValues = enumarationValues.toString();
+                                if (validValues.startsWith("[") && validValues.length() > 1) {
+                                    validValues = validValues.substring(1);
+                                }
+                                if (validValues.endsWith("]") && validValues.length() > 1) {
+                                    validValues = validValues.substring(0, validValues.length() - 1);
+                                }
+                                
+                                throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [" + input + "], allowed values are: " + validValues);
                             }
                             
                             if (!collection.add(value)) {
