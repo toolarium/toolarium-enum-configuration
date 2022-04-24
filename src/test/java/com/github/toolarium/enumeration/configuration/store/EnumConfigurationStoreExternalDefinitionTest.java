@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *  
  * @author patrick
  */
-public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfigurationStoreConstants {
+public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
     private static final String ENUM_CONFIGURATION_KEY_NAME = "DELAY";
     private static final String PACKAGENAME = "my.sample";
     private static final String CLASSNAME = PACKAGENAME + "." + "Sample";
@@ -386,67 +386,4 @@ public class EnumConfigurationStoreExternalDefinitionTest implements IEnumConfig
             value2.getValue();
         });
     }
-    
-    
-    /**
-     * Create the enum configuration mock
-     *
-     * @param className the class name
-     * @param enumKeyValueConfiguration the enum key value configuration
-     * @return the input stream
-     * @throws ValidationException In case of a validation error
-     * @throws IOException In case of an I/O error
-     */
-    private IEnumConfigurationResourceResolver createEnumConfigurationMock(String className, EnumKeyValueConfiguration enumKeyValueConfiguration) throws ValidationException, IOException {
-        EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration = new EnumConfiguration<EnumKeyValueConfiguration>(className);
-        enumConfiguration.add(enumKeyValueConfiguration);
-        EnumConfigurations enumConfigurations = new EnumConfigurations();
-        enumConfigurations.add(enumConfiguration);
-        ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
-        EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, outputstream);
-        LOG.debug("Prepared " + enumConfigurations);
-        return new EnumConfigurationResourceResolver(new ByteArrayInputStream(outputstream.toByteArray()));
-    }
-
-
-    /**
-     * Create the enum configuration
-     *
-     * @param enumConfigurtionKeyName the key name
-     * @param dataType the data type
-     * @param minSize the min size
-     * @param maxSize the max size
-     * @param defaultValue the default size
-     * @param exampleValue the example value
-     * @return the input stream
-     * @throws ValidationException In case of a validation error
-     * @throws IOException In case of an I/O error
-     */
-    private EnumKeyValueConfiguration createEnumKeyValueConfiguration(String enumConfigurtionKeyName, 
-                                                                      EnumKeyValueConfigurationDataType dataType,
-                                                                      String minSize,
-                                                                      String maxSize,
-                                                                      String defaultValue, 
-                                                                      String exampleValue) 
-            throws ValidationException, IOException {
-        // 1) define enum configuration
-        EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
-        EnumKeyValueConfigurationSizing<Integer> cardinality = new EnumKeyValueConfigurationSizing<Integer>(1, 1);
-        enumKeyValueConfiguration.setCardinality(cardinality);
-        enumKeyValueConfiguration.setConfidential(false);
-        enumKeyValueConfiguration.setKey(enumConfigurtionKeyName);
-        enumKeyValueConfiguration.setDefaultValue(defaultValue);
-        enumKeyValueConfiguration.setDescription("The description.");
-        enumKeyValueConfiguration.setEnumerationValue("");
-        enumKeyValueConfiguration.setExampleValue(exampleValue);
-        enumKeyValueConfiguration.setValidFrom(Instant.now());
-        enumKeyValueConfiguration.setValidTill(DateUtil.MAX_TIMESTAMP);
-        enumKeyValueConfiguration.setDataType(dataType);
-        //EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); // define long value
-        EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), minSize, maxSize); 
-        enumKeyValueConfiguration.setValueSize(valueSize);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        return enumKeyValueConfiguration;
-    }
-
 }
