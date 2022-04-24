@@ -92,9 +92,13 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
                     if (valueData != null) {
                         // merge default value and value
                         IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
-                        EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
-                        mergedValueData.merge(valueData);
-                        value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
+                        if (defaultValueData != null) {
+                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
+                            mergedValueData.merge(valueData);
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
+                        } else {
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(valueData);
+                        }
                     }
                 }
             } catch (ValidationException e) {
@@ -438,7 +442,10 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
     @SuppressWarnings("unchecked")
     protected <T extends Enum<T>> String convertObjectToString(String configurationName, EnumKeyValueConfiguration enumKeyValueConfiguration, Object configurationValue) {
         String value;
-        if (configurationValue.getClass().isArray() || configurationValue.getClass().isAssignableFrom(Collection.class)) {
+        
+        if (configurationValue == null) {
+            value = null;
+        } else if (configurationValue.getClass().isArray() || configurationValue.getClass().isAssignableFrom(Collection.class)) {
             List<String> list = new ArrayList<>();
 
             
@@ -482,6 +489,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         } else {
             value = configurationValue.toString();
         }
+        
         return value;
     }
     
