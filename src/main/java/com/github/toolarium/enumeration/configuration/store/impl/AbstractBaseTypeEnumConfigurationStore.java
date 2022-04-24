@@ -86,9 +86,13 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
                     if (valueData != null) {
                         // merge default value and value
                         IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
-                        EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
-                        mergedValueData.merge(valueData);
-                        value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
+                        if (defaultValueData != null) {
+                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
+                            mergedValueData.merge(valueData);
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
+                        } else {
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(valueData);
+                        }
                     }
                 }
             } catch (ValidationException e) {
