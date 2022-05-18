@@ -14,9 +14,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
 
 /**
  * Simple JSON util
@@ -111,13 +114,20 @@ public final class JSONUtil {
     /**
      * Convert a list of strings into a JSON array
      *
-     * @param list the string list
+     * @param inputList the string list
      * @return the list as json array
      * @throws IllegalArgumentException In case of invalid json format
      */
-    public String convert(Collection<String> list) throws IllegalArgumentException {
+    public String convert(Collection<String> inputList) throws IllegalArgumentException {
 
         try {
+            List<String> list = new ArrayList<String>();
+            for (String str : inputList) {
+                if (str != null) {
+                    list.add(str);
+                }
+            }
+            
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             write(list, outputStream);
             return outputStream.toString();
@@ -132,22 +142,23 @@ public final class JSONUtil {
     /**
      * Convert a JSON array into a list of strings
      *
-     * @param json the json array
+     * @param inputJson the json array
      * @return the json array as string list
      * @throws IllegalArgumentException In case of invalid json format
      */
-    public List<String> convert(String json) throws IllegalArgumentException {
+    public List<String> convert(String inputJson) throws IllegalArgumentException {
 
-        if (json == null) {
-            return null;
+        if (inputJson == null || inputJson.isBlank()) {
+            return Collections.emptyList();
         }
 
         try {
+            String json = inputJson.trim();
             if (!json.startsWith("[") && !json.endsWith("]")) {
-                return Arrays.asList(json);
+                return Arrays.asList(inputJson);
             }
 
-            String[] elements = getMapper().readValue(json, String[].class);
+            String[] elements = getMapper().readValue(inputJson, String[].class);
             if (elements != null && elements.length > 0) {
                 return Arrays.asList(elements);
             }
@@ -157,7 +168,7 @@ public final class JSONUtil {
             throw ex;
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
 

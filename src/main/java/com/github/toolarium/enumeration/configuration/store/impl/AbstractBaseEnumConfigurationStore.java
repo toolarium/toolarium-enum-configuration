@@ -455,7 +455,10 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
                 Object[] array = (Object[])configurationValue;
                 for (int i = 0; i < array.length; i++) {
                     try {
-                        list.add(StringTypeConverterFactory.getInstance().getStringTypeConverter().format(enumKeyValueConfiguration.getDataType(), array[i]));
+                        String str = StringTypeConverterFactory.getInstance().getStringTypeConverter().format(enumKeyValueConfiguration.getDataType(), array[i]);
+                        if (str != null) {
+                            list.add(str);
+                        }
                     } catch (ValidationException e) {
                         String msg = "Invalid configuration";
                         if (ex == null) {
