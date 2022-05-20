@@ -62,11 +62,11 @@ public class StringEnumKeyValueConfigurationValueValidator extends AbstractEnumK
 
         long inputLength = inputString.length();
         if (inputLength < minMaxValue.getMin().longValue()) {
-            throw new ValidationException("Too short: invalid length of [" + inputValue + "], should be at least [" + minMaxValue.getMin() + "] (now " + inputLength + ")!");
+            throw new ValidationException("Too short: invalid length of [" + inputValue + "], should be at least [" + minMaxValue.getMin() + "] (now " + inputLength + ")!", inputValue, inputString);
         }
 
         if (inputLength > minMaxValue.getMax().longValue()) {
-            throw new ValidationException("Too long: invalid length of [" + inputValue + "], should be in range of [" + minMaxValue.getMin() + ".." + minMaxValue.getMax() + "] (now " + inputLength + ")!");
+            throw new ValidationException("Too long: invalid length of [" + inputValue + "], should be in range of [" + minMaxValue.getMin() + ".." + minMaxValue.getMax() + "] (now " + inputLength + ")!", inputValue, inputString);
         }
         
         return inputString;

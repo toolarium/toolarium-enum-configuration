@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
  * @author patrick
  */
 public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
+    private static final String START_BRACKED = "[";
+    private static final String END_BRACKED = "]";
     private static final String ENUM_CONFIGURATION_KEY_NAME = "DELAY";
     private static final String PACKAGENAME = "my.sample";
     private static final String CLASSNAME = PACKAGENAME + "." + "Sample";
@@ -70,6 +72,8 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
             configurationStore.writeConfigurationValue(configurationKeyName, "your-host");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid value [your-host], it can not be converted into a NUMBER data type.", exception1.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception1.keySet().toString());
+        assertEquals("your-host", exception1.getInvalidConfigurationValue(configurationKeyName).toString());
         
         configurationStore.writeConfigurationValue(configurationKeyName, "3");
 
@@ -113,11 +117,14 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
         assertEquals(enumKeyValueConfiguration.getDefaultValue(), configurationStore.readConfigurationValue(configurationKeyName).toString());
 
         EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(configurationKeyName, "6");
+            configurationStore.writeConfigurationValue(configurationKeyName, "7");
         });
         // Invalid configuration found for key [sample#delay]: [input] Invalid cardinality of [input], the minSize is [2].
-        assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid cardinality of [input], the minSize is [2].", exception.getMessage());
+        assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid cardinality of [input], the min cardinality is [2].", exception.getMessage());
 
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception.keySet().toString());
+        assertEquals("7", exception.getInvalidConfigurationValue(configurationKeyName).toString());
+        
         configurationStore.writeConfigurationValue(configurationKeyName, "[ 6, 7 ]");
     }
 
@@ -138,14 +145,18 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
         
         // read not existing value
         EnumConfigurationStoreException exception1 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(configurationKeyName, "other-host");
+            configurationStore.writeConfigurationValue(configurationKeyName, "other-hosts");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception1.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception1.keySet().toString());
+        assertEquals("other-hosts", exception1.getInvalidConfigurationValue(configurationKeyName).toString());
 
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(configurationKeyName, "5");
+            configurationStore.writeConfigurationValue(configurationKeyName, "3");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception2.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception2.keySet().toString());
+        assertEquals("3", exception2.getInvalidConfigurationValue(configurationKeyName).toString());
     }
 
     
@@ -165,14 +176,18 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
         
         // read not existing value
         EnumConfigurationStoreException exception1 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(configurationKeyName, "other-host");
+            configurationStore.writeConfigurationValue(configurationKeyName, "other-hosts");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception1.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception1.keySet().toString());
+        assertEquals("other-hosts", exception1.getInvalidConfigurationValue(configurationKeyName).toString());
 
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(configurationKeyName, "5");
+            configurationStore.writeConfigurationValue(configurationKeyName, "7");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception2.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception2.keySet().toString());
+        assertEquals("7", exception2.getInvalidConfigurationValue(configurationKeyName).toString());
     }
 
     
@@ -197,11 +212,15 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
             configurationStore.writeConfigurationValue(configurationKeyName, "other-host");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception1.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception1.keySet().toString());
+        assertEquals("other-host", exception1.getInvalidConfigurationValue(configurationKeyName).toString());
 
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(configurationKeyName, "5");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception2.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception2.keySet().toString());
+        assertEquals("5", exception2.getInvalidConfigurationValue(configurationKeyName).toString());
     }
 
     
@@ -226,11 +245,15 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
             configurationStore.writeConfigurationValue(configurationKeyName, "other-host");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception1.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception1.keySet().toString());
+        assertEquals("other-host", exception1.getInvalidConfigurationValue(configurationKeyName).toString());
 
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(configurationKeyName, "5");
         });
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + INVALID_ENUM_KEY_CONFIGURATION, exception2.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception2.keySet().toString());
+        assertEquals("5", exception2.getInvalidConfigurationValue(configurationKeyName).toString());
     }
 
     
@@ -270,6 +293,8 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
         
         // Invalid configuration found for key [sample#delay]: [input] Invalid value [a], it can not be converted into a NUMBER data type.
         assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid value [a], it can not be converted into a NUMBER data type.", exception.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception.keySet().toString());
+        assertEquals("a", exception.getInvalidConfigurationValue(configurationKeyName).toString());
     }
 
     
@@ -352,7 +377,9 @@ public class EnumConfigurationStoreExternalDefinitionTest extends AbstractEnumCo
             configurationStore.writeConfigurationValue(configurationKeyName, "6");
         });
         // Invalid configuration found for key [sample#delay]: [input] Invalid cardinality of [input], the minSize is [2].
-        assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid cardinality of [input], the minSize is [2].", exception.getMessage());
+        assertEquals(INVALID_CONFIGURATION_FOUND_FOR_KEY + configurationKeyName + "]: [input] Invalid cardinality of [input], the min cardinality is [2].", exception.getMessage());
+        assertEquals(START_BRACKED + configurationKeyName + END_BRACKED, exception.keySet().toString());
+        assertEquals("6", exception.getInvalidConfigurationValue(configurationKeyName).toString());
 
         configurationStore.writeConfigurationValue(configurationKeyName, "[ 6, 7 ]");
         

@@ -71,15 +71,16 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
                 length = Long.valueOf(decodedBytes.length);
             }
         } catch (IllegalArgumentException ex) {
-            throw new ValidationException("Could not decode file content: " + ex.getMessage() + "\n -> [" + inputValue + "]!");
+            throw new ValidationException("Could not decode file content: " + ex.getMessage() + "\n -> [" + inputValue + "]!", inputValue, null);
         }
         
         if (isGreaterThan(minMaxValue.getMin(), length)) {
-            throw new ValidationException("Too small: invalid size of file, should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too small: invalid size of file, should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputBinaryObject);
         }
         
         if (isGreaterThan(length, minMaxValue.getMax())) {
-            throw new ValidationException("Too big: invalid size of file, should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ", encoded size: " + length + ")!");
+            throw new ValidationException("Too big: invalid size of file, should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ", encoded size: " + length + ")!", 
+                                          inputValue, inputBinaryObject);
         }
 
         return inputBinaryObject;

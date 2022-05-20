@@ -5,6 +5,10 @@
  */
 package com.github.toolarium.enumeration.configuration.store.exception;
 
+import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
+import com.github.toolarium.enumeration.configuration.store.dto.EnumConfigurationValue;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +20,7 @@ import java.util.Set;
  */
 public class EnumConfigurationStoreException extends RuntimeException {
     private static final long serialVersionUID = -247429687108299666L;
-    private Map<String, String> invalidConfigurationMap; 
+    private Map<String, IEnumConfigurationValue<Object>> invalidConfigurationValueMap; 
 
 
     /**
@@ -46,40 +50,58 @@ public class EnumConfigurationStoreException extends RuntimeException {
     public EnumConfigurationStoreException(String msg, Throwable cause) {
         super(msg, cause);
     }
-    
+
     
     /**
      * Add the invalid configuration
      *
      * @param key the key
      * @param value the value
+     * @param convertedObjectList the converted value list or null (optional)
      */
-    public void add(String key, String value) {
-        if (invalidConfigurationMap == null) {
-            invalidConfigurationMap = new HashMap<>();            
+    public void add(String key, String value, Collection<Object> convertedObjectList) {
+        if (key == null || value == null) {
+            return;
         }
         
-        invalidConfigurationMap.put(key, value);
-    }
-    
+        if (invalidConfigurationValueMap == null) {
+            invalidConfigurationValueMap = new HashMap<>();            
+        }
+        
+        Collection<Object> collection = null;
+        if (convertedObjectList != null) {
+            collection = convertedObjectList;
+        }
 
+        invalidConfigurationValueMap.put(key, new EnumConfigurationValue<>(value, collection));
+    }
+
+    
     /**
      * Get the key set of the invalid configurations
      *
      * @return the key set
      */
     public Set<String> keySet() {
-        return invalidConfigurationMap.keySet();
+        if (invalidConfigurationValueMap == null) {
+            return Collections.emptySet();
+        }
+        
+        return invalidConfigurationValueMap.keySet();
     }
     
-    
+
     /**
      * Get the invalid configuration value
      *
      * @param key the configuration key
      * @return the configuration value
      */
-    public String getInvalidConfiguration(String key) {
-        return invalidConfigurationMap.get(key);
+    public IEnumConfigurationValue<?> getInvalidConfigurationValue(String key) {
+        if (key == null || invalidConfigurationValueMap == null) {
+            return null;
+        }
+
+        return invalidConfigurationValueMap.get(key);
     }
 }

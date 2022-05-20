@@ -54,11 +54,12 @@ public class TimestampEnumKeyValueConfigurationValueValidator extends AbstractEn
 
         inputTimestamp = inputTimestamp.truncatedTo(ChronoUnit.MILLIS);
         if (inputTimestamp.compareTo(minMaxValue.getMin()) < 0) {
-            throw new ValidationException("Too small: invalid timestamp of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too small: invalid timestamp of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputTimestamp);
         }
     
         if (inputTimestamp.compareTo(minMaxValue.getMax()) > 0) {
-            throw new ValidationException("Too big: invalid timestamp of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too big: invalid timestamp of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!", 
+                                          inputValue, inputTimestamp);
         }
         
         return inputTimestamp;

@@ -50,11 +50,11 @@ public class NumberEnumKeyValueConfigurationValueValidator extends AbstractEnumK
         }
 
         if (inputNumber.compareTo(minMaxValue.getMin().longValue()) < 0) {
-            throw new ValidationException("Too small: invalid size of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too small: invalid size of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputNumber);
         }
     
         if (inputNumber.compareTo(minMaxValue.getMax().longValue()) > 0) {
-            throw new ValidationException("Too big: invalid size of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too big: invalid size of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputNumber);
         }
         
         return inputNumber;

@@ -40,6 +40,7 @@ public class EnumConfigurationStorePropertiesTest {
         assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.THIRD));
         assertNull(configurationStore.readConfigurationValue(MyConfigTest.HOSTNAME));
+        assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.PORT));
 
         // read by string and assume we have default values
         assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#first").getValue());

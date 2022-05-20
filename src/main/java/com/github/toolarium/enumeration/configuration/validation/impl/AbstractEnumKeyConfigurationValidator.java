@@ -136,7 +136,9 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         try {
             return validateValue("input", dataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
         } catch (ValidationException ex) {
-            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[input] " + ex.getMessage(), ex.getStackTrace());
+            ValidationException e = ExceptionUtil.getInstance().throwsException(ValidationException.class, "[input] " + ex.getMessage(), ex.getStackTrace()); 
+            e.setValue(ex.getConfigurationValue(), ex.getConvertedValueList());
+            throw e;
         }
     }
 
@@ -238,7 +240,9 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         try {
             return validateValue("defaultValue", dataType, cardinality, isUniqueness, valueSize, enumerationValue, defaultValue);
         } catch (ValidationException ex) {
-            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[defaultValue] " + ex.getMessage(), ex.getStackTrace());
+            ValidationException e = ExceptionUtil.getInstance().throwsException(ValidationException.class, "[defaultValue] " + ex.getMessage(), ex.getStackTrace());
+            e.setValue(ex.getConfigurationValue(), ex.getConvertedValueList());
+            throw e;
         }
     }
 
@@ -281,7 +285,9 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         } catch (ValidationException ex) {
             String msg = ex.getMessage();
             msg = msg.replace("minSize=1", "minSize=" + cardinality.getMinSizeAsString());
-            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[exampleValue] " + msg, ex.getStackTrace());
+            ValidationException e = ExceptionUtil.getInstance().throwsException(ValidationException.class, "[exampleValue] " + msg, ex.getStackTrace());
+            e.setValue(ex.getConfigurationValue(), ex.getConvertedValueList());
+            throw e;
         }
     }
 
@@ -334,7 +340,9 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
             }
             return result;
         } catch (ValidationException ex) {
-            throw ExceptionUtil.getInstance().throwsException(ValidationException.class, "[enumerationValue] " + ex.getMessage(), ex.getStackTrace());
+            ValidationException e = ExceptionUtil.getInstance().throwsException(ValidationException.class, "[enumerationValue] " + ex.getMessage(), ex.getStackTrace());
+            e.setValue(ex.getConfigurationValue(), ex.getConvertedValueList());
+            throw e;
         }
     }
 
@@ -386,7 +394,7 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
             // no cardinality
             
             if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMaxSize().intValue() < cardinality.getMinSize().intValue()) {
-                throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize [" + cardinality.getMinSize() + "] should be <= then maxSize [" + cardinality.getMaxSize() + "]! ");
+                throw new ValidationException("Invalid cardinality of [" + inputType + "], the min cardinality [" + cardinality.getMinSize() + "] should be <= then max cardinality [" + cardinality.getMaxSize() + "]! ", null);
             }
 
             try {
@@ -400,7 +408,7 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                         validValues = validValues.substring(0, validValues.length() - 1);
                     }
                     
-                    throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [\"" + input + "\"], allowed values are: " + validValues);
+                    throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [\"" + input + "\"], allowed values are: " + validValues, input, JSONUtil.getInstance().convert((String)value));
                 }
                 
                 collection.add(value);
@@ -419,34 +427,21 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                     length = inputList.size();
                 }
                 
-                if (cardinality.getMinSize() != null && length < cardinality.getMinSize().intValue()) {
-                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the minSize is [" + cardinality.getMinSize() + "].");
-                }
-
-                if (cardinality.getMaxSize() != null && length > cardinality.getMaxSize().intValue()) {
-                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the maxSize is [" + cardinality.getMaxSize() + "].");
-                }
-                
                 if (inputList != null) {
+                    boolean hasUniquenessError = false;
+                    boolean hasEnumerationError = false;
                     for (String in : inputList) {
                         try {
                             D value = validateValue(inputType, dataType, valueSize, in);
                             if (enumarationValues != null && !enumarationValues.contains(value)) {
-                                String validValues = enumarationValues.toString();
-                                if (validValues.startsWith("[") && validValues.length() > 1) {
-                                    validValues = validValues.substring(1);
-                                }
-                                if (validValues.endsWith("]") && validValues.length() > 1) {
-                                    validValues = validValues.substring(0, validValues.length() - 1);
-                                }
-                                
-                                throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [" + input + "], allowed values are: " + validValues);
+                                hasEnumerationError = true;
                             }
                             
                             if (!collection.add(value)) {
-                                throw new ValidationException("Invalid isUniqueness of [" + inputType + "] for intput [" + input + "]. Value already exist!");
+                                hasUniquenessError = true;
+                                collection = new ArrayList<D>(collection);
+                                collection.add(value);
                             }
-
                         } catch (EmptyValueException ex) {
                             if (cardinality != null && cardinality.getMinSize() != null && cardinality.getMinSize().intValue() <= 0) {
                                 // empty value is valid
@@ -454,10 +449,34 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
                                 throw ex;
                             }
                         }
+                    }                    
+                    
+                    if (hasEnumerationError) {
+                        String validValues = enumarationValues.toString();
+                        if (validValues.startsWith("[") && validValues.length() > 1) {
+                            validValues = validValues.substring(1);
+                        }
+                        if (validValues.endsWith("]") && validValues.length() > 1) {
+                            validValues = validValues.substring(0, validValues.length() - 1);
+                        }
+                        
+                        throw new ValidationException("Invalid enumeration of [" + inputType + "] for intput [" + input + "], allowed values are: " + validValues, input, collection);
+                    }
+                    
+                    if (hasUniquenessError) {
+                        throw new ValidationException("Invalid isUniqueness of [" + inputType + "] for intput [" + input + "]. Value already exist!", input, collection);
                     }
                 }
+                
+                if (cardinality.getMinSize() != null && length < cardinality.getMinSize().intValue()) {
+                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the min cardinality is [" + cardinality.getMinSize() + "].", input, collection);
+                }
+
+                if (cardinality.getMaxSize() != null && length > cardinality.getMaxSize().intValue()) {
+                    throw new ValidationException("Invalid cardinality of [" + inputType + "], the max cardinality Size is [" + cardinality.getMaxSize() + "].", input, collection);
+                }
             } catch (IllegalArgumentException e) {
-                throw new ValidationException("Invalid cardinality of [" + inputType + "] for intput [" + input + "]. Expected a JSON array: " + e.getMessage());
+                throw new ValidationException("Invalid cardinality of [" + inputType + "] for intput [" + input + "]. Expected a JSON array: " + e.getMessage(), input, null);
             }
         }
         

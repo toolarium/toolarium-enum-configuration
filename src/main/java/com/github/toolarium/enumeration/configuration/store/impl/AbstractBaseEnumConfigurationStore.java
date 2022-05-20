@@ -101,13 +101,12 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
                         }
                     }
                 }
-            } catch (ValidationException e) {
-                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + e.getMessage();
+            } catch (ValidationException ex) {
+                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
                 LOG.debug(msg);
-                
-                EnumConfigurationStoreException ex = new EnumConfigurationStoreException(msg, e);
-                ex.add(configurationKeyName, value);
-                throw ex;
+                EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
+                e.add(configurationKeyName, value, ex.getConvertedValueList());
+                throw e;
             }
         }
 
@@ -341,18 +340,12 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
             EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKeyName);
             Collection<D> valueList = EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, value);
             return prepareResult(value, valueList);
-        } catch (ValidationException e) {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Invalid configuration found for key [");
-            msg.append(configurationKeyName);
-            msg.append("]: ");                
-            msg.append(e.getMessage());                
-                
-            EnumConfigurationStoreException ex = new EnumConfigurationStoreException(msg.toString(), e);
-            ex.add(configurationKeyName, value);
-            
-            LOG.warn(ex.getMessage());
-            throw ex;
+        } catch (ValidationException ex) {
+            String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
+            LOG.warn(msg);
+            EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
+            e.add(configurationKeyName, value, ex.getConvertedValueList());
+            throw e;
         }
     }
 
@@ -448,7 +441,6 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         } else if (configurationValue.getClass().isArray() || configurationValue.getClass().isAssignableFrom(Collection.class)) {
             List<String> list = new ArrayList<>();
 
-            
             EnumConfigurationStoreException ex = null;
             if (configurationValue.getClass().isArray()) {
 
@@ -464,8 +456,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
                         if (ex == null) {
                             ex = new EnumConfigurationStoreException(msg, e);
                         }
-                        
-                        ex.add(configurationName, "" + array[i]);
+                        ex.add(configurationName, "" + array[i], e.getConvertedValueList());
                         LOG.warn(msg + " found for key [" + configurationName + "]: " + e.getMessage());
                     }
                 }
@@ -478,7 +469,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
                         if (ex == null) {
                             ex = new EnumConfigurationStoreException(msg, e);
                         }
-                        ex.add(configurationName, "" + object);
+                        ex.add(configurationName, "" + object, e.getConvertedValueList());
                         LOG.warn(msg + " found for key [" + configurationName + "]: " + e.getMessage());
                     }
                 }

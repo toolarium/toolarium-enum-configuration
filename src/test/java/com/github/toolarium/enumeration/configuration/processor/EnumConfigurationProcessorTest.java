@@ -103,7 +103,7 @@ public class EnumConfigurationProcessorTest {
                + "    @EnumKeyValueConfiguration(description = \"My value F.\", dataType = DataType.STRING, cardinality = \"2..3\", exampleValue = \"[\\\"A\\\" ]\")\n"
                + "    VALUE_F;\n"
                + "}"));
-        assertThat(compilation).hadErrorContaining("Invalid cardinality of [exampleValue], the minSize is [2]");
+        assertThat(compilation).hadErrorContaining("Invalid cardinality of [exampleValue], the min cardinality is [2]");
     }
 
     

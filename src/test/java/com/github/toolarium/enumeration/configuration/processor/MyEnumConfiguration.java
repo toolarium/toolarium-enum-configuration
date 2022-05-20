@@ -40,10 +40,10 @@ public enum MyEnumConfiguration implements IEnumConfiguration, IMyEnumConfigurat
     @EnumKeyValueConfiguration(description = "My value C.", dataType = DataType.NUMBER, minValue = "100", exampleValue = "123", cardinality = "0..1")
     VALUE_C,
 
-    @EnumKeyValueConfiguration(description = "My value F.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\" ]")
+    @EnumKeyValueConfiguration(description = "My value F.",  dataType = DataType.NUMBER, cardinality = "2..3", defaultValue = "[\"1\", \"2\" ]", exampleValue = "[\"1\", \"2\" ]", isUniqueness = true)
     VALUE_F,
 
-    @EnumKeyValueConfiguration(description = "My value F.",  dataType = DataType.STRING, cardinality = "2..3", exampleValue = "[\"A\", \"1\"]")
+    @EnumKeyValueConfiguration(description = "My value G.",  dataType = DataType.STRING, cardinality = "2..3", exampleValue = "[\"A\", \"1\"]")
     VALUE_G,
 
     @EnumKeyValueConfiguration(description = "My value H.", exampleValue = "2", dataType = DataType.NUMBER, cardinality = "2")

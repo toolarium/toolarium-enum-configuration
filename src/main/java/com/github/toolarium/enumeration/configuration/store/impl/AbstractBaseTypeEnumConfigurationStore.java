@@ -95,13 +95,12 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
                         }
                     }
                 }
-            } catch (ValidationException e) {
-                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + e.getMessage();
+            } catch (ValidationException ex) {
+                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
                 LOG.debug(msg);
-                
-                EnumConfigurationStoreException ex = new EnumConfigurationStoreException(msg, e);
-                ex.add(configurationKeyName, value);
-                throw ex;
+                EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
+                e.add(configurationKeyName, value, ex.getConvertedValueList());
+                throw e;
             }
         }
 
@@ -257,12 +256,12 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
             EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
             Collection<D> valueList = EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, value);
             return prepareResult(value, valueList);
-        } catch (ValidationException e) {
-            String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + e.getMessage();
+        } catch (ValidationException ex) {
+            String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
             LOG.debug(msg);
-            EnumConfigurationStoreException ex = new EnumConfigurationStoreException(msg, e);
-            ex.add(configurationKeyName, value);
-            throw ex;
+            EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
+            e.add(configurationKeyName, value, ex.getConvertedValueList());
+            throw e;
         }
     }
     

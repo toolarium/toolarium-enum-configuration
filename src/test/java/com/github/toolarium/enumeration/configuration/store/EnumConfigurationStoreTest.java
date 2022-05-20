@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Test;
  */
 public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTest implements IEnumConfigurationStoreConstants {
 
+    private static final String START_BRACKED = "[";
+    private static final String END_BRACKED = "]";
     private static final String BRACE_START = "{";
     private static final String BRACE_END = "}";
     private static final String EQUALS = "=";
@@ -49,7 +51,9 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
     private static final String SECOND = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#second";
     private static final String DATE   = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#date";
     private static final String PORT   = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#port";
-
+    private static final String VALUEF = "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#value_f";
+    private static final String DELAY_PRECISION_A = "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#delay_precision_a";    
+    
     
     /**
      * Test read, write and delete value
@@ -234,22 +238,27 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
      */
     @Test
     public void readWriteNumber() {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
 
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.VALUE_C));
         assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_C));
 
-        // read not existing value
+        // read not existing value: data type
         EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, "test 1");
         });
         assertEquals(HEADER + "value_c]: [input] Invalid value [test 1], it can not be converted into a NUMBER data type.", exception.getMessage());
- 
-        // write value
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C) + END_BRACKED, exception.keySet().toString());
+        assertEquals("test 1", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).toString());
+        
+        // write value: invalid range
         exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, 10);
         });
         assertEquals(HEADER + "value_c]: [input] Too small: invalid size of [10], should be at least [100] (now 10)!", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C) + END_BRACKED, exception.keySet().toString());
+        assertEquals("10", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).toString());
+        assertEquals(10L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).getValue());
 
         configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, 101);
 
@@ -259,6 +268,50 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         assertEquals("101", value.toString());
         assertEquals(Long.valueOf(101), value.getValue());
         assertEquals("[101]", value.getValueList().toString());
+        
+        // write value: invalid cardinality
+        exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_F, 10);
+        });
+        assertEquals(HEADER + "value_f]: [input] Invalid cardinality of [input], the min cardinality is [2].", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F) + END_BRACKED, exception.keySet().toString());
+        assertEquals("10", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).toString());
+        assertEquals(10L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+
+        // write and read value properly
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_F, "[ \"2\", \"3\" ]");
+        Properties properties = configurationStore.readConfigurationValueList(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F));       
+        assertEquals("[ \"2\", \"3\" ]", properties.get(VALUEF));
+        
+        // set invalid cardinality and read
+        properties.setProperty(VALUEF, "[ \"2\", \"3\", \"4\", \"5\" ]");
+        configurationStore.setProperties(properties);
+        exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_F);
+        });
+        
+        assertEquals(HEADER + "value_f]: [input] Invalid cardinality of [input], the max cardinality Size is [3].", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F) + END_BRACKED, exception.keySet().toString());
+        assertEquals("[ \"2\", \"3\", \"4\", \"5\" ]", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).toString());
+        assertEquals(2L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(3L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(4L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(5L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        
+        // set invalid isUniqueness error
+        properties.setProperty(VALUEF, "[ \"2\", \"3\", \"4\", \"4\" ]");
+        configurationStore.setProperties(properties);
+        exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_F);
+        });
+        
+        assertEquals(HEADER + "value_f]: [input] Invalid isUniqueness of [input] for intput [[ \"2\", \"3\", \"4\", \"4\" ]]. Value already exist!", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F) + END_BRACKED, exception.keySet().toString());
+        assertEquals("[ \"2\", \"3\", \"4\", \"4\" ]", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).toString());
+        assertEquals(2L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(3L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(4L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
+        assertEquals(4L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_F)).getValue());
     }
 
 
@@ -272,18 +325,24 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.ARRAY_SAMPLE));
         assertEquals("[\"1\", \"2\" ]", configurationStore.readConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE).toString());
 
-        // read not existing value
+        // read not existing value: data type
         EnumConfigurationStoreException exception1 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, "test 2");
         });
-        assertEquals(HEADER + "array_sample]: [input] Invalid cardinality of [input], the minSize is [2].", exception1.getMessage());
-        
-        // write value
+                               
+        assertEquals(HEADER + "array_sample]: [input] Invalid value [test 2], it can not be converted into a NUMBER data type.", exception1.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE) + END_BRACKED, exception1.keySet().toString());
+        assertEquals("test 2", exception1.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE)).toString());
+
+        // write value: invalid range
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, 10);
         });
-        assertEquals(HEADER + "array_sample]: [input] Invalid cardinality of [input], the minSize is [2].", exception2.getMessage());
-        
+        assertEquals(HEADER + "array_sample]: [input] Invalid cardinality of [input], the min cardinality is [2].", exception2.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE) + END_BRACKED, exception2.keySet().toString());
+        assertEquals("10", exception2.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE)).toString());
+
+        // cardinality
         configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, new Long[] {101L, 102L});
 
         // get back and verify
@@ -319,7 +378,9 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         });
         // Invalid configuration found for key [com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample]: [input] Invalid value [a], it can not be converted into a NUMBER data type.
         assertEquals(HEADER + "array_sample]: [input] Invalid value [a], it can not be converted into a NUMBER data type.", exception3.getMessage());
-        
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE) + END_BRACKED, exception3.keySet().toString());
+        assertEquals("[ \"107\", \"a\" ]", exception3.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.ARRAY_SAMPLE)).toString());
+
         assertEquals("{com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#array_sample=[105, 106]}", "" + configurationStore.getProperties());
     }
 
@@ -334,17 +395,22 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.DATE));
         assertEquals("2021-03-01", configurationStore.readConfigurationValue(MyEnumConfiguration.DATE).toString());
 
-        // read not existing value
+        // read not existing value: invalid data type
         EnumConfigurationStoreException exception1 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.DATE, "your-host");
         });
         assertEquals(HEADER + "date]: [input] Invalid value [your-host], it can not be converted into a DATE data type: Text 'your-host' could not be parsed at index 0.", exception1.getMessage());
-        
-        // write value
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DATE) + END_BRACKED, exception1.keySet().toString());
+        assertEquals("your-host", exception1.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DATE)).toString());
+
+        // write value: invalid range
         EnumConfigurationStoreException exception2 = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
             configurationStore.writeConfigurationValue(MyEnumConfiguration.DATE, "1999-12-31");
         });
         assertEquals(HEADER + "date]: [input] Too small: invalid date of [1999-12-31], should be at least [2000-01-01] (now 1999-12-31)!", exception2.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DATE) + END_BRACKED, exception2.keySet().toString());
+        assertEquals("1999-12-31", exception2.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DATE)).toString());
+        assertEquals(LocalDate.parse("1999-12-31"), exception2.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DATE)).getValue());
         
         configurationStore.writeConfigurationValue(MyEnumConfiguration.DATE, "2022-05-26");
 
@@ -447,7 +513,7 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
      */
     @Test
     public void validateEnumerationA() throws ValidationException, IOException {
-        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
 
         assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.DELAY_PRECISION_A));
         assertEquals("SECONDS", configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A).getValue().toString());
@@ -456,6 +522,9 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
             configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A, "TEST");
         });
         assertEquals(HEADER + "delay_precision_a]: [input] Invalid enumeration of [input] for intput [\"TEST\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A) + END_BRACKED, exception.keySet().toString());
+        assertEquals("TEST", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A)).toString());
+        assertEquals("TEST", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A)).getValue());
         
         // get back and verify
         IEnumConfigurationValue<IEnumKeyValueConfigurationBinaryObject> value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A);
@@ -465,7 +534,21 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A, "MILLITSECONDS");
         value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A);
         assertNotNull(value);
-        assertEquals("MILLITSECONDS", value.toString());
+        assertEquals("MILLITSECONDS", value.toString());        
+        
+        // set invalid isUniqueness error
+        Properties properties = new Properties();
+        properties.setProperty(DELAY_PRECISION_A, "[ \"TEST\", \"TESTP\" ]");
+        configurationStore.setProperties(properties);
+        exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_A);
+        });
+        
+        assertEquals(HEADER + "delay_precision_a]: [input] Invalid enumeration of [input] for intput [\"[ \"TEST\", \"TESTP\" ]\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A) + END_BRACKED, exception.keySet().toString());
+        assertEquals("[ \"TEST\", \"TESTP\" ]", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A)).toString());
+        assertEquals("TEST", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A)).getValue());
+        assertEquals("TESTP", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_A)).getValue());        
     }
 
     
@@ -482,9 +565,12 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         assertEquals("SECONDS", configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B).getValue().toString());
         
         EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
-            configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B, "TEST");
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B, "TESTP");
         }); 
-        assertEquals(HEADER + "delay_precision_b]: [input] Invalid enumeration of [input] for intput [\"TEST\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        assertEquals(HEADER + "delay_precision_b]: [input] Invalid enumeration of [input] for intput [\"TESTP\"], allowed values are: SECONDS, MILLITSECONDS", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_B) + END_BRACKED, exception.keySet().toString());
+        assertEquals("TESTP", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_B)).toString());
+        assertEquals("TESTP", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.DELAY_PRECISION_B)).getValue());
         
         // get back and verify
         IEnumConfigurationValue<IEnumKeyValueConfigurationBinaryObject> value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B);
@@ -495,6 +581,44 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         value = configurationStore.readConfigurationValue(MyEnumConfiguration.DELAY_PRECISION_B);
         assertNotNull(value);
         assertEquals("MILLITSECONDS", value.toString());
+    }
+
+    
+    /**
+     * Test number
+     */
+    @Test
+    public void invalidInputData() {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(MyEnumConfiguration.VALUE_C));
+        assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_C));
+
+        // read not existing value: invalid data type
+        EnumConfigurationStoreException exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, "test 1");
+        });
+        assertEquals(HEADER + "value_c]: [input] Invalid value [test 1], it can not be converted into a NUMBER data type.", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C) + END_BRACKED, exception.keySet().toString());
+        assertEquals("test 1", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).toString());
+        
+        // write value: invalid range
+        exception = Assertions.assertThrows(EnumConfigurationStoreException.class, () -> {
+            configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, 10);
+        });
+        assertEquals(HEADER + "value_c]: [input] Too small: invalid size of [10], should be at least [100] (now 10)!", exception.getMessage());
+        assertEquals(START_BRACKED + configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C) + END_BRACKED, exception.keySet().toString());
+        assertEquals("10", exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).toString());
+        assertEquals(10L, (Long)exception.getInvalidConfigurationValue(configurationStore.getEnumConfigurationKeyResolver().resolveConfigurationKeyName(MyEnumConfiguration.VALUE_C)).getValue());
+
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.VALUE_C, 101);
+
+        // get back and verify
+        IEnumConfigurationValue<String> value = configurationStore.readConfigurationValue(MyEnumConfiguration.VALUE_C);
+        assertNotNull(value);
+        assertEquals("101", value.toString());
+        assertEquals(Long.valueOf(101), value.getValue());
+        assertEquals("[101]", value.getValueList().toString());
     }
 
 

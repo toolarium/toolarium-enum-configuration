@@ -52,11 +52,11 @@ public class DateEnumKeyValueConfigurationValueValidator extends AbstractEnumKey
         }
         
         if (inputDate.compareTo(minMaxValue.getMin()) < 0) {
-            throw new ValidationException("Too small: invalid date of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too small: invalid date of [" + inputValue + "], should be at least [" + valueSize.getMinSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputDate);
         }
     
         if (inputDate.compareTo(minMaxValue.getMax()) > 0) {
-            throw new ValidationException("Too big: invalid date of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!");
+            throw new ValidationException("Too big: invalid date of [" + inputValue + "], should be in range of [" + valueSize.getMinSizeAsString() + ".." + valueSize.getMaxSizeAsString() + "] (now " + inputValue + ")!", inputValue, inputDate);
         }
         
         return inputDate;
