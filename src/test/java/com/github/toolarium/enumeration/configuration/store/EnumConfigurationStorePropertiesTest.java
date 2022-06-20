@@ -147,7 +147,43 @@ public class EnumConfigurationStorePropertiesTest {
 
     }
 
+    
+    /**
+     * Read properties
+     */
+    @Test
+    public void readAllProperties() {
+        PropertiesEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+        
+        // read by type and assume we have default values
+        Long val = configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue();
+        assertEquals(Long.valueOf(11), val);
 
+        assertEquals(Long.valueOf(11), configurationStore.readConfigurationValue(MyConfigTest.FIRST).getValue());
+        assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue(MyConfigTest.SECOND).getValue());
+        assertNull(configurationStore.readConfigurationValue(MyConfigTest.THIRD));
+        assertNull(configurationStore.readConfigurationValue(MyConfigTest.HOSTNAME));
+        assertNull(configurationStore.readConfigurationValue(MyEnumConfiguration.PORT));
+
+        // read by string and assume we have default values
+        assertEquals(Long.valueOf(22), configurationStore.readConfigurationValue(" com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#second").getValue());
+        assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#third"));
+        assertNull(configurationStore.readConfigurationValue("com.github.toolarium.enumeration.configuration.store.enumconfigurationstorepropertiestest$myconfigtest#hostname"));
+
+        // write values by type
+        configurationStore.writeConfigurationValue(MyConfigTest.FIRST, "22"); // write type by string
+        configurationStore.writeConfigurationValue(MyConfigTest.SECOND, 33); // write type by object
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.HINT, "my hint");
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.HOSTNAME, "my-host");
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.PORT, "8082");
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.DATE, "2022-02-17");
+        configurationStore.writeConfigurationValue(MyEnumConfiguration.ARRAY_SAMPLE, "[\"33\", \"44\"]");
+
+        // write values by string
+        assertEquals(configurationStore.getProperties(), configurationStore.readConfigurationValueList(""));
+    }
+
+    
     @EnumConfiguration(description = "The description")
     public enum MyConfigTest implements IEnumConfiguration {
         @EnumKeyValueConfiguration(description =  "First description.", dataType = DataType.NUMBER, defaultValue = "11", exampleValue = "42")

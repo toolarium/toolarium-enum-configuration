@@ -77,38 +77,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         }
 
         String configurationKeyName = inputConfigurationKeyName.trim();
-        String value = loadConfiguration(configurationKeyName);
-        EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKeyName);
-
-        if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
-            value = enumKeyValueConfiguration.getDefaultValue();
-        }
-
-        // special handling for binary types
-        if (enumKeyValueConfiguration != null && EnumKeyValueConfigurationDataType.BINARY.equals(enumKeyValueConfiguration.getDataType()) && enumKeyValueConfiguration.getDefaultValue() != null) {
-            try {
-                if (!enumKeyValueConfiguration.getDefaultValue().equals(value)) {
-                    IEnumKeyValueConfigurationBinaryObject valueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), value);
-                    if (valueData != null) {
-                        // merge default value and value
-                        IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
-                        if (defaultValueData != null) {
-                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
-                            mergedValueData.merge(valueData);
-                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
-                        } else {
-                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(valueData);
-                        }
-                    }
-                }
-            } catch (ValidationException ex) {
-                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
-                LOG.debug(msg);
-                EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
-                e.add(configurationKeyName, value, ex.getConvertedValueList());
-                throw e;
-            }
-        }
+        String value = prepareValue(configurationKeyName, loadConfiguration(configurationKeyName), supportReturnDefaultValueIfMissing);
 
         IEnumConfigurationValue<D> result = null;
         if (value != null) {
@@ -118,7 +87,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         return result; 
     }
 
-    
+
     /**
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueIgnoreDefault(java.lang.String)
      */
@@ -165,8 +134,10 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueList(java.lang.String[])
      */
     @Override
-    public Properties readConfigurationValueList(String... configurationKeyNames) throws EnumConfigurationStoreException {
+    public Properties readConfigurationValueList(String... inputConfigurationKeyNames) throws EnumConfigurationStoreException {
         Properties result = new SortedProperties();
+
+        String[] configurationKeyNames = prepareConfigurationNames(inputConfigurationKeyNames);
         if (configurationKeyNames == null) {
             LOG.debug("Invalid input configuration key names!");
             return result;
@@ -190,9 +161,10 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#readConfigurationValueListIgnoreDefault(java.lang.String[])
      */
     @Override
-    public Properties readConfigurationValueListIgnoreDefault(String... configurationKeyNames) throws EnumConfigurationStoreException {
+    public Properties readConfigurationValueListIgnoreDefault(String... inputConfigurationKeyNames) throws EnumConfigurationStoreException {
         Properties result = new SortedProperties();
-        if (configurationKeyNames == null || configurationKeyNames.length == 0) {
+        String[] configurationKeyNames = prepareConfigurationNames(inputConfigurationKeyNames);
+        if (configurationKeyNames == null) {
             LOG.debug("Invalid input configuration key names!");
             return result;
         }
@@ -280,9 +252,10 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      * @see com.github.toolarium.enumeration.configuration.store.IEnumConfigurationStore#deleteConfigurationValueList(java.lang.String[])
      */
     @Override
-    public Properties deleteConfigurationValueList(String... configurationKeyNames) throws EnumConfigurationStoreException {
+    public Properties deleteConfigurationValueList(String... inputConfigurationKeyNames) throws EnumConfigurationStoreException {
         Properties result = new SortedProperties();
-        if (configurationKeyNames == null || configurationKeyNames.length == 0) {
+        String[] configurationKeyNames = prepareConfigurationNames(inputConfigurationKeyNames);
+        if (configurationKeyNames == null) {
             LOG.debug("Invalid input configuration key names!");
             return result;
         }
@@ -316,6 +289,51 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
      */
     public void setEnumConfigurationKeyResolver(IEnumConfigurationKeyResolver enumConfigurationKeyResolver) {
         this.enumConfigurationKeyResolver = enumConfigurationKeyResolver;        
+    }
+
+    
+    /**
+     * Prepare the read value
+     * 
+     * @param configurationKeyName The unique configuration key, started by the name in lower case and dot notation, separated by <code>#</code> and the key.
+     * @param inputValue the read value
+     * @param supportReturnDefaultValueIfMissing true to support default value
+     * @return value the value
+     */
+    protected String prepareValue(String configurationKeyName, String inputValue, boolean supportReturnDefaultValueIfMissing) {
+        EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKeyName);
+        String value = inputValue;
+
+        if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
+            value = enumKeyValueConfiguration.getDefaultValue();
+        }
+
+        // special handling for binary types
+        if (enumKeyValueConfiguration != null && EnumKeyValueConfigurationDataType.BINARY.equals(enumKeyValueConfiguration.getDataType()) && enumKeyValueConfiguration.getDefaultValue() != null) {
+            try {
+                if (!enumKeyValueConfiguration.getDefaultValue().equals(value)) {
+                    IEnumKeyValueConfigurationBinaryObject valueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), value);
+                    if (valueData != null) {
+                        // merge default value and value
+                        IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
+                        if (defaultValueData != null) {
+                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
+                            mergedValueData.merge(valueData);
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
+                        } else {
+                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(valueData);
+                        }
+                    }
+                }
+            } catch (ValidationException ex) {
+                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
+                LOG.debug(msg);
+                EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
+                e.add(configurationKeyName, value, ex.getConvertedValueList());
+                throw e;
+            }
+        }
+        return value;
     }
 
     
@@ -500,5 +518,38 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         }
 
         return "";
+    }
+
+    
+    /**
+     * Prepare configuration key names
+     *
+     * @param inputConfigurationKeyNames the input name list. In case it's null or empty then all keys will be read
+     * @return the configuration key names to read
+     * @throws EnumConfigurationStoreException in case the enum configuration cannot be accessed 
+     */
+    protected String[] prepareConfigurationNames(String... inputConfigurationKeyNames) throws EnumConfigurationStoreException {
+        String[] configurationKeyNames = inputConfigurationKeyNames;
+
+        List<String> list = null;
+        if (configurationKeyNames != null && configurationKeyNames.length > 0) {
+            list = new ArrayList<>();
+            for (String configurationKeyName : configurationKeyNames) {
+                if (configurationKeyName != null && !configurationKeyName.isBlank()) {
+                    list.add(configurationKeyName);
+                }
+            }
+        }
+        
+        if (list == null || list.isEmpty()) {
+            Set<String> keySet = readKeys();
+            if (keySet != null) {
+                return keySet.toArray(String[]::new);
+            } else {
+                return null;
+            }
+        }
+
+        return list.toArray(String[]::new);
     }
 }
