@@ -5,15 +5,10 @@
  */
 package com.github.toolarium.enumeration.configuration.store.impl;
 
-import com.github.toolarium.enumeration.configuration.converter.StringTypeConverterFactory;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
-import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
-import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
-import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
 import com.github.toolarium.enumeration.configuration.dto.SortedProperties;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
-import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
 import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
@@ -71,45 +66,14 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
         }
         
         String configurationKeyName = getEnumConfigurationKeyResolver().resolveConfigurationKeyName(configurationKey);
-        String value = loadConfiguration(configurationKeyName);
-        EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
-
-        if (value == null && supportReturnDefaultValueIfMissing && enumKeyValueConfiguration != null && enumKeyValueConfiguration.getDefaultValue() != null && !enumKeyValueConfiguration.getDefaultValue().isEmpty()) {
-            value = enumKeyValueConfiguration.getDefaultValue();
-        }
-
-        // special handling for binary types
-        if (enumKeyValueConfiguration != null && EnumKeyValueConfigurationDataType.BINARY.equals(enumKeyValueConfiguration.getDataType()) && enumKeyValueConfiguration.getDefaultValue() != null) {
-            try {
-                if (!enumKeyValueConfiguration.getDefaultValue().equals(value)) {
-                    IEnumKeyValueConfigurationBinaryObject valueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), value);
-                    if (valueData != null) {
-                        // merge default value and value
-                        IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
-                        if (defaultValueData != null) {
-                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
-                            mergedValueData.merge(valueData);
-                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(mergedValueData);
-                        } else {
-                            value = EnumKeyValueConfigurationBinaryObjectParser.getInstance().format(valueData);
-                        }
-                    }
-                }
-            } catch (ValidationException ex) {
-                String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();
-                LOG.debug(msg);
-                EnumConfigurationStoreException e = new EnumConfigurationStoreException(msg, ex);
-                e.add(configurationKeyName, value, ex.getConvertedValueList());
-                throw e;
-            }
-        }
-
+        String value = prepareValue(getEnumKeyValueConfiguration(configurationKey), loadConfiguration(configurationKeyName), supportReturnDefaultValueIfMissing);
+        
         IEnumConfigurationValue<D> result = null;
         if (value != null) {
             result = validate(configurationKey, value);
         }
 
-        return result; 
+        return result;
     }
 
     

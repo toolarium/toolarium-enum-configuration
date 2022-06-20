@@ -5,8 +5,13 @@
  */
 package com.github.toolarium.enumeration.configuration.util;
 
+import com.github.toolarium.enumeration.configuration.converter.StringTypeConverterFactory;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.dto.IEnumKeyValueConfigurationBinaryObject;
+import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
+import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
@@ -178,6 +183,45 @@ public final class EnumKeyValueConfigurationBinaryObjectParser {
         return "EnumKeyValueConfigurationBinaryObject [name=" + name + ", timestamp=" + timestamp + ", mimetype="
                 + mimetype + ", dataHash=" + dataHash + "]";
                 */
+    }
+
+    
+    /**
+     * Merge potential default values to a binary value which was read from a configuration. 
+     *
+     * @param enumKeyValueConfiguration the enum key value configuration
+     * @param inputValue the value
+     * @return the enhanced value
+     */
+    public String mergeDefaultValues(EnumKeyValueConfiguration enumKeyValueConfiguration, String inputValue) {
+        String value = inputValue;
+        
+        // special handling for binary types
+        if (enumKeyValueConfiguration != null && EnumKeyValueConfigurationDataType.BINARY.equals(enumKeyValueConfiguration.getDataType()) && enumKeyValueConfiguration.getDefaultValue() != null) {
+            try {
+                if (!enumKeyValueConfiguration.getDefaultValue().equals(value)) {
+                    IEnumKeyValueConfigurationBinaryObject valueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), value);
+                    if (valueData != null) {
+                        // merge default value and value
+                        IEnumKeyValueConfigurationBinaryObject defaultValueData = StringTypeConverterFactory.getInstance().getStringTypeConverter().convert(enumKeyValueConfiguration.getDataType(), enumKeyValueConfiguration.getDefaultValue());
+                        if (defaultValueData != null) {
+                            EnumKeyValueConfigurationBinaryObject mergedValueData = new EnumKeyValueConfigurationBinaryObject(defaultValueData);
+                            mergedValueData.merge(valueData);
+                            value = format(mergedValueData);
+                        } else {
+                            value = format(valueData);
+                        }
+                    }
+                }
+            } catch (ValidationException ex) {
+                String configurationKeyName = enumKeyValueConfiguration.getKey();
+                EnumConfigurationStoreException e = new EnumConfigurationStoreException("Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage(), ex);
+                e.add(configurationKeyName, value, ex.getConvertedValueList());
+                throw e;
+            }
+        }
+        
+        return value;
     }
 
     
