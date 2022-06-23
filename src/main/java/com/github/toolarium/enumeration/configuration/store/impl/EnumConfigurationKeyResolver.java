@@ -280,7 +280,7 @@ public class EnumConfigurationKeyResolver implements IEnumConfigurationKeyResolv
         String className = split[0].trim();
         String enumName =  split[1].trim();
         
-        List<Class<?>> classes = ClassPathUtil.getInstance().search(className, false);
+        List<Class<?>> classes = ClassPathUtil.getInstance().search(className, true);
         if (classes != null && !classes.isEmpty()) {
             for (Class<?> clazz : classes) {
                 @SuppressWarnings("unchecked")
