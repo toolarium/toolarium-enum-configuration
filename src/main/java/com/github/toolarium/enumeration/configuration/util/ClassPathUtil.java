@@ -111,26 +111,45 @@ public final class ClassPathUtil {
      * @throws IOException In case of an I/O error
      */
     protected List<Class<?>> getClassOfPackage(String packageName) {
-
         List<Class<?>> classes = new ArrayList<Class<?>>();
+        
+        // select all from current thread class loader
+        List<String> currentThreadClassLoaderDirs = selectResourcesFromClassLoader(Thread.currentThread().getContextClassLoader(), packageName);
+        for (String directory : currentThreadClassLoaderDirs) {
+            classes.addAll(findClasses(new File(directory), packageName, false));
+        }
+        
+        // select all from system class loader
+        List<String> systemClassLoaderDirs = selectResourcesFromClassLoader(ClassLoader.getSystemClassLoader(), packageName);
+        for (String directory : systemClassLoaderDirs) {
+            classes.addAll(findClasses(new File(directory), packageName, true));
+        }
+        
+        return classes;
+    }
 
+
+    /**
+     * Select all directories
+     * 
+     * @param classLoader the class loader
+     * @param packageName the package name
+     * @return the read directories
+     */
+    private List<String> selectResourcesFromClassLoader(ClassLoader classLoader, String packageName) {
+        List<String> dirs = new ArrayList<String>();
+        
         try {
-            List<File> dirs = new ArrayList<File>();
-            ClassLoader classLoader = ClassLoader.getSystemClassLoader(); //Thread.currentThread().getContextClassLoader();
             Enumeration<URL> resources = classLoader.getResources(packageName.replace('.', '/'));
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                dirs.add(new File(resource.getFile()));
-            }
-            
-            for (File directory : dirs) {
-                classes.addAll(findClasses(directory, packageName));
+                dirs.add(resource.getFile());
             }
         } catch (IOException e) {
             LOG.warn("Could not read path: " + packageName + ": " + e.getMessage());
         }
         
-        return classes;
+        return dirs;
     }
 
     
@@ -139,10 +158,11 @@ public final class ClassPathUtil {
      *
      * @param directory the directory
      * @param packageName the package name
+     * @param preferSystemClassLoader true to preffer system class load
      * @return the classes
      * @throws ClassNotFoundException In case of a class can't be found
      */
-    private static List<Class<?>> findClasses(File directory, String packageName) {
+    private static List<Class<?>> findClasses(File directory, String packageName, boolean preferSystemClassLoader) {
         List<Class<?>> classes = new ArrayList<Class<?>>();
         if (!directory.exists()) {
             return classes;
@@ -152,16 +172,57 @@ public final class ClassPathUtil {
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                classes.addAll(findClasses(file, packageName + "." + file.getName(), preferSystemClassLoader));
             } else if (file.getName().endsWith(".class")) {
-                try {
-                    classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-                } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
-                    // NOP
-                }
+                String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                loadClass(classes, className, preferSystemClassLoader);
             }
         }
         
         return classes;
+    }
+
+
+    /**
+     * Load class
+     * 
+     * @param classes the classes list
+     * @param className the class name
+     * @param preferSystemClassLoader true to prefer system class loader
+     */
+    private static void loadClass(List<Class<?>> classes, String className, boolean preferSystemClassLoader) {
+        if (preferSystemClassLoader) {
+            try {
+                // try by system class loader
+                classes.add(ClassLoader.getSystemClassLoader().loadClass(className));
+                return;
+            } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
+                // NOP
+            }
+        }
+
+        try {
+            classes.add(Class.forName(className));
+            return;
+        } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
+            // NOP
+        }
+
+        try {
+            classes.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+            return;
+        } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
+            // NOP
+        }
+        
+        if (!preferSystemClassLoader) {
+            try {
+                // try by system class loader
+                classes.add(ClassLoader.getSystemClassLoader().loadClass(className));
+                return;
+            } catch (ClassNotFoundException | ExceptionInInitializerError | NoClassDefFoundError e) {
+                // NOP
+            }
+        }
     }
 }
