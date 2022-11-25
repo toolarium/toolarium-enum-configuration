@@ -5,6 +5,7 @@
  */
 package com.github.toolarium.enumeration.configuration.util;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration;
@@ -154,6 +155,29 @@ public class EnumKeyValueConfigurationBinaryObjectParserTest {
         // myfile.txt|2021-03-15T08:59:22.123Z|VGV4dAo= 
         assertEqualsBinaryObjectMerge(NAME, TIMESTAMP, refMimeType, MESSAGE_ENCODED, NAME + PIPE + TIMESTAMP_STRING + PIPE + MESSAGE_ENCODED);
         assertEqualsBinaryObjectMerge(NAME, TIMESTAMP, refMimeType, MESSAGE_ENCODED, SPACE + NAME + SPACE + PIPE + SPACE + TIMESTAMP_STRING + SPACE + PIPE + SPACE + MESSAGE_ENCODED);
+    }
+
+    
+    /**
+     * Test empty or null
+     */
+    @Test
+    public void testFilenameHeader() {
+        String filenameHeader = "<my:/resource/>";
+
+        // <my:/resource/<name -> will be interpreted as data
+        assertNull(EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME).getName());
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME).getData());
+
+        // <my:/resource/>name|{mimetype} -> will be interpreted as name and mime type
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE + BRACE_START + MIME_TYPE + BRACE_END).getName());
+        assertEquals(MIME_TYPE, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE + BRACE_START + MIME_TYPE + BRACE_END).getMimetype());
+
+        // <my:/resource/<name -> will be interpreted as data
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE).getData());
+        
+        // <my:/resource/>name|{mimetype} -> will be interpreted as name and mime type
+        assertEqualsBinaryObject(filenameHeader + NAME, TIMESTAMP, MIME_TYPE, null, filenameHeader + NAME + PIPE + TIMESTAMP_STRING + PIPE + BRACE_START + MIME_TYPE + BRACE_END);
     }
 
     
