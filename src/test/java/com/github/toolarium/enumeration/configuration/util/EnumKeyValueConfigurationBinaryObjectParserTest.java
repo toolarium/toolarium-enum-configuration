@@ -178,6 +178,23 @@ public class EnumKeyValueConfigurationBinaryObjectParserTest {
         
         // <my:/resource/>name|{mimetype} -> will be interpreted as name and mime type
         assertEqualsBinaryObject(filenameHeader + NAME, TIMESTAMP, MIME_TYPE, null, filenameHeader + NAME + PIPE + TIMESTAMP_STRING + PIPE + BRACE_START + MIME_TYPE + BRACE_END);
+        
+        
+        filenameHeader = "my:/resource/";
+
+        // <my:/resource/<name -> will be interpreted as data
+        assertNull(EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME).getName());
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME).getData());
+
+        // <my:/resource/>name|{mimetype} -> will be interpreted as name and mime type
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE + BRACE_START + MIME_TYPE + BRACE_END).getName());
+        assertEquals(MIME_TYPE, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE + BRACE_START + MIME_TYPE + BRACE_END).getMimetype());
+
+        // <my:/resource/<name -> will be interpreted as data
+        assertEquals(filenameHeader + NAME, EnumKeyValueConfigurationBinaryObjectParser.getInstance().parse(filenameHeader + NAME + PIPE).getData());
+        
+        // <my:/resource/>name|{mimetype} -> will be interpreted as name and mime type
+        assertEqualsBinaryObject(filenameHeader + NAME, TIMESTAMP, MIME_TYPE, null, filenameHeader + NAME + PIPE + TIMESTAMP_STRING + PIPE + BRACE_START + MIME_TYPE + BRACE_END);
     }
 
     
