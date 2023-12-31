@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test the {@link JSONUtil}.
+ * 
  * @author patrick
- *
  */
 public class JSONUtilTest {
 
