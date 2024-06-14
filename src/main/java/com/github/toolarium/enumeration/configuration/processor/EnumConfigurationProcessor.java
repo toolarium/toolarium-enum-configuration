@@ -55,6 +55,13 @@ import javax.tools.StandardLocation;
  */
 @SupportedOptions(value = "enumconfiguration.validate.strict")
 public class EnumConfigurationProcessor extends AbstractProcessor {
+    /** Defines the output filename */
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME = "toolarium-enum-configuration.json";
+    /** Defines the output filename */
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_PATH = "META-INF/";
+    /** Defines the output file path */
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_OUTPUT_FILE = TOOLARIUM_ENUM_CONFIGURATION_JSON_PATH + TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME;
+    
     private static final String ENUM_CONFIGURATION = "com.github.toolarium.enumeration.configuration.IEnumConfiguration";
     private List<Class<? extends Annotation>> annoationClassList;
     private List<String> warnList;
@@ -167,7 +174,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         if (enumConfigurations.getEnumConfigurationList() != null && !enumConfigurations.getEnumConfigurationList().isEmpty()) {
             try {
                 //processingEnv.getOptions();
-                FileObject jsonResource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/toolarium-enum-configuration.json");
+                FileObject jsonResource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", TOOLARIUM_ENUM_CONFIGURATION_JSON_OUTPUT_FILE);
                 EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, jsonResource.openOutputStream());
 
                 /*

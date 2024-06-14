@@ -198,6 +198,25 @@ public class EnumConfigurations implements Serializable {
         return result;
     }
 
+    
+    /**
+     * Returns a list of enumeration configuration which implementing the interfaces.
+     *
+     * @param interfacesToCompare the interfaces to compare
+     * @param compareMarkerInterface true to compare the marker interfaces; otherwise the interfaces
+     * @return the enumeration configuration which are implementing the defined interfaces
+     */
+    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> selectEnumConfigurationByInterfaceList(Set<String> interfacesToCompare, boolean compareMarkerInterface) {
+        Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<>();
+        
+        for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
+            if (e.getValue().matchInterfaces(interfacesToCompare, compareMarkerInterface)) {
+                result.add(e.getValue());
+            }
+        }
+        
+        return result;
+    }
 
 
     /**

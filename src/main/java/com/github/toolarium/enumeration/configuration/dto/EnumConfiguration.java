@@ -6,6 +6,7 @@
 package com.github.toolarium.enumeration.configuration.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -224,6 +225,23 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
 
     
     /**
+     * Check if interfaces matching 
+     *
+     * @param interfacesToCompare the interfaces to compare
+     * @param compareMarkerInterface true to compare the marker interfaces; otherwise the interfaces
+     * @return true if they are matching or not
+     */
+    public boolean matchInterfaces(Set<String> interfacesToCompare, boolean compareMarkerInterface) {
+        // check empty interface to search
+        if (compareMarkerInterface) {
+            return listEqualsIgnoreOrder(markerInterfaceList, interfacesToCompare);
+        } else {
+            return listEqualsIgnoreOrder(interfaceList, interfacesToCompare);
+        }
+    }
+
+    
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -323,6 +341,26 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
                + ", interfaceList=" + getInterfaceList()
                + ", markerInterfaceList=" + getMarkerInterfaceList()
                + "]";
+    }
+
+
+    /**
+     * Compare
+     *
+     * @param set1 the first set to compare
+     * @param set2 the second set to compare
+     * @return true if they are equals
+     */
+    private boolean listEqualsIgnoreOrder(Set<String> set1, Set<String> set2) {
+        if (set1 == null) {
+            return set2 == null;
+        }
+        
+        if (set2 == null) {
+            return set1 == null;
+        }
+        
+        return new HashSet<>(set1).equals(new HashSet<>(set2));
     }
 }
 
