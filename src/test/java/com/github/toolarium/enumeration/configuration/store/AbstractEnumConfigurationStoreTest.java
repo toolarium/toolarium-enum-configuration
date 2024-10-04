@@ -68,11 +68,11 @@ public abstract class AbstractEnumConfigurationStoreTest {
      * @throws IOException In case of an I/O error
      */
     protected EnumKeyValueConfiguration createEnumKeyValueConfiguration(String enumConfigurtionKeyName, 
-                                                                      EnumKeyValueConfigurationDataType dataType,
-                                                                      String minSize,
-                                                                      String maxSize,
-                                                                      String defaultValue, 
-                                                                      String exampleValue) 
+                                                                        EnumKeyValueConfigurationDataType dataType,
+                                                                        String minSize,
+                                                                        String maxSize,
+                                                                        String defaultValue, 
+                                                                        String exampleValue) 
             throws ValidationException, IOException {
         // 1) define enum configuration
         EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
