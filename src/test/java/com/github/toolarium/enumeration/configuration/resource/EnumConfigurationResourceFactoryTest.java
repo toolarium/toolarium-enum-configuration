@@ -357,6 +357,53 @@ public class EnumConfigurationResourceFactoryTest {
 
     
     /**
+     * Test empty enum configurations
+     * 
+     * @throws IOException in case of an error
+     */
+    @Test
+    public void testTagInEnumConfigurations() throws IOException {
+        EnumConfiguration<? super EnumKeyConfiguration> ec = new EnumConfiguration<>("myName");
+        ec.setDescription("My description");
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration1 = create("myKey1", true, "My key 1 description", null, "example value 1", OPTIONAL_CARDINALITY, null, null);
+        ec.add(enumKeyValueConfiguration1);
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration2 = create("myKey2", true, "My key 2 desc.", "default value 2", null, OPTIONAL_CARDINALITY, Instant.now().plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec.add(enumKeyValueConfiguration2);
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration3 = create("myKey3", false, "My key 3 description", "default value 3", null, null, Instant.now().plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec.add(enumKeyValueConfiguration3);
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration4 = create("myKey4", false, "My key 4 description", null, "example value 4", null, Instant.now().plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec.add(enumKeyValueConfiguration4);
+
+        EnumConfigurations e = new EnumConfigurations();
+        e.add(ec);
+
+        ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(e, outputstream);
+        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : null,"), -1); // there is no tag in output
+        Assert.assertEquals(outputstream.toString(), outputstream.toString().replace("    \"tag\" : null,\n", ""));
+
+        EnumConfigurations e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
+        Assert.assertEquals(e, e2);
+        Assert.assertNull(e2.getEnumConfigurationList().iterator().next().getTag());
+        
+        String tag = "myTag";
+        ec.setTag(tag);
+        outputstream = new ByteArrayOutputStream();
+        EnumConfigurationResourceFactory.getInstance().store(e, outputstream);
+        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : \"" + tag + "\","), 259); // there is a tag
+        Assert.assertNotEquals(outputstream.toString(), outputstream.toString().replace("    \"tag\" : \"" + tag + "\",\n", ""));
+
+        e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
+        Assert.assertEquals(e, e2);
+        Assert.assertEquals(tag, e2.getEnumConfigurationList().iterator().next().getTag());
+    }
+
+    
+    /**
      * Read and write 
      *
      * @param inputEnumConfigurations the input enum configurations

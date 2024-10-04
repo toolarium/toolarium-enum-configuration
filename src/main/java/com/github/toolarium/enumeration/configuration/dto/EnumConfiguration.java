@@ -5,6 +5,8 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -29,6 +31,10 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
 
     private static final long serialVersionUID = -5016414165364299512L;
     private String name;
+
+    @JsonInclude(Include.NON_NULL)
+    private String tag;
+
     private Map<String, T> keyList;
     private Set<String> interfaceList;
     private Set<String> markerInterfaceList;
@@ -40,6 +46,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
     public EnumConfiguration() {
         super();
         name = null;
+        tag = null;
         keyList = new LinkedHashMap<String, T>();
         interfaceList = new LinkedHashSet<String>();
         markerInterfaceList = new LinkedHashSet<String>();
@@ -74,6 +81,26 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    
+    /**
+     * Get the tag of the enumeration configuration, which is optional and can be used for identify specific enum configurations.
+     *
+     * @return the configuration tag
+     */
+    public String getTag() {
+        return tag;
+    }
+
+
+    /**
+     * Set the tag of the enumeration configuration, which is optional and can be used for identify specific enum configurations.
+     *
+     * @param tag the configuration tag
+     */
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     
@@ -253,6 +280,10 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
         if (name != null) {
             result += name.hashCode();
         }
+        
+        if (tag != null) {
+            result += tag.hashCode();
+        }
 
         result = prime * result;
         if (keyList != null) {
@@ -300,6 +331,14 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
             return false;
         }
 
+        if (tag == null) {
+            if (other.tag != null) {
+                return false;
+            }
+        } else if (!tag.equals(other.tag)) {
+            return false;
+        }
+
         if (keyList == null) {
             if (other.keyList != null) {
                 return false;
@@ -334,6 +373,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
     @Override
     public String toString() {
         return "EnumConfiguration [name=" + name 
+               + ", tag=" + getTag()
                + ", description=" + getDescription()
                + ", validFrom=" + getValidFrom() 
                + ", validTill=" + getValidTill() 

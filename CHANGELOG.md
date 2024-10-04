@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [ 1.1.10 ] - 2024-06-14
+## [ 1.2.0 ] - 2024-10-04
+### Changed
+- Added tag support on the com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration.
+- Added tag support on the com.github.toolarium.enumeration.configuration.dto.EnumConfiguration.
+- Added tag support in processor com.github.toolarium.enumeration.configuration.processor.EnumConfigurationProcessor.
+- Extended tests for tag support and backward compatibility.
 
 ## [ 1.1.9 ] - 2024-06-14
 ### Changed

@@ -32,6 +32,14 @@ public @interface EnumConfiguration {
 
     
     /**
+     * Defines the tag of the enumeration configuration, which is optional and can be used for identify specific enum configurations.
+     * 
+     * @return The tag of the enumeration configuration.
+     */
+    String tag() default "";
+
+    
+    /**
      * Defines the valid from date of the enumeration configuration. By default it's empty which means the current timestamp:
      * <code>DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.MILLIS))</code>.
      * 

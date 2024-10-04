@@ -18,6 +18,7 @@ import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigur
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +44,7 @@ import javax.tools.StandardLocation;
 
 
 /**
- * Implements the enumeration confuguration annotation processor 
+ * Implements the enumeration configuration annotation processor 
  * 
  * @author patrick
  * 
@@ -175,8 +176,8 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
             try {
                 //processingEnv.getOptions();
                 FileObject jsonResource = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", TOOLARIUM_ENUM_CONFIGURATION_JSON_OUTPUT_FILE);
-                EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, jsonResource.openOutputStream());
-
+                generateFileContent(TOOLARIUM_ENUM_CONFIGURATION_JSON_OUTPUT_FILE, enumConfigurations, jsonResource.openOutputStream());
+                
                 /*
                 FileObject resource = processingEnv.getFiler().createResource(StandardLocation.SOURCE_OUTPUT, "com", "content.txt");
                 try (Writer writer = resource.openWriter()) {
@@ -194,6 +195,19 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         return false;
     }
 
+    
+    /**
+     * Generate the file content
+     *
+     * @param name the name
+     * @param enumConfigurations the enum-configuration
+     * @param stream the stream
+     * @throws IOException In case of a stream exception
+     */
+    protected void generateFileContent(String name, EnumConfigurations enumConfigurations, OutputStream stream) throws IOException {
+        EnumConfigurationResourceFactory.getInstance().store(enumConfigurations, stream);
+    }
+    
     
     /**
      * Process the enumeration configuration element annotation.
@@ -239,6 +253,9 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                         switch (key) {
                             case "description": 
                                 enumConfiguration.setDescription(value);
+                                break;
+                            case "tag": 
+                                enumConfiguration.setTag(value);
                                 break;
                             case "validFrom": 
                                 enumConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(value));

@@ -68,6 +68,10 @@ public final class AnnotationConvertUtil {
         EnumConfiguration<T> enumConfiguration = new EnumConfiguration<T>();
         enumConfiguration.setDescription(enumConfigurationAnnotation.description());
 
+        if (enumConfigurationAnnotation.tag() != null && !enumConfigurationAnnotation.tag().trim().isEmpty()) {
+            enumConfiguration.setTag(enumConfigurationAnnotation.tag());
+        }
+
         if (enumConfigurationAnnotation.validFrom() != null && !enumConfigurationAnnotation.validFrom().trim().isEmpty()) {
             enumConfiguration.setValidFrom(DateUtil.getInstance().parseTimestamp(enumConfigurationAnnotation.validFrom()));
         }
