@@ -394,7 +394,7 @@ public class EnumConfigurationResourceFactoryTest {
         ec.setTag(tag);
         outputstream = new ByteArrayOutputStream();
         EnumConfigurationResourceFactory.getInstance().store(e, outputstream);
-        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : \"" + tag + "\","), 259); // there is a tag
+        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : \"" + tag + "\","), 258); // there is a tag
         Assert.assertNotEquals(outputstream.toString(), outputstream.toString().replace("    \"tag\" : \"" + tag + "\",\n", ""));
 
         e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
