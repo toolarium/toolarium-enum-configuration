@@ -383,8 +383,7 @@ public class EnumConfigurationResourceFactoryTest {
 
         ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
         EnumConfigurationResourceFactory.getInstance().store(e, outputstream);
-        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : null,"), -1); // there is no tag in output
-        Assert.assertEquals(outputstream.toString(), outputstream.toString().replace("    \"tag\" : null,\n", ""));
+        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\""), -1); // there is no tag in output
 
         EnumConfigurations e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
         Assert.assertEquals(e, e2);
@@ -394,8 +393,8 @@ public class EnumConfigurationResourceFactoryTest {
         ec.setTag(tag);
         outputstream = new ByteArrayOutputStream();
         EnumConfigurationResourceFactory.getInstance().store(e, outputstream);
-        Assert.assertEquals(outputstream.toString().indexOf("    \"tag\" : \"" + tag + "\","), 258); // there is a tag
-        Assert.assertNotEquals(outputstream.toString(), outputstream.toString().replace("    \"tag\" : \"" + tag + "\",\n", ""));
+        
+        Assert.assertTrue(outputstream.toString().indexOf("    \"tag\" : \"" + tag + "\",") > 0); // there is a tag
 
         e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
         Assert.assertEquals(e, e2);

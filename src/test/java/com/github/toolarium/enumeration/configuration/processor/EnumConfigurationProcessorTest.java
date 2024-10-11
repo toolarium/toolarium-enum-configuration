@@ -91,6 +91,31 @@ public class EnumConfigurationProcessorTest {
         assertThat(compilation).succeeded();
     }
 
+
+    /**
+     * Simple annotation test
+     */
+    @Test
+    public void compileAnnotationTest3() {
+        Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
+               + "import com.github.toolarium.enumeration.configuration.IEnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
+               + ""
+               + "@EnumConfiguration(description = \"The system configuration.\")\n"
+               + "enum MyEnumConfiguration implements IEnumConfiguration, MyMarkerInterface {\n"
+               + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
+               + "HOSTNAME,\n"
+               + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
+               + "PORT,\n"
+               + "@EnumKeyValueConfiguration(description = \"The hint\", exampleValue = \"hint\")\n"
+               + "HINT;\n"
+               + "}\n"
+               + "interface MyMarkerInterface {}"));
+        assertThat(compilation).succeeded();
+    }
+
     
     /**
      * Test invalid cardinality

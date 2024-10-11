@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/toolarium/toolarium-enum-configuration)](https://github.com/toolarium/toolarium-enum-configuration/blob/master/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.toolarium/toolarium-enum-configuration/1.1.9)](https://search.maven.org/artifact/com.github.toolarium/toolarium-enum-configuration/1.1.9/jar)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.toolarium/toolarium-enum-configuration/1.2.0)](https://search.maven.org/artifact/com.github.toolarium/toolarium-enum-configuration/1.2.0/jar)
 [![javadoc](https://javadoc.io/badge2/com.github.toolarium/toolarium-enum-configuration/javadoc.svg)](https://javadoc.io/doc/com.github.toolarium/toolarium-enum-configuration)
 
 # toolarium-enum-configuration
@@ -37,7 +37,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ```groovy
 dependencies {
-    implementation "com.github.toolarium:toolarium-enum-configuration:1.1.9"
+    implementation "com.github.toolarium:toolarium-enum-configuration:1.2.0"
 }
 ```
 
@@ -47,6 +47,6 @@ dependencies {
 <dependency>
     <groupId>com.github.toolarium</groupId>
     <artifactId>toolarium-enum-configuration</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.0</version>
 </dependency>
 ```
