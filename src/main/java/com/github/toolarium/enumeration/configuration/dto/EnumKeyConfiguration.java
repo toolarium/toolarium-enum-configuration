@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+
 /**
  * Defines the enum key configuration  
  * 
@@ -130,8 +131,29 @@ public class EnumKeyConfiguration extends AbstractEnumConfiguration {
 
         return true;
     }
+    
+    
+    /**
+     * Check if the enum key configuration is compliant with another. 
+     *
+     * @param o the 
+     * @return true if it is compliant
+     */
+    public EnumConfigurationComplianceResult isCompliant(EnumKeyConfiguration o) {
+        EnumConfigurationComplianceResult result = super.isCompliant(o);
+        if (!result.isValid()) {
+            return result;
+        }
 
+        if (key != null && o.getKey() != null && !key.equals(o.getKey())) {
+            return new EnumConfigurationComplianceResult("Incompliant key (" + key + " != " + o.getKey() + ")");
+        }
 
+        // ignore isConfidential
+        return result;
+    }
+
+    
     /**
      * @see java.lang.Object#toString()
      */

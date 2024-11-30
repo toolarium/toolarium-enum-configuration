@@ -165,6 +165,30 @@ public abstract class AbstractEnumConfiguration implements Serializable {
 
         return true;
     }
+
+
+    /**
+     * Check if the enum configuration is compliant with another. 
+     *
+     * @param o the 
+     * @return true if it is compliant
+     */
+    public EnumConfigurationComplianceResult isCompliant(AbstractEnumConfiguration o) {
+        EnumConfigurationComplianceResult result = EnumConfigurationComplianceResult.isNull(o);
+        if (!result.isValid()) {
+            return result;
+        }
+        
+        if (validFrom != null && o.getValidFrom() != null && !validFrom.equals(o.getValidFrom()) && o.getValidFrom().isBefore(validFrom)) {
+            return new EnumConfigurationComplianceResult("Valid from is before current (" + validFrom + " > " + o.getValidFrom() + ")");
+        }
+
+        if (validTill != null && o.getValidTill() != null && !validTill.equals(o.getValidTill()) && o.getValidTill().isAfter(validTill)) {
+            return new EnumConfigurationComplianceResult("Valid till is after current (" + validTill + " < " + o.getValidTill() + ")");
+        }
+        
+        return EnumConfigurationComplianceResult.VALID;
+    }
 }
 
 

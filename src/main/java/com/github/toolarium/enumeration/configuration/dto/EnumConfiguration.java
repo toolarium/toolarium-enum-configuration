@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Defines the enum configuration
  *
@@ -364,6 +365,69 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
         }
 
         return true;
+    }
+
+    
+    /**
+     * Check if the enum configuration is compliant with another. 
+     *
+     * @param o the 
+     * @return true if it is compliant
+     */
+    public EnumConfigurationComplianceResult isCompliant(EnumConfiguration<T> o) {
+        EnumConfigurationComplianceResult result = super.isCompliant(o);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        if (!name.equals(o.getName())) {
+            return new EnumConfigurationComplianceResult("Incompliant name: " + name + " -> " + o.getName() + "!");
+        }
+
+        if (!tag.equals(o.getTag())) {
+            return new EnumConfigurationComplianceResult("Incompliant tag: " + tag + " -> " + o.getTag() + "!");
+        }
+
+        if (o.keyList != null) {
+            for (Map.Entry<String, T> e : o.keyList.entrySet()) {
+                T value = keyList.get(e.getKey());
+                if (value == null) {
+                    return new EnumConfigurationComplianceResult("Incompliant tag: " + tag + " -> " + o.getTag() + "!");
+                }
+                
+                if (EnumKeyValueConfiguration.class.isInstance(value)) {
+                    if (EnumKeyValueConfiguration.class.isInstance(e.getValue())) {
+                        result = value.isCompliant(((EnumKeyValueConfiguration)e.getValue()));
+                    } else {
+                        result = value.isCompliant(e.getValue());
+                    }
+                } else {
+                    result = value.isCompliant(e.getValue());
+                }
+
+                if (!result.isValid()) {
+                    return result;
+                }
+            }
+        }
+        
+        if (o.getInterfaceList() != null) {
+            for (String interfaceName : o.getInterfaceList()) {
+                if (!interfaceList.contains(interfaceName)) {
+                    return new EnumConfigurationComplianceResult("Missing interface: " + interfaceName + "!");
+                }
+            }
+        }
+        
+        if (o.getMarkerInterfaceList() != null) {
+            for (String markerInterfaceName : o.getMarkerInterfaceList()) {
+                if (!markerInterfaceList.contains(markerInterfaceName)) {
+                    return new EnumConfigurationComplianceResult("Missing marker interface: " + markerInterfaceName + "!");
+                }
+            }
+        }
+
+        return result;
     }
 
 

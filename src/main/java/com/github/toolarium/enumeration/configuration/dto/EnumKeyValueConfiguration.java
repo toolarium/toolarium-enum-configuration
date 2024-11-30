@@ -324,6 +324,48 @@ public class EnumKeyValueConfiguration extends EnumKeyConfiguration {
         return true;
     }
 
+    
+    /**
+     * Check if the enum configuration is compliant with another. 
+     *
+     * @param o the 
+     * @return true if it is compliant
+     */
+    public EnumConfigurationComplianceResult isCompliant(EnumKeyValueConfiguration o) {
+        EnumConfigurationComplianceResult result = super.isCompliant(o);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        if (dataType != null && o.getDataType() != null && !dataType.equals(o.getDataType())) {
+            return new EnumConfigurationComplianceResult("Incompliant data type (" + dataType + " != " + o.getDataType() + ")");
+        }
+
+        if (enumerationValue != null && o.getEnumerationValue() != null && !enumerationValue.equals(o.getEnumerationValue())) {
+            return new EnumConfigurationComplianceResult("Incompliant enumeration value type (" + enumerationValue + " != " + o.getEnumerationValue() + ")");
+        }
+
+        if (valueSize != null && o.getValueSize() != null) {
+            result = valueSize.isCompliant(o.getValueSize());
+            if (!result.isValid()) {
+                return result;
+            }
+        }
+
+        /*
+        if (cardinality != null && o.getCardinality() != null) {
+            result = cardinality.isCompliant(o.cardinality());
+            if (!result.isValid()) {
+                return result;
+            }
+        }
+        */
+        // ignore defaultValue, exampleValue
+        
+        // TODO: isUniqueness
+        return result;
+    }
+
 
     /**
      * @see java.lang.Object#toString()

@@ -8,6 +8,7 @@ package com.github.toolarium.enumeration.configuration.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
+
 /**
  * Defines the sizing aspects.
  * 
@@ -258,7 +259,51 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
         return true;
     }
 
+    
+    /**
+     * Check if the enum configuration is compliant with another. 
+     *
+     * @param o the 
+     * @return true if it is compliant
+     */
+    public EnumConfigurationComplianceResult isCompliant(EnumKeyValueConfigurationSizing<?> o) {
+        EnumConfigurationComplianceResult result = EnumConfigurationComplianceResult.isNull(o);
+        if (!result.isValid()) {
+            return result;
+        }
 
+        if (minSizeAsString != null && o.getMinSizeAsString() != null && !minSizeAsString.equals(o.getMinSizeAsString()) && minSizeAsString.compareTo(o.getMinSizeAsString()) > 0) {
+            return new EnumConfigurationComplianceResult("Valid from is smaller than current (" + minSizeAsString + " > " + o.getMinSizeAsString() + "): " + toStringExpression() + " - " + o.toStringExpression());
+        }
+
+        if (maxSizeAsString != null && o.getMaxSizeAsString() != null && !maxSizeAsString.equals(o.getMaxSizeAsString()) && maxSizeAsString.compareTo(o.getMaxSizeAsString()) < 0) {
+            return new EnumConfigurationComplianceResult("Valid till is smaller than current (" + maxSizeAsString + " < " + o.getMaxSizeAsString() + "): " + toStringExpression() + " - " + o.toStringExpression());
+        }
+
+        return result;
+    }
+    
+    
+    /**
+     * Convert to a string representation
+     *
+     * @return the string representation
+     */
+    public String toStringExpression() {
+        String result = ""; // "1..1";
+        if (getMinSizeAsString() != null) {
+            result = getMinSizeAsString();
+            if (getMaxSizeAsString() != null) {
+                result += ".." + getMaxSizeAsString();
+            }
+        } else if (getMaxSizeAsString() != null) {
+            result = "1.." + getMaxSizeAsString();
+        }
+        
+        return result;
+    }
+
+    
     /**
      * @see java.lang.Object#toString()
      */
