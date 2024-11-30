@@ -268,6 +268,9 @@ public class EnumConfigurationResourceFactoryTest {
         e.add(ec3);
         Assert.assertEquals(e, writeAndRead(e));
 
+        assertEquals("[this.is.my.interface, this.is.my.second.interface]", e.getEnumConfigurationInterfaceList(false).toString());
+        assertEquals("[this.is.my.markerinterface, this.is.my.second.markerinterface]", e.getEnumConfigurationInterfaceList(true).toString());
+
         assertEquals("[myName1, myName2]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceA), false).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
         assertEquals("[myName1, myName2]", e.selectEnumConfigurationByInterfaceList(Set.of(markerInterfaceA), true).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
         assertEquals("[myName3]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceB), false).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());

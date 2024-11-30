@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -93,7 +94,7 @@ public class EnumConfigurations implements Serializable {
     /**
      * Gets the enumeration configuration content list
      * 
-     * @return true if it is empty
+     * @return the enumeration configuration list
      */
     public Set<EnumConfiguration<? extends EnumKeyConfiguration>> getEnumConfigurationList() {
         Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<EnumConfiguration<? extends EnumKeyConfiguration>>();
@@ -103,8 +104,36 @@ public class EnumConfigurations implements Serializable {
         
         return result;
     }
+
     
-    
+    /**
+     * Get interfaces used by the enumeration configuration
+     * 
+     * @param selectMarkerInterface true to select the marker interfaces; otherwise the interfaces
+     * @return the interface list
+     */
+    public Set<String> getEnumConfigurationInterfaceList(boolean selectMarkerInterface) {
+        Set<String> result = new TreeSet<String>();
+        for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
+            if (e.getValue() != null && e.getValue().getInterfaceList() != null) {
+                Set<String> list;
+                if (selectMarkerInterface) {
+                    list = e.getValue().getMarkerInterfaceList();
+                } else {
+                    list = e.getValue().getInterfaceList();
+                }
+                for (String interfaceName : list) {
+                    if (!result.contains(interfaceName)) {
+                        result.add(interfaceName);
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+
+        
     /**
      * Sets the enumeration configuration content list
      * 
