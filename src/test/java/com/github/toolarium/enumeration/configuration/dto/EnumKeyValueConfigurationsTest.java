@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test {@link EnumConfigurations}.
+ * Test {@link EnumKeyValueConfigurationsTest}.
  * 
  * @author patrick
  *
