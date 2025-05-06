@@ -15,7 +15,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.github.toolarium.enumeration.configuration.dto.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
+import com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration;
 import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.util.JavaFileObjectUtil;
 import com.google.common.collect.ImmutableList;
@@ -74,13 +76,12 @@ public class EnumConfigurationProcessorTest {
     @Test
     public void compileAnnotationTest2() {
         Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
-               + "import com.github.toolarium.enumeration.configuration.IEnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
                + ""
                + "@EnumConfiguration(description = \"The system configuration.\")\n"
-               + "enum MyEnumConfiguration implements IEnumConfiguration {\n"
+               + "enum MyEnumConfiguration {\n"
                + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
                + "HOSTNAME,\n"
                + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
@@ -91,20 +92,19 @@ public class EnumConfigurationProcessorTest {
         assertThat(compilation).succeeded();
     }
 
-
+    
     /**
      * Simple annotation test
      */
     @Test
     public void compileAnnotationTest3() {
         Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
-               + "import com.github.toolarium.enumeration.configuration.IEnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
                + ""
                + "@EnumConfiguration(description = \"The system configuration.\")\n"
-               + "enum MyEnumConfiguration implements IEnumConfiguration, MyMarkerInterface {\n"
+               + "enum MyEnumConfiguration implements MyMarkerInterface {\n"
                + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
                + "HOSTNAME,\n"
                + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
@@ -123,13 +123,12 @@ public class EnumConfigurationProcessorTest {
     @Test
     public void invalidCardinalityTest() {
         Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
-               + "import com.github.toolarium.enumeration.configuration.IEnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
                + ""
                + "@EnumConfiguration(description = \"The system configuration.\")\n"
-               + "enum MyEnumConfiguration implements IEnumConfiguration {\n"
+               + "enum MyEnumConfiguration {\n"
                + "    @EnumKeyValueConfiguration(description = \"My value F.\", dataType = DataType.STRING, cardinality = \"2..3\", exampleValue = \"[\\\"A\\\" ]\")\n"
                + "    VALUE_F;\n"
                + "}"));
@@ -183,6 +182,7 @@ public class EnumConfigurationProcessorTest {
         TestEnumConfigurationProcessor testEnumConfigurationProcessor = new TestEnumConfigurationProcessor();
         assertAbout(javaSources())
         .that(ImmutableList.of(JavaFileObjectUtil.getInstance().loadTestSourceByClass(IMyEnumConfiguration.class),
+                               JavaFileObjectUtil.getInstance().loadTestSourceByClass(IMySecondEnumConfiguration.class),                
                                JavaFileObjectUtil.getInstance().loadTestSourceByClass(MyEnumWithTagConfiguration.class)))
         .processedWith(testEnumConfigurationProcessor).compilesWithoutError();
 
@@ -191,12 +191,14 @@ public class EnumConfigurationProcessorTest {
         EnumConfigurations enumConfigurations = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(content.getBytes()));
         assertNotNull(enumConfigurations);
         
-        assertEquals("myTag", enumConfigurations.getEnumConfigurationList().iterator().next().getTag());
-        
+        EnumConfiguration<? extends EnumKeyConfiguration> enumKeyConfiguration = enumConfigurations.getEnumConfigurationList().iterator().next();
+        assertEquals("[com.github.toolarium.enumeration.configuration.processor.IMySecondEnumConfiguration, com.github.toolarium.enumeration.configuration.processor.IMyEnumConfiguration]", enumKeyConfiguration.getInterfaceList().toString());
+        assertEquals("myTag", enumKeyConfiguration.getTag());
         
         testEnumConfigurationProcessor = new TestEnumConfigurationProcessor();
         assertAbout(javaSources())
         .that(ImmutableList.of(JavaFileObjectUtil.getInstance().loadTestSourceByClass(IMyEnumConfiguration.class),
+                               JavaFileObjectUtil.getInstance().loadTestSourceByClass(IMySecondEnumConfiguration.class),                
                                JavaFileObjectUtil.getInstance().loadTestSourceByClass(MyEnumConfiguration.class)))
         .processedWith(testEnumConfigurationProcessor).compilesWithoutError();
 
@@ -207,6 +209,78 @@ public class EnumConfigurationProcessorTest {
         
         assertNull(enumConfigurations.getEnumConfigurationList().iterator().next().getTag());
     }
+
+    
+    /**
+     * Simple annotation test
+     */
+    @Test
+    public void compileAnnotationTestWithCustomValidator() {
+        Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
+               + "import com.github.toolarium.enumeration.configuration.validator.IMyEnumConfiguration;\n"
+               + ""
+               + "@EnumConfiguration(description = \"The system configuration.\")\n"
+               + "enum MyEnumConfiguration implements IMyEnumConfiguration {\n"
+               + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
+               + "HOSTNAME,\n"
+               + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
+               + "PORT,\n"
+               + "@EnumKeyValueConfiguration(description = \"The hint\", exampleValue = \"hint\")\n"
+               + "HINT;\n"
+               + "}"));
+        assertThat(compilation).succeeded();
+    }
+
+
+    /**
+     * Simple annotation test
+     */
+    @Test
+    public void compileAnnotationTestWithCustomValidatorEndedWithError() {
+        Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
+                + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
+                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
+                + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
+                + "import com.github.toolarium.enumeration.configuration.validator.IMyEnumConfiguration;\n"
+                + ""
+                + "@EnumConfiguration(description = \"The system configuration.\")\n"
+                + "enum MyEnumConfiguration implements IMyEnumConfiguration {\n"
+                + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
+                + "HOSTNAME,\n"
+                + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
+                + "MYPORT,\n"
+                + "@EnumKeyValueConfiguration(description = \"The hint\", exampleValue = \"hint\")\n"
+                + "HINT;\n"
+                + "}"));
+        assertThat(compilation).hadErrorContaining("Please check the annotation of MyEnumConfiguration#MYPORT");
+    }
+
+    
+    /**
+     * Simple annotation test
+    @Test
+    public void compileAnnotationTestWithCustomValidatorAndInvalidConfiguration() {
+        Compilation compilation = compilerWithGenerator().compile(JavaFileObjects.forSourceString("MyEnumConfiguration.java", ""
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;\n"
+               + "import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;\n"
+               + "import com.github.toolarium.enumeration.configuration.validator.IMyEnumConfiguration;\n"
+               + ""
+               + "@EnumConfiguration(description = \"The system configuration.\")\n"
+               + "enum MyEnumConfiguration implements IMyEnumConfiguration {\n"
+               + "@EnumKeyValueConfiguration(description = \"The hostname\", dataType = DataType.STRING, defaultValue = \"true\", minValue = \"1\", maxValue = \"10\", exampleValue = \"true\")\n"
+               + "HOSTNAME,\n"
+               + "@EnumKeyValueConfiguration(description = \"The port\", exampleValue = \"8080\")\n"
+               + "PORT,\n"
+               + "@EnumKeyValueConfiguration(description = \"The hint\", exampleValue = \"hint\")\n"
+               + "HINT;\n"
+               + "}"));
+        assertThat(compilation).hadErrorContaining("Please check the annotation of MyEnumConfiguration#MYPORT");
+    }
+     */
 
     
     /**

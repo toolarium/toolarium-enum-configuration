@@ -15,7 +15,7 @@ import com.github.toolarium.enumeration.configuration.store.dto.EnumConfiguratio
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.util.EnumKeyValueConfigurationBinaryObjectParser;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -335,7 +335,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
         
         try {
             EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKeyName);
-            Collection<D> valueList = EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, value);
+            Collection<D> valueList = EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, value);
             return prepareResult(value, valueList);
         } catch (ValidationException ex) {
             String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();

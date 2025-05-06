@@ -13,7 +13,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.store.impl.EnumConfigurationResourceResolver;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.ByteArrayInputStream;
@@ -90,7 +90,7 @@ public abstract class AbstractEnumConfigurationStoreTest {
         //EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); // define long value
         EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), minSize, maxSize); 
         enumKeyValueConfiguration.setValueSize(valueSize);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
         return enumKeyValueConfiguration;
     }
 

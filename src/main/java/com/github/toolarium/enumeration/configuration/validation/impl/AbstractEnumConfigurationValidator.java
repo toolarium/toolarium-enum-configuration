@@ -1,5 +1,5 @@
 /*
- * AbstractEnumKeyConfigurationValidator.java
+ * AbstractEnumConfigurationValidator.java
  *
  * Copyright by toolarium, all rights reserved.
  */
@@ -12,7 +12,8 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
 import com.github.toolarium.enumeration.configuration.util.JSONUtil;
 import com.github.toolarium.enumeration.configuration.validation.EmptyValueException;
-import com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator;
+import com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationStructureValidator;
+import com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationValueValidator;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.value.IEnumKeyConfigurationValueValidator;
@@ -24,48 +25,22 @@ import java.util.List;
 
 
 /**
- * Abstract validator base class
+ * Abstract enum-configuration validator base class
  * 
  * @author patrick
  */
-public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyConfigurationValidator  {
+public abstract class AbstractEnumConfigurationValidator implements IEnumConfigurationStructureValidator, IEnumConfigurationValueValidator  {
 
     
     /**
-     * Constructor for AbstractEnumKeyConfigurationValidator
+     * Constructor for AbstractEnumConfigurationValidator
      */
-    protected AbstractEnumKeyConfigurationValidator() {
+    protected AbstractEnumConfigurationValidator() {
     }
     
 
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration, java.lang.String)
-     */
-    @Override
-    public void validate(EnumKeyConfiguration enumKeyConfiguration, String input) throws ValidationException {
-        validate(enumKeyConfiguration);
-    }
-
-    
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration, java.lang.String)
-     */
-    @Override
-    public <D> Collection<D> validate(EnumKeyValueConfiguration enumKeyValueConfiguration, String input) throws ValidationException {
-        
-        validate(enumKeyValueConfiguration);
-        
-        return validate(enumKeyValueConfiguration.getDataType(), 
-                        enumKeyValueConfiguration.getCardinality(),
-                        enumKeyValueConfiguration.isUniqueness(),
-                        enumKeyValueConfiguration.getValueSize(),
-                        enumKeyValueConfiguration.getEnumerationValue(),
-                        input);
-    }
-
-
-    /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration)
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationStructureValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration)
      */
     @Override
     public void validate(EnumKeyConfiguration enumKeyConfiguration) throws ValidationException {
@@ -81,9 +56,9 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         validateValidity(enumKeyConfiguration.getValidFrom(), enumKeyConfiguration.getValidTill());
     }
 
-    
+
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration)
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationStructureValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration)
      */
     @Override
     public void validate(EnumKeyValueConfiguration enumKeyValueConfiguration) throws ValidationException {
@@ -120,13 +95,39 @@ public abstract class AbstractEnumKeyConfigurationValidator implements IEnumKeyC
         
     }
 
-
+    
     /**
-     * @see com.github.toolarium.enumeration.configuration.validation.IEnumKeyConfigurationValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType, 
-     * com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, boolean, com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing, java.lang.String, java.lang.String)
+     * @see com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationValueValidator#validate(com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration, java.lang.String)
      */
     @Override
-    public <D,T> Collection<D> validate(EnumKeyValueConfigurationDataType dataType, 
+    public <D> Collection<D> validate(EnumKeyValueConfiguration enumKeyValueConfiguration, String input) throws ValidationException {
+        
+        validate(enumKeyValueConfiguration);
+        
+        return validate(enumKeyValueConfiguration.getDataType(), 
+                        enumKeyValueConfiguration.getCardinality(),
+                        enumKeyValueConfiguration.isUniqueness(),
+                        enumKeyValueConfiguration.getValueSize(),
+                        enumKeyValueConfiguration.getEnumerationValue(),
+                        input);
+    }
+
+
+    /**
+     * Validate the data type against an input string
+     *
+     * @param <D> the validated data type
+     * @param <T> the size type
+     * @param dataType the data type 
+     * @param cardinality the cardinality
+     * @param isUniqueness True if it is unique; otherwise false, which means that the same value can occur more than once. 
+     * @param valueSize the value size
+     * @param enumerationValue In case the input has to be inside the enumeration
+     * @param input the input to validate
+     * @return the validated values
+     * @throws ValidationException In case of a validation error
+     */
+    protected <D,T> Collection<D> validate(EnumKeyValueConfigurationDataType dataType, 
                                         EnumKeyValueConfigurationSizing<Integer> cardinality, 
                                         boolean isUniqueness, 
                                         EnumKeyValueConfigurationSizing<T> valueSize,

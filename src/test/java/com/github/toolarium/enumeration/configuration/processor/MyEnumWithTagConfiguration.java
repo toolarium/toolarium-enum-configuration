@@ -5,7 +5,6 @@
  */
 package com.github.toolarium.enumeration.configuration.processor;
 
-import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
@@ -17,7 +16,7 @@ import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueCon
  * @author patrick
  */
 @EnumConfiguration(description = "The system configuration.", tag = "myTag")
-public enum MyEnumWithTagConfiguration implements IEnumConfiguration, IMyEnumConfiguration {
+public enum MyEnumWithTagConfiguration implements IMyEnumConfiguration, IMySecondEnumConfiguration {
     @EnumKeyValueConfiguration(description = "The hostname", dataType = DataType.STRING, defaultValue = "hostname", exampleValue = "myhost.com", minValue = "0", maxValue = "10")
     HOSTNAME,
 

@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 
 
 /**
- * Test the {@link EnumKeyConfigurationValidatorFactory}.
+ * Test the {@link EnumConfigurationValidatorFactory}.
  * @author patrick
  *
  */
-public class EnumKeyConfigurationValidatorFactoryTest {
+public class EnumConfigurationValidatorFactoryTest {
 
     /**
      * Test empty {@link EnumKeyValueConfiguration}.
@@ -30,11 +30,11 @@ public class EnumKeyConfigurationValidatorFactoryTest {
     @Test 
     public void testEmptyEnumKeyValueConfiguration() throws ValidationException {
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(null);
+            EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(null);
         });
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate((EnumKeyValueConfiguration)null, "");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate((EnumKeyValueConfiguration)null, "");
         });
 
         EnumKeyValueConfiguration enumKeyValueConfiguration = new EnumKeyValueConfiguration();
@@ -45,9 +45,9 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertFalse(enumKeyValueConfiguration.hasDefaultValue());
         assertTrue(enumKeyValueConfiguration.isMandatory());
         
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
         });
     }
 
@@ -64,16 +64,16 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         enumKeyValueConfiguration.setKey("com.github.toolarium.1");
         enumKeyValueConfiguration.setDescription("This is a description 1.");        
         enumKeyValueConfiguration.setExampleValue("2021-03-20");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
         
         assertFalse(enumKeyValueConfiguration.hasDefaultValue());
         assertTrue(enumKeyValueConfiguration.isMandatory());
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
         });
 
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-20");
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-20");
     }
 
     
@@ -93,11 +93,11 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertFalse(enumKeyValueConfiguration.hasDefaultValue());
         assertTrue(enumKeyValueConfiguration.isMandatory());
 
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-21");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-21");
         
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
         });
     }
 
@@ -119,11 +119,11 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertTrue(enumKeyValueConfiguration.hasDefaultValue());
         assertTrue(enumKeyValueConfiguration.isMandatory());
         
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-22");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-22");
         
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
         });
     }
 
@@ -146,9 +146,9 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertTrue(enumKeyValueConfiguration.hasDefaultValue());
         assertFalse(enumKeyValueConfiguration.isMandatory());
 
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-23");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-23");
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
     }
 
     
@@ -169,9 +169,9 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertFalse(enumKeyValueConfiguration.hasDefaultValue());
         assertFalse(enumKeyValueConfiguration.isMandatory());
         
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-24");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-24");
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
     }
 
     
@@ -193,9 +193,9 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertTrue(enumKeyValueConfiguration.hasDefaultValue());
         assertFalse(enumKeyValueConfiguration.isMandatory());
         
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-25");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-25");
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
     }
 
     
@@ -216,9 +216,9 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         assertFalse(enumKeyValueConfiguration.hasDefaultValue());
         assertFalse(enumKeyValueConfiguration.isMandatory());
         
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-03-26");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-03-26");
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "");
     }
 
     
@@ -242,10 +242,10 @@ public class EnumKeyConfigurationValidatorFactoryTest {
 
         enumKeyValueConfiguration.setExampleValue("2021-03-27");
         enumKeyValueConfiguration.setDefaultValue("2021-03-27");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-35-27");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-35-27");
         });
     }
 
@@ -262,8 +262,8 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         enumKeyValueConfiguration.setExampleValue("2021-03-28 ");
         enumKeyValueConfiguration.setKey("com.github.toolarium.9");
         enumKeyValueConfiguration.setDescription("This is a description 9.");
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, " 2021-03-28");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, " 2021-03-28");
     }
 
 
@@ -279,11 +279,11 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         enumKeyValueConfiguration.setDescription("This is a description 10.");
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+            EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
         });
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-35-29");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-35-29");
         });
     }
 
@@ -302,8 +302,8 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         enumKeyValueConfiguration.setDescription("This is a description 11.");
         enumKeyValueConfiguration.setExampleValue("2021-03-30");
 
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, " 2021-03-30");
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, " 2021-03-30");
     }
 
 
@@ -319,11 +319,11 @@ public class EnumKeyConfigurationValidatorFactoryTest {
         enumKeyValueConfiguration.setDescription("This is a description 12.");
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+            EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
         });
 
         Assertions.assertThrows(ValidationException.class, () -> {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, "2021-35-31");
+            EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, "2021-35-31");
         });
     }
 }

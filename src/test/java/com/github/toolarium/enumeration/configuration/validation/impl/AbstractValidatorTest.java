@@ -14,7 +14,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationSizing;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.ExceptionUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.value.impl.AbstractEnumKeyValueConfigurationValueValidator;
@@ -40,6 +40,7 @@ public abstract class AbstractValidatorTest {
     private String[] tooSmallValues; 
     private String[] tooBigValues;
     private boolean runUniqnessTest;
+    private DefaultEnumConfigurationValidator validator;
 
     
     /**
@@ -70,6 +71,7 @@ public abstract class AbstractValidatorTest {
         this.tooSmallValues = tooSmallValues;
         this.tooBigValues = tooBigValues;
         this.runUniqnessTest = runUniqnessTest;
+        this.validator = new DefaultEnumConfigurationValidator();
         
         assertNotNull(validValues);
         assertTrue(validValues.length > 2);
@@ -348,8 +350,8 @@ public abstract class AbstractValidatorTest {
      */
     @Test
     public void testCompare() {
-        assertTrue(EnumKeyConfigurationValidatorFactory.getInstance().getValidator().equals(EnumKeyConfigurationValidatorFactory.getInstance().getValidator()));
-        assertEquals(EnumKeyConfigurationValidatorFactory.getInstance().getValidator().hashCode(), EnumKeyConfigurationValidatorFactory.getInstance().getValidator().hashCode());
+        assertTrue(EnumConfigurationValidatorFactory.getInstance().getStructureValidator().equals(EnumConfigurationValidatorFactory.getInstance().getStructureValidator()));
+        assertEquals(EnumConfigurationValidatorFactory.getInstance().getStructureValidator().hashCode(), EnumConfigurationValidatorFactory.getInstance().getStructureValidator().hashCode());
     }
     
 
@@ -473,7 +475,7 @@ public abstract class AbstractValidatorTest {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
+            validator.validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
         } catch (ValidationException ex) {
             fail(ExceptionUtil.getInstance().prepareExceptionWithStacktraceInMessage(ex));
         }
@@ -530,7 +532,8 @@ public abstract class AbstractValidatorTest {
             EnumKeyValueConfigurationSizing<Integer> cardinality = AnnotationConvertUtil.getInstance().parseCardinality(inputCardinality);
             EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfigurationDataType, minValueSize, maxValueSize);
             
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
+            
+            validator.validate(enumKeyValueConfigurationDataType, cardinality, isUniqueness, valueSize, enumerationValue, input);
             fail("Input [" + input + "], cardinality [" + inputCardinality + "], min: " + minValueSize + ", max: " + maxValueSize);
         } catch (ValidationException ex) {
             // NOP

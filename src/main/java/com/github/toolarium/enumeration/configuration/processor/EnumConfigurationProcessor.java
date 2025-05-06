@@ -12,12 +12,16 @@ import com.github.toolarium.enumeration.configuration.dto.EnumConfigurations;
 import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurationDataType;
 import com.github.toolarium.enumeration.configuration.resource.EnumConfigurationResourceFactory;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
+import com.github.toolarium.enumeration.configuration.util.ClassPathUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.util.ReflectionUtil;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.IEnumConfigurationStructureValidator;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -26,8 +30,10 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
@@ -56,14 +62,25 @@ import javax.tools.StandardLocation;
  */
 @SupportedOptions(value = "enumconfiguration.validate.strict")
 public class EnumConfigurationProcessor extends AbstractProcessor {
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILENAME = "toolarium-enum-configuration-validators.properties";
+
+    /** Defines the input path */
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_PATH = "/META-INF/";
+
+    /** Defines the interface validators file */
+    public static final String TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILE = TOOLARIUM_ENUM_CONFIGURATION_PATH + TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILENAME;
+
     /** Defines the output filename */
     public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME = "toolarium-enum-configuration.json";
+
     /** Defines the output filename */
     public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_PATH = "META-INF/";
+    
     /** Defines the output file path */
     public static final String TOOLARIUM_ENUM_CONFIGURATION_JSON_OUTPUT_FILE = TOOLARIUM_ENUM_CONFIGURATION_JSON_PATH + TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME;
+
     
-    private static final String ENUM_CONFIGURATION = "com.github.toolarium.enumeration.configuration.IEnumConfiguration";
+    
     private List<Class<? extends Annotation>> annoationClassList;
     private List<String> warnList;
     
@@ -72,8 +89,6 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
      * Constructor for EnumConfigurationProcessor
      */
     public EnumConfigurationProcessor() {
-        annoationClassList = Arrays.asList(EnumConfiguration.class, EnumKeyConfiguration.class, EnumKeyValueConfiguration.class);
-        warnList = new ArrayList<String>();
     }
 
     
@@ -99,7 +114,21 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         return SourceVersion.latest();
     }
 
-    
+
+    /**
+     * @see javax.annotation.processing.AbstractProcessor#init(javax.annotation.processing.ProcessingEnvironment)
+     */
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        
+        annoationClassList = Arrays.asList(EnumConfiguration.class, EnumKeyConfiguration.class, EnumKeyValueConfiguration.class);
+        warnList = new ArrayList<String>();
+        
+        initializeInterfaceValidators(processingEnv);
+    }
+
+
     /**
      * @see javax.annotation.processing.AbstractProcessor#process(java.util.Set, javax.annotation.processing.RoundEnvironment)
      */
@@ -138,7 +167,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                         warnList.add(fullQualifiedName);
                     }
                 } else { 
-                    com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = processEnumKeyConfigurationElement(element);
+                    com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = processEnumKeyConfigurationElement(enumConfiguration.getInterfaceList(), element);
                     if (enumKeyConfiguration != null) {
                         enumConfiguration.add(enumKeyConfiguration);
                     }
@@ -159,7 +188,7 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                         warnList.add(fullQualifiedName);
                     }
                 } else { 
-                    com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = processEnumKeyValueConfigurationElement(element);
+                    com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = processEnumKeyValueConfigurationElement(enumConfiguration.getInterfaceList(), element);
                     if (enumKeyValueConfiguration != null) {
                         enumConfiguration.add(enumKeyValueConfiguration);
                     }
@@ -221,21 +250,11 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<T> enumConfiguration = new com.github.toolarium.enumeration.configuration.dto.EnumConfiguration<T>(fullQualifiedName);
         //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found enum configuration element: " + fullQualifiedName);
                 
-        TypeMirror inheritedEnumConfigurationMarkerInterface = processingEnv.getTypeUtils().erasure(processingEnv.getElementUtils().getTypeElement(ENUM_CONFIGURATION).asType());
         for (TypeMirror tm : typeElement.getInterfaces()) {
-            boolean hasInheritedEnumConfigurationMarkerInterface = processingEnv.getTypeUtils().isAssignable(tm, inheritedEnumConfigurationMarkerInterface); 
-            if (hasInheritedEnumConfigurationMarkerInterface) {
-                try {
-                    enumConfiguration.getMarkerInterfaceList().add(((DeclaredType)tm).asElement().toString());
-                } catch (Exception ex) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ex.getMessage());
-                }
-            } else {
-                try {
-                    enumConfiguration.getInterfaceList().add(((DeclaredType)tm).asElement().toString());
-                } catch (Exception ex) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ex.getMessage());
-                }
+            try {
+                enumConfiguration.getInterfaceList().add(((DeclaredType)tm).asElement().toString());
+            } catch (Exception ex) {
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ex.getMessage());
             }
         }
         
@@ -279,10 +298,11 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
     /**
      * Process the enumeration key annotation element
      * 
+     * @param interfaceList the interface list
      * @param element the element
      * @return the created key enumeration configuration
      */
-    private com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration processEnumKeyConfigurationElement(Element element) {
+    private com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration processEnumKeyConfigurationElement(Set<String> interfaceList, Element element) {
         com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration enumKeyConfiguration = new com.github.toolarium.enumeration.configuration.dto.EnumKeyConfiguration();
 
         String enumName = "" + element.getSimpleName();
@@ -326,7 +346,22 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         }
 
         try {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyConfiguration);
+            // validate enum-configuration
+            EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyConfiguration);
+            
+            // validate additional custom interfaces
+            if ((interfaceList != null && !interfaceList.isEmpty())) {
+                for (String interfaceName : interfaceList) {
+                    final IEnumConfigurationStructureValidator validator = EnumConfigurationValidatorFactory.getInstance().getInterfaceStructureValidator(interfaceName);
+                    if (validator != null) {
+                        try {
+                            validator.validate(enumKeyConfiguration);
+                        } catch (ValidationException ex) {
+                            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + ex.getMessage());
+                        }
+                    }
+                }
+            }
         } catch (ValidationException ex) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + ex.getMessage());
         }
@@ -339,10 +374,11 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
     /**
      * Process the enumeration key / value annotation element
      * 
+     * @param interfaceList the interface list
      * @param element the element
      * @return the created enumeration key value configuration
      */
-    private com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration processEnumKeyValueConfigurationElement(Element element) {
+    private com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration processEnumKeyValueConfigurationElement(Set<String> interfaceList, Element element) {
         com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration enumKeyValueConfiguration = new com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfiguration();
         enumKeyValueConfiguration.setDataType(EnumKeyValueConfigurationDataType.STRING);
 
@@ -436,14 +472,32 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         try {
             enumKeyValueConfiguration.setValueSize(EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), minValueSize, maxValueSize));
         } catch (Exception ex) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "" + ex.getMessage() + " Please check the annotation of " + fullQualifiedName + ".");
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + "" + ex.getMessage());
         }
 
         try {
-            EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+            // validate enum-configuration
+            EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
+
+            // validate additional custom interfaces
+            if ((interfaceList != null && !interfaceList.isEmpty())) {
+                for (String interfaceName : interfaceList) {
+                    //processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, ">>> Validate: " + fullQualifiedName + "/" + interfaceName);
+                    
+                    final IEnumConfigurationStructureValidator validator = EnumConfigurationValidatorFactory.getInstance().getInterfaceStructureValidator(interfaceName);
+                    if (validator != null) {
+                        try { 
+                            validator.validate(enumKeyValueConfiguration);
+                        } catch (ValidationException ex) {
+                            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + ex.getMessage());
+                        }
+                    }
+                }
+            }
         } catch (ValidationException ex) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Please check the annotation of " + fullQualifiedName + ": \n" + ex.getMessage());
         }
+            
         
         //processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found enum value configuration: " + enumKeyValueConfiguration);
         return enumKeyValueConfiguration;
@@ -481,6 +535,45 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
         return ormStream;
     }            
      */
+
+
+    /**
+     *Initialize the interface validators
+     *
+     * @param processingEnv environment to access facilities the tool framework provides to the processor
+     */
+    private void initializeInterfaceValidators(ProcessingEnvironment processingEnv) {
+        //processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Check found configuration:");
+        try (InputStream inputStream = EnumConfigurationProcessor.class.getResourceAsStream(TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILE)) {
+            if (inputStream != null) {
+                Properties prop = new Properties();
+                prop.load(inputStream);
+                //processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Found configuration:" + prop);
+                prop.entrySet().forEach(entry -> {
+                    if (entry.getValue() != null && !entry.getValue().toString().trim().isEmpty()) {
+                        final List<Class<?>> classes = ClassPathUtil.getInstance().search("" + entry.getValue().toString().trim(), true);
+                        if (classes != null && !classes.isEmpty()) {
+                            for (Class<?> clazz : classes) {
+                                try {
+                                    //processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Found interface:" + entry.getValue().toString().trim());
+                                    final IEnumConfigurationStructureValidator validator = (IEnumConfigurationStructureValidator)ReflectionUtil.getInstance().newInstance(clazz);
+                                    EnumConfigurationValidatorFactory.getInstance().setInterfaceStructureValidator(entry.getKey().toString().trim(), validator);
+                                } catch (Exception e) {
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Invalid configuration of " + entry.getKey() + " in configuration file "
+                                                                                                        + TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILE + ". The class " + entry.getValue() + " can't be initialized: " + e.getMessage());
+                                }
+                            }
+                        } else {
+                            processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Invalid configuration of " + entry.getKey() + " in configuration file "
+                                                                                              + TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILE + ". The class " + entry.getValue() + " can't be found in class path!");
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Could not load the EnumConfiguration configuration file " + TOOLARIUM_ENUM_CONFIGURATION_INTERFACE_VALIDATORS_FILE + ": " + e.getMessage());
+        }
+    }
 }
 
 

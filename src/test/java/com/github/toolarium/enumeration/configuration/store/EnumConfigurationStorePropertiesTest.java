@@ -8,7 +8,6 @@ package com.github.toolarium.enumeration.configuration.store;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;
@@ -185,7 +184,7 @@ public class EnumConfigurationStorePropertiesTest {
 
     
     @EnumConfiguration(description = "The description")
-    public enum MyConfigTest implements IEnumConfiguration {
+    public enum MyConfigTest {
         @EnumKeyValueConfiguration(description =  "First description.", dataType = DataType.NUMBER, defaultValue = "11", exampleValue = "42")
         FIRST,
         

@@ -10,7 +10,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration.DataType;
@@ -623,7 +622,7 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
 
 
     @EnumConfiguration(description = "The description")
-    public enum SimpleConfigTest implements IEnumConfiguration {
+    public enum SimpleConfigTest {
         @EnumKeyValueConfiguration(description =  "First description.", dataType = DataType.NUMBER, defaultValue = "11", exampleValue = "42")
         FIRST,
         

@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.github.toolarium.enumeration.configuration.IEnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyConfiguration;
 import com.github.toolarium.enumeration.configuration.annotation.EnumKeyValueConfiguration;
@@ -116,7 +115,7 @@ public class AnnotationConvertUtilTest {
     
        
     @EnumConfiguration(description = "The description")
-    public enum MyConfigTest implements IEnumConfiguration {
+    public enum MyConfigTest {
         @EnumKeyValueConfiguration(description =  "First", defaultValue = "11", exampleValue = "42")
         FIRST,
         

@@ -109,19 +109,13 @@ public class EnumConfigurations implements Serializable {
     /**
      * Get interfaces used by the enumeration configuration
      * 
-     * @param selectMarkerInterface true to select the marker interfaces; otherwise the interfaces
      * @return the interface list
      */
-    public Set<String> getEnumConfigurationInterfaceList(boolean selectMarkerInterface) {
+    public Set<String> getEnumConfigurationInterfaceList() {
         Set<String> result = new TreeSet<String>();
         for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
             if (e.getValue() != null && e.getValue().getInterfaceList() != null) {
-                Set<String> list;
-                if (selectMarkerInterface) {
-                    list = e.getValue().getMarkerInterfaceList();
-                } else {
-                    list = e.getValue().getInterfaceList();
-                }
+                Set<String> list = e.getValue().getInterfaceList();
                 for (String interfaceName : list) {
                     if (!result.contains(interfaceName)) {
                         result.add(interfaceName);
@@ -190,7 +184,6 @@ public class EnumConfigurations implements Serializable {
                 enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
                 enumConfigurationToAdd.setName(e.getValue().getName());
                 enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
-                enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
                 enumConfigurationToAdd.setKeyList(enumKeyConfigurationList);
                 result.add(enumConfigurationToAdd);
             }
@@ -218,7 +211,6 @@ public class EnumConfigurations implements Serializable {
                 enumConfigurationToAdd.setValidTill(e.getValue().getValidTill());
                 enumConfigurationToAdd.setName(e.getValue().getName());
                 enumConfigurationToAdd.setInterfaceList(e.getValue().getInterfaceList());
-                enumConfigurationToAdd.setMarkerInterfaceList(e.getValue().getMarkerInterfaceList());
                 enumConfigurationToAdd.setKeyList(enumKeyConfigurationList);
                 result.add(enumConfigurationToAdd);
             }
@@ -232,14 +224,13 @@ public class EnumConfigurations implements Serializable {
      * Returns a list of enumeration configuration which implementing the interfaces.
      *
      * @param interfacesToCompare the interfaces to compare
-     * @param compareMarkerInterface true to compare the marker interfaces; otherwise the interfaces
      * @return the enumeration configuration which are implementing the defined interfaces
      */
-    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> selectEnumConfigurationByInterfaceList(Set<String> interfacesToCompare, boolean compareMarkerInterface) {
+    public Set<EnumConfiguration<? extends EnumKeyConfiguration>> selectEnumConfigurationByInterfaceList(Set<String> interfacesToCompare) {
         Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<>();
         
         for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
-            if (e.getValue().matchInterfaces(interfacesToCompare, compareMarkerInterface)) {
+            if (e.getValue().matchInterfaces(interfacesToCompare)) {
                 result.add(e.getValue());
             }
         }

@@ -87,6 +87,6 @@ public class EnumKeyValueConfigurationsTest {
         Assert.assertNull(enumConfiguration.getName());
         Assert.assertTrue(enumConfiguration.getKeyList().isEmpty());
         Assert.assertTrue(enumConfiguration.getInterfaceList().isEmpty());
-        Assert.assertTrue(enumConfiguration.getMarkerInterfaceList().isEmpty());
+        Assert.assertNull(enumConfiguration.getMarkerInterfaceList());
     }
 }

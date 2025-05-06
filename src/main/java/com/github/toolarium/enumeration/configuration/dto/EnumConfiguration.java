@@ -38,6 +38,8 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
 
     private Map<String, T> keyList;
     private Set<String> interfaceList;
+    
+    @JsonInclude(Include.NON_NULL)
     private Set<String> markerInterfaceList;
 
     
@@ -50,7 +52,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
         tag = null;
         keyList = new LinkedHashMap<String, T>();
         interfaceList = new LinkedHashSet<String>();
-        markerInterfaceList = new LinkedHashSet<String>();
+        markerInterfaceList = null;
     }
 
     
@@ -256,16 +258,10 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
      * Check if interfaces matching 
      *
      * @param interfacesToCompare the interfaces to compare
-     * @param compareMarkerInterface true to compare the marker interfaces; otherwise the interfaces
      * @return true if they are matching or not
      */
-    public boolean matchInterfaces(Set<String> interfacesToCompare, boolean compareMarkerInterface) {
-        // check empty interface to search
-        if (compareMarkerInterface) {
-            return listEqualsIgnoreOrder(markerInterfaceList, interfacesToCompare);
-        } else {
-            return listEqualsIgnoreOrder(interfaceList, interfacesToCompare);
-        }
+    public boolean matchInterfaces(Set<String> interfacesToCompare) {
+        return listEqualsIgnoreOrder(interfaceList, interfacesToCompare);
     }
 
     
@@ -294,11 +290,6 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
         result = prime * result;
         if (interfaceList != null) {
             result += interfaceList.hashCode();
-        }
-
-        result = prime * result;
-        if (markerInterfaceList != null) {
-            result += markerInterfaceList.hashCode();
         }
 
         return result;
@@ -356,78 +347,7 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
             return false;
         }
 
-        if (markerInterfaceList == null) {
-            if (other.markerInterfaceList != null) {
-                return false;
-            }
-        } else if (!markerInterfaceList.equals(other.markerInterfaceList)) {
-            return false;
-        }
-
         return true;
-    }
-
-    
-    /**
-     * Check if the enum configuration is compliant with another. 
-     *
-     * @param o the 
-     * @return true if it is compliant
-     */
-    public EnumConfigurationComplianceResult isCompliant(EnumConfiguration<T> o) {
-        EnumConfigurationComplianceResult result = super.isCompliant(o);
-        if (!result.isValid()) {
-            return result;
-        }
-
-        if (!name.equals(o.getName())) {
-            return new EnumConfigurationComplianceResult("Incompliant name: " + name + " -> " + o.getName() + "!");
-        }
-
-        if (!tag.equals(o.getTag())) {
-            return new EnumConfigurationComplianceResult("Incompliant tag: " + tag + " -> " + o.getTag() + "!");
-        }
-
-        if (o.keyList != null) {
-            for (Map.Entry<String, T> e : o.keyList.entrySet()) {
-                T value = keyList.get(e.getKey());
-                if (value == null) {
-                    return new EnumConfigurationComplianceResult("Incompliant tag: " + tag + " -> " + o.getTag() + "!");
-                }
-                
-                if (EnumKeyValueConfiguration.class.isInstance(value)) {
-                    if (EnumKeyValueConfiguration.class.isInstance(e.getValue())) {
-                        result = value.isCompliant(((EnumKeyValueConfiguration)e.getValue()));
-                    } else {
-                        result = value.isCompliant(e.getValue());
-                    }
-                } else {
-                    result = value.isCompliant(e.getValue());
-                }
-
-                if (!result.isValid()) {
-                    return result;
-                }
-            }
-        }
-        
-        if (o.getInterfaceList() != null) {
-            for (String interfaceName : o.getInterfaceList()) {
-                if (!interfaceList.contains(interfaceName)) {
-                    return new EnumConfigurationComplianceResult("Missing interface: " + interfaceName + "!");
-                }
-            }
-        }
-        
-        if (o.getMarkerInterfaceList() != null) {
-            for (String markerInterfaceName : o.getMarkerInterfaceList()) {
-                if (!markerInterfaceList.contains(markerInterfaceName)) {
-                    return new EnumConfigurationComplianceResult("Missing marker interface: " + markerInterfaceName + "!");
-                }
-            }
-        }
-
-        return result;
     }
 
 
@@ -443,7 +363,6 @@ public class EnumConfiguration<T extends EnumKeyConfiguration> extends AbstractE
                + ", validTill=" + getValidTill() 
                + ", keyList=" + getKeyList()
                + ", interfaceList=" + getInterfaceList()
-               + ", markerInterfaceList=" + getMarkerInterfaceList()
                + "]";
     }
 

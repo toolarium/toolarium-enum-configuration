@@ -16,7 +16,7 @@ import com.github.toolarium.enumeration.configuration.dto.EnumKeyValueConfigurat
 import com.github.toolarium.enumeration.configuration.processor.EnumConfigurationProcessor;
 import com.github.toolarium.enumeration.configuration.util.AnnotationConvertUtil;
 import com.github.toolarium.enumeration.configuration.util.DateUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import com.github.toolarium.enumeration.configuration.validation.value.EnumKeyValueConfigurationValueValidatorFactory;
 import java.io.ByteArrayInputStream;
@@ -268,13 +268,11 @@ public class EnumConfigurationResourceFactoryTest {
         e.add(ec3);
         Assert.assertEquals(e, writeAndRead(e));
 
-        assertEquals("[this.is.my.interface, this.is.my.second.interface]", e.getEnumConfigurationInterfaceList(false).toString());
-        assertEquals("[this.is.my.markerinterface, this.is.my.second.markerinterface]", e.getEnumConfigurationInterfaceList(true).toString());
+        assertEquals("[this.is.my.interface, this.is.my.second.interface]", e.getEnumConfigurationInterfaceList().toString());
+        //assertEquals("[this.is.my.markerinterface, this.is.my.second.markerinterface]", e.getEnumConfigurationInterfaceList(true).toString());
 
-        assertEquals("[myName1, myName2]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceA), false).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
-        assertEquals("[myName1, myName2]", e.selectEnumConfigurationByInterfaceList(Set.of(markerInterfaceA), true).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
-        assertEquals("[myName3]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceB), false).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
-        assertEquals("[myName3]", e.selectEnumConfigurationByInterfaceList(Set.of(markerInterfaceB), true).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
+        assertEquals("[myName1, myName2]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceA)).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
+        assertEquals("[myName3]", e.selectEnumConfigurationByInterfaceList(Set.of(interfaceB)).stream().map(p -> p.getName()).collect(Collectors.toList()).toString());
         
         String testPath = "build";
         File file = Paths.get(testPath, EnumConfigurationProcessor.TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME).toFile();
@@ -308,7 +306,7 @@ public class EnumConfigurationResourceFactoryTest {
         //EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Long>(0L, 10L); // define long value
         EnumKeyValueConfigurationSizing<?> valueSize = EnumKeyValueConfigurationValueValidatorFactory.getInstance().createEnumKeyValueConfigurationSizing(enumKeyValueConfiguration.getDataType(), "0", "10"); 
         enumKeyValueConfiguration.setValueSize(valueSize);
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
 
         // persiste and store 
         EnumConfiguration<EnumKeyValueConfiguration> enumConfiguration = new EnumConfiguration<EnumKeyValueConfiguration>("sample");
@@ -328,7 +326,7 @@ public class EnumConfigurationResourceFactoryTest {
         //EnumKeyValueConfigurationSizing<Long> restoredValueSize = (EnumKeyValueConfigurationSizing<Long>)restoredEnumKeyValueConfiguration.getValueSize();
         // differences: integer
         //assertEquals(valueSize.getMaxSize().getClass(), restoredValueSize.getMaxSize().getClass());
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(restoredEnumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(restoredEnumKeyValueConfiguration);
     }
 
     
@@ -355,7 +353,7 @@ public class EnumConfigurationResourceFactoryTest {
         EnumKeyValueConfigurationSizing<?> valueSize = new EnumKeyValueConfigurationSizing<Integer>(0, 10); //define Integer value
         enumKeyValueConfiguration.setValueSize(valueSize);
 
-        EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration);
+        EnumConfigurationValidatorFactory.getInstance().getStructureValidator().validate(enumKeyValueConfiguration);
     }
 
     
@@ -402,6 +400,105 @@ public class EnumConfigurationResourceFactoryTest {
         e2 = EnumConfigurationResourceFactory.getInstance().load(new ByteArrayInputStream(outputstream.toByteArray()));
         Assert.assertEquals(e, e2);
         Assert.assertEquals(tag, e2.getEnumConfigurationList().iterator().next().getTag());
+    }
+
+    
+    /**
+     * Test empty enum configurations
+     * 
+     * @throws IOException in case of an error
+     */
+    @Test
+    public void testComplianceWithAndWithoutMarkerInterface() throws IOException {
+        Instant now = Instant.now();
+        
+        String interfaceA = "this.is.my.interface";
+        String markerInterfaceA = "this.is.my.markerinterface";
+        EnumConfiguration<? super EnumKeyConfiguration> ec1 = new EnumConfiguration<>("myName1");
+        ec1.setDescription("My description 1");
+        ec1.setInterfaceList(Set.of(interfaceA));
+        ec1.setMarkerInterfaceList(Set.of(markerInterfaceA));
+        ec1.setValidFrom(now.minus(24, ChronoUnit.HOURS));
+        ec1.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration1 = create("myKey1", true, "My key 1 description", null, "example value 1", OPTIONAL_CARDINALITY, now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration1);
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration2 = create("myKey2", true, "My key 2 description", "default value 2", "example value 2", OPTIONAL_CARDINALITY, 
+                now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration2);
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration3 = create("myKey3", false, "My key 3 description", "default value 3", "example value 3", null, now.plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration3);
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration4 = create("myKey4", false, "My key 4 description", null, "example value 4", null, now.plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyValueConfiguration4);
+
+        EnumKeyConfiguration enumKeyConfiguration1 = create("myKeyOnly", false, "My key only description", now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec1.add(enumKeyConfiguration1);
+
+        EnumConfigurations e1 = new EnumConfigurations();
+        e1.add(ec1);
+        
+        //
+        String interfaceB = "this.is.my.second.interface";
+        String markerInterfaceB = "this.is.my.second.markerinterface";
+        EnumConfiguration<? super EnumKeyConfiguration> ec2 = new EnumConfiguration<>("myName2");
+        ec2.setDescription("My description 2");
+        ec2.setInterfaceList(Set.of(interfaceB));
+        ec2.setMarkerInterfaceList(Set.of(markerInterfaceB));
+        ec2.setValidFrom(now.minus(48, ChronoUnit.HOURS));
+        ec2.setValidTill(DateUtil.MAX_TIMESTAMP.plus(2, ChronoUnit.HOURS));
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration5 = create("myKey5", true, "My key 5 description", null, "example value 5", OPTIONAL_CARDINALITY, now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration5);
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration6 = create("myKey6", true, "My key 6 description", "default value 6", "example value 6", OPTIONAL_CARDINALITY, 
+                now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration6);
+        
+        EnumKeyValueConfiguration enumKeyValueConfiguration7 = create("myKey7", true, "My key 7 description", "default value 7", "example value 7", null, now.plus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.minus(24, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration7);
+
+        EnumKeyValueConfiguration enumKeyValueConfiguration8 = create("myKey8", true, "My key 8 description", null, "example value 8", null, now.minus(24, ChronoUnit.HOURS), DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec2.add(enumKeyValueConfiguration8);
+        
+        e1.add(ec2);
+        EnumConfigurations e2 = writeAndRead(e1);
+        assertEquals(e1, e2);
+        
+        //ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+        //EnumConfigurationResourceFactory.getInstance().store(e2, outputstream);
+        //println("==>"+ new String(outputstream.toByteArray()));
+        
+        EnumConfiguration<? super EnumKeyConfiguration> ec3 = new EnumConfiguration<>("myName1");
+        ec3.setDescription("My description 1");
+        ec3.setInterfaceList(Set.of(interfaceA));
+        ec3.setValidFrom(now.minus(24, ChronoUnit.HOURS));
+        ec3.setValidTill(DateUtil.MAX_TIMESTAMP.plus(1, ChronoUnit.HOURS));
+        ec3.add(enumKeyValueConfiguration1);
+        ec3.add(enumKeyValueConfiguration2);
+        ec3.add(enumKeyValueConfiguration3);
+        ec3.add(enumKeyValueConfiguration4);
+        ec3.add(enumKeyConfiguration1);
+
+        EnumConfigurations e3 = new EnumConfigurations();
+        e3.add(ec3);
+        
+        //
+        EnumConfiguration<? super EnumKeyConfiguration> ec4 = new EnumConfiguration<>("myName2");
+        ec4.setDescription("My description 2");
+        ec4.setInterfaceList(Set.of(interfaceB));
+        ec4.setValidFrom(now.minus(48, ChronoUnit.HOURS));
+        ec4.setValidTill(DateUtil.MAX_TIMESTAMP.plus(2, ChronoUnit.HOURS));
+        ec4.add(enumKeyValueConfiguration5);
+        ec4.add(enumKeyValueConfiguration6);
+        ec4.add(enumKeyValueConfiguration7);
+        ec4.add(enumKeyValueConfiguration8);
+        
+        e3.add(ec4);
+        
+        assertEquals(e2, e3);
     }
 
     

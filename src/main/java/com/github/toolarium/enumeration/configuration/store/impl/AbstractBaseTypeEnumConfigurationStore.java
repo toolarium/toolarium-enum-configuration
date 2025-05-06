@@ -10,7 +10,7 @@ import com.github.toolarium.enumeration.configuration.dto.SortedProperties;
 import com.github.toolarium.enumeration.configuration.store.IEnumConfigurationValue;
 import com.github.toolarium.enumeration.configuration.store.exception.EnumConfigurationStoreException;
 import com.github.toolarium.enumeration.configuration.util.EnumUtil;
-import com.github.toolarium.enumeration.configuration.validation.EnumKeyConfigurationValidatorFactory;
+import com.github.toolarium.enumeration.configuration.validation.EnumConfigurationValidatorFactory;
 import com.github.toolarium.enumeration.configuration.validation.ValidationException;
 import java.util.Collection;
 import java.util.Map;
@@ -218,7 +218,7 @@ public abstract class AbstractBaseTypeEnumConfigurationStore extends AbstractBas
 
         try {
             EnumKeyValueConfiguration enumKeyValueConfiguration = getEnumKeyValueConfiguration(configurationKey);
-            Collection<D> valueList = EnumKeyConfigurationValidatorFactory.getInstance().getValidator().validate(enumKeyValueConfiguration, value);
+            Collection<D> valueList = EnumConfigurationValidatorFactory.getInstance().getValueValidator().validate(enumKeyValueConfiguration, value);
             return prepareResult(value, valueList);
         } catch (ValidationException ex) {
             String msg = "Invalid configuration found for key [" + configurationKeyName + "]: " + ex.getMessage();

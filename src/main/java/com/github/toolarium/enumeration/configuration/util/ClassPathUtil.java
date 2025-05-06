@@ -129,18 +129,20 @@ public final class ClassPathUtil {
      * @param classLoaders the class loaders
      * @return the read directories
      */
-    private List<String> selectResourcesFromClassLoader(String packageName, ClassLoader... classLoaders) {
+    public List<String> selectResourcesFromClassLoader(String packageName, ClassLoader... classLoaders) {
         List<String> dirs = new ArrayList<String>();
 
         for (ClassLoader cl : classLoaders) {
-            try {
-                Enumeration<URL> resources = cl.getResources(packageName.replace('.', '/'));
-                while (resources.hasMoreElements()) {
-                    URL resource = resources.nextElement();
-                    dirs.add(resource.getFile());
+            if (cl != null) {
+                try {
+                    Enumeration<URL> resources = cl.getResources(packageName.replace('.', '/'));
+                    while (resources.hasMoreElements()) {
+                        URL resource = resources.nextElement();
+                        dirs.add(resource.getFile());
+                    }
+                } catch (IOException e) {
+                    LOG.warn("Could not read path: " + packageName + ": " + e.getMessage());
                 }
-            } catch (IOException e) {
-                LOG.warn("Could not read path: " + packageName + ": " + e.getMessage());
             }
         }
         

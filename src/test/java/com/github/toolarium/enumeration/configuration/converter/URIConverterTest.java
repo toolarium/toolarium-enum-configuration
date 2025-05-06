@@ -39,7 +39,7 @@ public class URIConverterTest extends AbstractStringTypeConverterTest {
         } catch (URISyntaxException e) {
             Assert.fail();
         }
-        assertException("Invalid value [httds://www.sbb.ch\\d], it can not be converted into a URI data type: Illegal character in authority at index 8: httds://www.sbb.ch\\d.", "httds://www.sbb.ch\\d");
+        assertException("Invalid value [httds://www.sbb.ch\\d], it can not be converted into a URI data type: Illegal character in authority at index 18: httds://www.sbb.ch\\d.", "httds://www.sbb.ch\\d");
         
     }
 }
