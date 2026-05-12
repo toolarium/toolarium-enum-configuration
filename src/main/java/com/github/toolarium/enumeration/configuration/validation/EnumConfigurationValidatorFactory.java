@@ -26,7 +26,7 @@ public final class EnumConfigurationValidatorFactory {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final EnumConfigurationValidatorFactory INSTANCE = new EnumConfigurationValidatorFactory();
     }
 

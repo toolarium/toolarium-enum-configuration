@@ -27,7 +27,7 @@ public final class DateUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final DateUtil INSTANCE = new DateUtil();
     }
 

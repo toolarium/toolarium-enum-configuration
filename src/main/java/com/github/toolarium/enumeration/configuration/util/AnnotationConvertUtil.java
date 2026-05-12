@@ -29,7 +29,7 @@ public final class AnnotationConvertUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final AnnotationConvertUtil INSTANCE = new AnnotationConvertUtil();
     }
 

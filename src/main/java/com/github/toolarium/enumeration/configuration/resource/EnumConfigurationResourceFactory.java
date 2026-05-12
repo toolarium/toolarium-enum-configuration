@@ -27,7 +27,7 @@ public final class EnumConfigurationResourceFactory {
     /**
      * Private class, the only instance of the singleton which will be created by accessing the holder class.
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final EnumConfigurationResourceFactory INSTANCE = new EnumConfigurationResourceFactory();
     }
 

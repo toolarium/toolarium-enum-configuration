@@ -36,7 +36,7 @@ public final class JavaFileObjectUtil {
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final JavaFileObjectUtil INSTANCE = new JavaFileObjectUtil();
     }
 

@@ -75,7 +75,7 @@ public @interface EnumKeyValueConfiguration {
         CERTIFICATE,
         
         /**
-         * <p>A binary content which represents as example an entire file, format: <code>[name]|[timestamp]|{mime-type}[content base64 encoded].</code></p>
+         * A binary content which represents as example an entire file, format: <code>[name]|[timestamp]|{mime-type}[content base64 encoded].</code>
          * 
          * <p>The name, timestamp (according to RFC 3339), mime-type and the content  (base64 encoded content) are optional values. If the name, timestamp or content are present, 
          * they must be separated by a pipe character (|). The mime-type can be declared as header of the content. If there is no pipe character it's assumed its the content part.</p>
@@ -164,18 +164,17 @@ public @interface EnumKeyValueConfiguration {
     
     
     /**
-     * <p>The cardinality expression for an entry. If there is more than one element, the content of the representation corresponds to a
+     * The cardinality expression for an entry. If there is more than one element, the content of the representation corresponds to a
      * JSON array, e.g. <code>[ "My string array", "with 3", "elements (cardinality = 3)" ]</code>. This means the cardinality can be 
-     * combined with the different data types.</p>
-     * 
+     * combined with the different data types.
+     *
      * <p>The cardinality is defined as a range: <code>[min]..[max]</code>:
-     * <ul> 
+     * <ul>
      * <li>If the cardinality is empty (=blank string), it must be interpreted as <code>1..1</code> (min = 1 and max = 1).</li>
      * <li>The min value is optional and can be ignored, e.g. <code>5</code> (this corresponds to <code>1..5</code>)</li>
      * <li>If the max has no limit it can be defined as <code>*</code> or <code>1..*</code></li>
      * <li>If the max has no limit and its optional it can be defined as <code>0..*</code></li>
      * </ul>
-     * </p>
      * @return The cardinality expression.
      */
     String cardinality() default "1..1";

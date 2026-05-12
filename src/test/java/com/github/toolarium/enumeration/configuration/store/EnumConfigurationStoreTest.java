@@ -52,6 +52,7 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
     private static final String PORT   = "com.github.toolarium.enumeration.configuration.store.enumconfigurationstoretest$simpleconfigtest#port";
     private static final String VALUEF = "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#value_f";
     private static final String DELAY_PRECISION_A = "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#delay_precision_a";    
+    private static final String WORKING_DAYS = "com.github.toolarium.enumeration.configuration.processor.myenumconfiguration#working_days";    
     
     
     /**
@@ -620,6 +621,30 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         assertEquals("[101]", value.getValueList().toString());
     }
 
+    
+    /**
+     * Test number
+     */
+    @Test
+    public void weekDays() {
+        IEnumConfigurationStore configurationStore = new PropertiesEnumConfigurationStore();
+
+        // readConfigurationValue(String configurationKey)
+        IEnumConfigurationValue<String> workingDays = configurationStore.readConfigurationValue(SimpleConfigTest.WORKING_DAYS);
+        assertEquals("WEDNESDAY", workingDays.getValue());
+        assertEquals("MONDAY", workingDays.getValue());
+        assertEquals("THURSDAY", workingDays.getValue());
+        assertEquals("TUESDAY", workingDays.getValue());
+        assertEquals("FRIDAY", workingDays.getValue());
+        
+        assertNull(configurationStore.readConfigurationValueIgnoreDefault(SimpleConfigTest.WORKING_DAYS));
+
+        IEnumConfigurationValue<String> value = configurationStore.readConfigurationValue(SimpleConfigTest.WORKING_DAYS);
+        assertNotNull(value);
+        assertEquals("[\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"]", value.toString());
+        assertEquals("[WEDNESDAY, MONDAY, THURSDAY, TUESDAY, FRIDAY]", value.getValueList().toString());
+    }
+
 
     @EnumConfiguration(description = "The description")
     public enum SimpleConfigTest {
@@ -645,6 +670,10 @@ public class EnumConfigurationStoreTest extends AbstractEnumConfigurationStoreTe
         EMPTY_STRING_WITH_DEFAULT,
 
         @EnumKeyValueConfiguration(description =  "Hostname description.", defaultValue = "hostname", exampleValue = "second host")
-        HOSTNAME;
+        HOSTNAME,
+        
+        @EnumKeyValueConfiguration(description =  "Working hours.", defaultValue = "[\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"]", exampleValue = "[\"MONDAY\", \"TUESDAY\"]", cardinality = "0..*", isUniqueness = true, 
+                                   enumerationValue = "MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY")
+        WORKING_DAYS;
     }
 }

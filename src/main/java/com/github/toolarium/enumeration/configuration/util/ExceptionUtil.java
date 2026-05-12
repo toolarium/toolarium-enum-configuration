@@ -21,7 +21,7 @@ public final class ExceptionUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final ExceptionUtil INSTANCE = new ExceptionUtil();
     }
 

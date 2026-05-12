@@ -29,7 +29,7 @@ public final class ClassPathUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final ClassPathUtil INSTANCE = new ClassPathUtil();
     }
 
