@@ -66,7 +66,21 @@ public class BinaryEnumKeyValueConfigurationValueValidator extends AbstractEnumK
 
         Long length = 0L;
         try {
-            final byte[] decodedBytes = Base64.getDecoder().decode(inputBinaryObject.getData().trim());
+            String base64Data = inputBinaryObject.getData().trim();
+            // Estimate decoded size before allocating memory to prevent memory exhaustion
+            int padding = 0;
+            if (base64Data.endsWith("==")) {
+                padding = 2;
+            } else if (base64Data.endsWith("=")) {
+                padding = 1;
+            }
+            long estimatedSize = (base64Data.length() * 3L) / 4 - padding;
+            if (minMaxValue.getMax() != null && estimatedSize > minMaxValue.getMax().longValue()) {
+                throw new ValidationException("Too big: estimated decoded size (" + estimatedSize
+                    + ") exceeds maximum [" + valueSize.getMaxSizeAsString() + "]!", inputValue, inputBinaryObject);
+            }
+
+            final byte[] decodedBytes = Base64.getDecoder().decode(base64Data);
             if (decodedBytes != null) {
                 length = Long.valueOf(decodedBytes.length);
             }

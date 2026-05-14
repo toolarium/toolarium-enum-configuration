@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -87,7 +88,13 @@ public final class EnumConfigurationResourceFactory {
             fileName = EnumConfigurationProcessor.TOOLARIUM_ENUM_CONFIGURATION_JSON_FILENAME;
         }
         
-        try (InputStream stream = new FileInputStream(Paths.get(filePath, fileName).toFile())) {
+        Path basePath = Paths.get(filePath).normalize();
+        Path resolved = Paths.get(filePath, fileName).normalize();
+        if (!resolved.startsWith(basePath)) {
+            throw new IOException("Invalid file path: path traversal detected.");
+        }
+
+        try (InputStream stream = new FileInputStream(resolved.toFile())) {
             return load(stream);
         }
     }

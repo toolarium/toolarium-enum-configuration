@@ -73,11 +73,8 @@ public final class EnumUtil {
             return enumKeyConfiguration;
             
         } catch (Exception ex) {
-            // NOP
-            IllegalArgumentException ie = new IllegalArgumentException("Could not find annotation: " + ex.getMessage());
-            ie.setStackTrace(ex.getStackTrace());
-            throw ie;
-        } 
+            throw new IllegalArgumentException("Could not find annotation: " + ex.getMessage(), ex);
+        }
     }
 
     
@@ -110,10 +107,8 @@ public final class EnumUtil {
             return enumKeyValueConfiguration;
             
         } catch (Exception ex) {
-            IllegalArgumentException ie = new IllegalArgumentException("Could not find annotation: " + ex.getMessage());
-            ie.setStackTrace(ex.getStackTrace());
-            throw ie;
-        } 
+            throw new IllegalArgumentException("Could not find annotation: " + ex.getMessage(), ex);
+        }
     }
 
         

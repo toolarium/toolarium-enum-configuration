@@ -5,7 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [ 1.3.1 ] - 2025-05-06
+## [ 1.3.1 ] - 2026-05-14
+### Changed
+- Updated dependencies.
+
+### Fixed
+- Added ReDoS protection in regex validation with max length and nested quantifier detection.
+- Added interface type check before class instantiation in EnumConfigurationProcessor.
+- Fixed numeric size comparison in EnumKeyValueConfigurationSizing using Long instead of lexicographic String comparison.
+- Fixed Base64 decoded size estimation to account for padding in BinaryEnumKeyValueConfigurationValueValidator.
+- Fixed email validation to reject multiple @ signs, empty local or domain parts.
+- Added cron field character validation with compiled pattern.
+- Added path traversal protection in EnumConfigurationResourceFactory.
+- Fixed null propagation in EnumKeyValueConfigurationSizing setters creating "null" strings.
+- Fixed equals symmetry for null/blank data in EnumKeyValueConfigurationBinaryObject.
+- Added null guard in EnumKeyValueConfigurationBinaryObject.merge().
+- Added null guard for directory.listFiles() in ClassPathUtil.
+- Fixed exception chaining in EnumUtil to preserve original cause.
+- Added warning log for validator creation failures in EnumKeyValueConfigurationValueValidatorFactory.
+- Made enumConfigurationKeyResolver field volatile in AbstractBaseEnumConfigurationStore.
+- Used explicit UTF-8 charset in JSONUtil.
+
+### Added
+- Added classpath search result caching in ClassPathUtil.
+- Added validator instance caching per data type in EnumKeyValueConfigurationValueValidatorFactory.
+- Added overridable getter methods for patterns in AbstractStringTypeConverter.
 
 ## [ 1.3.0 ] - 2025-05-06
 ### Added

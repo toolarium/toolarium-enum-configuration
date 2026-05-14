@@ -33,7 +33,7 @@ public final class CIDRUtil {
     public static final String IPV6_EXPRESSION = "^((" + IPV6_EXPRESSION_STD + ")|(" + IPV6_EXPRESSION_HEX_COMPRESSED + "))$";
 
     /** Regular expression: ipv4 address range pattern */
-    public static final  String IPV4_RANGE_EXPRESSION = "^([0-9]{1,3}\\.){3}[0-9]{1,3}" + "/([0-9]|[1-2][0-9]|3[0-2])$";
+    public static final  String IPV4_RANGE_EXPRESSION = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" + "/([0-9]|[1-2][0-9]|3[0-2])$";
 
     /** Regular expression: ipv6 address range pattern */
     public static final  String IPV6_RANGE_EXPRESSION = "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}"

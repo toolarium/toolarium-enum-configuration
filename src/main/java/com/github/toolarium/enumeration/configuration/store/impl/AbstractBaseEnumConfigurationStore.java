@@ -37,7 +37,7 @@ public abstract class AbstractBaseEnumConfigurationStore implements IEnumConfigu
     private static final Logger LOG = LoggerFactory.getLogger(AbstractBaseEnumConfigurationStore.class);
     private static final String INVALID_INPUT_CONFIGURATION_KEY_NAME = "Invalid input configuration key name!";
     
-    private IEnumConfigurationKeyResolver enumConfigurationKeyResolver;    
+    private volatile IEnumConfigurationKeyResolver enumConfigurationKeyResolver;
 
     
     /**

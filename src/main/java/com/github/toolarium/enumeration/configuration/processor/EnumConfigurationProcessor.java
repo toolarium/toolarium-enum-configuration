@@ -554,6 +554,11 @@ public class EnumConfigurationProcessor extends AbstractProcessor {
                         final List<Class<?>> classes = ClassPathUtil.getInstance().search("" + entry.getValue().toString().trim(), true);
                         if (classes != null && !classes.isEmpty()) {
                             for (Class<?> clazz : classes) {
+                                if (!IEnumConfigurationStructureValidator.class.isAssignableFrom(clazz)) {
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING,
+                                        "Class " + clazz.getName() + " does not implement IEnumConfigurationStructureValidator, skipping.");
+                                    continue;
+                                }
                                 try {
                                     //processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Found interface:" + entry.getValue().toString().trim());
                                     final IEnumConfigurationStructureValidator validator = (IEnumConfigurationStructureValidator)ReflectionUtil.getInstance().newInstance(clazz);

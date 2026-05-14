@@ -24,6 +24,10 @@ import com.github.toolarium.enumeration.configuration.validation.value.impl.Time
 import com.github.toolarium.enumeration.configuration.validation.value.impl.TimestampEnumKeyValueConfigurationValueValidator;
 import com.github.toolarium.enumeration.configuration.validation.value.impl.URIEnumKeyValueConfigurationValueValidator;
 import com.github.toolarium.enumeration.configuration.validation.value.impl.UUIDEnumKeyValueConfigurationValueValidator;
+import java.util.EnumMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,7 +36,10 @@ import com.github.toolarium.enumeration.configuration.validation.value.impl.UUID
  * @author patrick
  */
 public final class EnumKeyValueConfigurationValueValidatorFactory {
-    
+    private static final Logger LOG = LoggerFactory.getLogger(EnumKeyValueConfigurationValueValidatorFactory.class);
+    private final Map<EnumKeyValueConfigurationDataType, IEnumKeyConfigurationValueValidator<?, ?>> validatorCache =
+            new EnumMap<>(EnumKeyValueConfigurationDataType.class);
+
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
      */
@@ -65,18 +72,29 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
      * @return the resolved type
      */
     public IEnumKeyConfigurationValueValidator<?, ?> createEnumKeyValueConfigurationValueValidator(EnumKeyValueConfigurationDataType dataType, String maxValue) {
+        return validatorCache.computeIfAbsent(dataType, this::newValidator);
+    }
+
+
+    /**
+     * Create a new validator instance for the given data type.
+     *
+     * @param dataType the enum data type
+     * @return the validator instance or null
+     */
+    private IEnumKeyConfigurationValueValidator<?, ?> newValidator(EnumKeyValueConfigurationDataType dataType) {
         try {
             switch (dataType) {
                 case NUMBER:      return new NumberEnumKeyValueConfigurationValueValidator();
-                case DOUBLE:      return new DoubleEnumKeyValueConfigurationValueValidator(); 
-                case BOOLEAN:     return new BooleanEnumKeyValueConfigurationValueValidator(); 
-                case DATE:        return new DateEnumKeyValueConfigurationValueValidator(); 
+                case DOUBLE:      return new DoubleEnumKeyValueConfigurationValueValidator();
+                case BOOLEAN:     return new BooleanEnumKeyValueConfigurationValueValidator();
+                case DATE:        return new DateEnumKeyValueConfigurationValueValidator();
                 case TIME:        return new TimeEnumKeyValueConfigurationValueValidator();
                 case TIMESTAMP:   return new TimestampEnumKeyValueConfigurationValueValidator();
                 case REGEXP:      return new RegExpEnumKeyValueConfigurationValueValidator();
                 case UUID:        return new UUIDEnumKeyValueConfigurationValueValidator();
                 case URI:         return new URIEnumKeyValueConfigurationValueValidator();
-                case CIDR:        return new CIDREnumKeyValueConfigurationValueValidator();                
+                case CIDR:        return new CIDREnumKeyValueConfigurationValueValidator();
                 case EMAIL:       return new EmailEnumKeyValueConfigurationValueValidator();
                 case CRON:        return new CronEnumKeyValueConfigurationValueValidator();
                 case COLOR:       return new ColorEnumKeyValueConfigurationValueValidator();
@@ -87,7 +105,7 @@ public final class EnumKeyValueConfigurationValueValidatorFactory {
                     return new StringEnumKeyValueConfigurationValueValidator();
             }
         } catch (Exception e) {
-            // NOP
+            LOG.warn("Failed to create validator for data type {}: {}", dataType, e.getMessage(), e);
             return null;
         }
     }

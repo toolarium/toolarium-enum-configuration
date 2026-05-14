@@ -66,6 +66,9 @@ public class EnumKeyValueConfigurationBinaryObject implements IEnumKeyValueConfi
      * @param enumKeyValueConfigurationBinaryObject the data to merge
      */
     public void merge(IEnumKeyValueConfigurationBinaryObject enumKeyValueConfigurationBinaryObject) {
+        if (enumKeyValueConfigurationBinaryObject == null) {
+            return;
+        }
 
         if (enumKeyValueConfigurationBinaryObject.getName() != null && !enumKeyValueConfigurationBinaryObject.getName().isBlank()) {
             name = enumKeyValueConfigurationBinaryObject.getName();
@@ -232,11 +235,11 @@ public class EnumKeyValueConfigurationBinaryObject implements IEnumKeyValueConfi
             return false;
         }
         
-        if (data == null) {
-            if (other.getData() != null && !other.getData().isBlank()) {
-                return false;
-            }
-        } else if (!data.equals(other.getData())) {
+        boolean thisDataEmpty = (data == null || data.isBlank());
+        boolean otherDataEmpty = (other.getData() == null || other.getData().isBlank());
+        if (thisDataEmpty != otherDataEmpty) {
+            return false;
+        } else if (!thisDataEmpty && !data.equals(other.getData())) {
             return false;
         }
         return true;

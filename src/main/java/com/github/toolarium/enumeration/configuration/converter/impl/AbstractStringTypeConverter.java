@@ -29,7 +29,11 @@ import java.util.regex.PatternSyntaxException;
  */
 public abstract class AbstractStringTypeConverter implements IStringTypeConverter {
     protected static final String HEX_WEBCOLOR_PATTERN = "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$";
+    protected static final String CRON_FIELD_EXPRESSION = "[0-9*,/\\-?#LWa-zA-Z]+";
+    protected static final String NESTED_QUANTIFIER_EXPRESSION = ".*([+*])\\)([+*?]|\\{\\d).*";
     protected static final Pattern hexWebColorPattern = Pattern.compile(HEX_WEBCOLOR_PATTERN);
+    protected static final Pattern cronFieldPattern = Pattern.compile(CRON_FIELD_EXPRESSION);
+    protected static final Pattern nestedQuantifierPattern = Pattern.compile(NESTED_QUANTIFIER_EXPRESSION);
 
 
     /**
@@ -226,8 +230,18 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
         if (value == null) {
             return null;
         }
-        
-        Pattern.compile(value);        
+
+        // Guard against ReDoS: reject patterns exceeding a reasonable length
+        if (value.length() > getMaxRegExpLength()) {
+            throw new PatternSyntaxException("Pattern too long, maximum length is " + getMaxRegExpLength(), value, -1);
+        }
+
+        // Guard against nested quantifiers that cause catastrophic backtracking
+        if (getNestedQuantifierPattern().matcher(value).matches()) {
+            throw new PatternSyntaxException("Potentially unsafe pattern with nested quantifiers", value, -1);
+        }
+
+        Pattern.compile(value);
         return value;
     }
 
@@ -302,7 +316,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
         }
         
         String[] split = value.split("@");
-        if (split == null || split.length < 2) {
+        if (split.length != 2 || split[0].isEmpty() || split[1].isEmpty()) {
             throw new IllegalArgumentException("Invalid value: [" + input + "].");
         }
 
@@ -327,7 +341,14 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
         if (cronSplit.length < 5) {
             throw new IllegalArgumentException("Invalid cron entry [" + input + "]!");
         }
-        
+
+        // Validate that each field contains only valid cron characters
+        for (String field : cronSplit) {
+            if (!getCronFieldPattern().matcher(field).matches()) {
+                throw new IllegalArgumentException("Invalid cron entry [" + input + "]!");
+            }
+        }
+
         return value;
     }
     
@@ -345,7 +366,7 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
             return null;
         }
         
-        Matcher matcher = hexWebColorPattern.matcher(value);
+        Matcher matcher = getHexWebColorPattern().matcher(value);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Invalid value: [" + input + "].");
         }
@@ -433,6 +454,46 @@ public abstract class AbstractStringTypeConverter implements IStringTypeConverte
      
         msg.append(".");
         return msg.toString();
-        
+
+    }
+
+
+    /**
+     * Get the maximum allowed regexp length. Subclasses can override to adjust the limit.
+     *
+     * @return the maximum regexp length
+     */
+    protected int getMaxRegExpLength() {
+        return 2048;
+    }
+
+
+    /**
+     * Get the pattern used to detect nested quantifiers. Subclasses can override to customize ReDoS protection.
+     *
+     * @return the nested quantifier pattern
+     */
+    protected Pattern getNestedQuantifierPattern() {
+        return nestedQuantifierPattern;
+    }
+
+
+    /**
+     * Get the hex web color pattern. Subclasses can override to customize color validation.
+     *
+     * @return the hex web color pattern
+     */
+    protected Pattern getHexWebColorPattern() {
+        return hexWebColorPattern;
+    }
+
+
+    /**
+     * Get the cron field pattern. Subclasses can override to customize cron validation.
+     *
+     * @return the cron field pattern
+     */
+    protected Pattern getCronFieldPattern() {
+        return cronFieldPattern;
     }
 }

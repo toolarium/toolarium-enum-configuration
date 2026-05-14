@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ClassPathUtil {
     private static final Logger LOG = LoggerFactory.getLogger(ClassPathUtil.class);
-    
+    private final Map<String, List<Class<?>>> searchCache = new ConcurrentHashMap<>();
 
     /**
      * Private class, the only instance of the singelton which will be created by accessing the holder class.
@@ -60,20 +62,26 @@ public final class ClassPathUtil {
      * @return the found classes
      */
     public List<Class<?>> search(String inputClassName, boolean ignoreCase) {
-        List<Class<?>> result = new ArrayList<Class<?>>();
         if (inputClassName == null || inputClassName.isBlank()) {
-            return result;
+            return new ArrayList<>();
         }
-    
+
+        String cacheKey = inputClassName.trim() + "|" + ignoreCase;
+        List<Class<?>> cached = searchCache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        List<Class<?>> result = new ArrayList<Class<?>>();
         String className = inputClassName.trim();
         int idx = className.lastIndexOf('.');
         if (idx <= 0) {
             return result;
         }
-        
+
         final String packageName = className.substring(0, idx);
         final String classToSearch = className;
-                
+
         /* jptools to resolve
         List<String> list = ClassPath.getInstance().searchClassByPackageName(className.substring(0, idx));
         className = list.stream().filter(string -> classLowecaseName.equalsIgnoreCase(string)).findAny().orElse(null);
@@ -98,6 +106,7 @@ public final class ClassPathUtil {
             }
         }
 
+        searchCache.put(cacheKey, result);
         return result;
     }
     
@@ -165,6 +174,9 @@ public final class ClassPathUtil {
         }
         
         File[] files = directory.listFiles();
+        if (files == null) {
+            return classes;
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");

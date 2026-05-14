@@ -112,9 +112,9 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
      */
     public void setMinSize(T minSize) {
         this.minSize = minSize;
-        
-        if (minSizeAsString == null) {
-            setMinSizeAsString("" + minSize); 
+
+        if (minSizeAsString == null && minSize != null) {
+            setMinSizeAsString(minSize.toString());
         }
     }
 
@@ -158,9 +158,9 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
      */
     public void setMaxSize(T maxSize) {
         this.maxSize = maxSize;
-        
-        if (maxSizeAsString == null) {
-            setMaxSizeAsString("" + maxSize); 
+
+        if (maxSizeAsString == null && maxSize != null) {
+            setMaxSizeAsString(maxSize.toString());
         }
     }
 
@@ -272,11 +272,11 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
             return result;
         }
 
-        if (minSizeAsString != null && o.getMinSizeAsString() != null && !minSizeAsString.equals(o.getMinSizeAsString()) && minSizeAsString.compareTo(o.getMinSizeAsString()) > 0) {
+        if (minSizeAsString != null && o.getMinSizeAsString() != null && !minSizeAsString.equals(o.getMinSizeAsString()) && compareSizeStrings(minSizeAsString, o.getMinSizeAsString()) > 0) {
             return new EnumConfigurationComplianceResult("Valid from is smaller than current (" + minSizeAsString + " > " + o.getMinSizeAsString() + "): " + toStringExpression() + " - " + o.toStringExpression());
         }
 
-        if (maxSizeAsString != null && o.getMaxSizeAsString() != null && !maxSizeAsString.equals(o.getMaxSizeAsString()) && maxSizeAsString.compareTo(o.getMaxSizeAsString()) < 0) {
+        if (maxSizeAsString != null && o.getMaxSizeAsString() != null && !maxSizeAsString.equals(o.getMaxSizeAsString()) && compareSizeStrings(maxSizeAsString, o.getMaxSizeAsString()) < 0) {
             return new EnumConfigurationComplianceResult("Valid till is smaller than current (" + maxSizeAsString + " < " + o.getMaxSizeAsString() + "): " + toStringExpression() + " - " + o.toStringExpression());
         }
 
@@ -284,6 +284,33 @@ public class EnumKeyValueConfigurationSizing<T> implements Serializable {
     }
     
     
+    /**
+     * Compare two size strings numerically. The wildcard "*" is treated as the largest possible value.
+     * Falls back to lexicographic comparison if parsing fails.
+     *
+     * @param a the first size string
+     * @param b the second size string
+     * @return negative if a &lt; b, zero if equal, positive if a &gt; b
+     */
+    private static int compareSizeStrings(String a, String b) {
+        if (MAX_CARDINALITY.equals(a) && MAX_CARDINALITY.equals(b)) {
+            return 0;
+        }
+        if (MAX_CARDINALITY.equals(a)) {
+            return 1;
+        }
+        if (MAX_CARDINALITY.equals(b)) {
+            return -1;
+        }
+
+        try {
+            return Long.compare(Long.parseLong(a), Long.parseLong(b));
+        } catch (NumberFormatException e) {
+            return a.compareTo(b);
+        }
+    }
+
+
     /**
      * Convert to a string representation
      *
