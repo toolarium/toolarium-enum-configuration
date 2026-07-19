@@ -5,6 +5,9 @@
  */
 package com.github.toolarium.enumeration.configuration.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.toolarium.enumeration.configuration.Version;
 import java.io.Serializable;
@@ -20,6 +23,7 @@ import java.util.TreeSet;
  * 
  * @author patrick
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EnumConfigurations implements Serializable {
     private static final long serialVersionUID = 8595845598162960442L;
     private String name;
@@ -93,9 +97,10 @@ public class EnumConfigurations implements Serializable {
     
     /**
      * Gets the enumeration configuration content list
-     * 
+     *
      * @return the enumeration configuration list
      */
+    @JsonProperty("enumConfigurationList")
     public Set<EnumConfiguration<? extends EnumKeyConfiguration>> getEnumConfigurationList() {
         Set<EnumConfiguration<? extends EnumKeyConfiguration>> result = new LinkedHashSet<EnumConfiguration<? extends EnumKeyConfiguration>>();
         for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
@@ -108,9 +113,10 @@ public class EnumConfigurations implements Serializable {
     
     /**
      * Get interfaces used by the enumeration configuration
-     * 
+     *
      * @return the interface list
      */
+    @JsonIgnore
     public Set<String> getEnumConfigurationInterfaceList() {
         Set<String> result = new TreeSet<String>();
         for (Map.Entry<String, EnumConfiguration<? extends EnumKeyConfiguration>> e : enumConfigurationContentMap.entrySet()) {
@@ -133,6 +139,7 @@ public class EnumConfigurations implements Serializable {
      * 
      * @param list the enumeration configuration content list
      */
+    @JsonProperty("enumConfigurationList")
     @JsonDeserialize(as = LinkedHashSet.class)
     public void setEnumConfigurationList(Set<EnumConfiguration<? extends EnumKeyConfiguration>> list) {
         enumConfigurationContentMap = new LinkedHashMap<String, EnumConfiguration<? extends EnumKeyConfiguration>>();
