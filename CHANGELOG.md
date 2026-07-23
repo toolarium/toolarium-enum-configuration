@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [ 1.3.3 ] - 2026-07-19
+## [ 1.3.3 ] - 2026-07-23
+### Changed
+- Switched Jackson dependencies to use the Jackson BOM (`com.fasterxml.jackson:jackson-bom:2.21.5`) to ensure all Jackson modules are aligned on the same version and prevent unintended version downgrades introduced by transitive BOM references in Jackson 2.21.x.
+- Added Jackson version compatibility documentation to README.
 
 ## [ 1.3.2 ] - 2026-07-19
 ### Fixed

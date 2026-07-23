@@ -50,3 +50,31 @@ dependencies {
     <version>1.3.1</version>
 </dependency>
 ```
+
+## Jackson Version Compatibility
+
+This library depends on Jackson. Starting with Jackson 2.21.x, `jackson-core` introduces a transitive BOM reference that can cause unintended version downgrades (e.g. `jackson-core:2.21.x` being resolved to `2.18.x`) when mixed with earlier Jackson releases.
+
+To ensure all Jackson modules are aligned on the same version, import the Jackson BOM in your Gradle build.
+
+### Align to Jackson 2.21.x (recommended):
+
+```groovy
+dependencies {
+    implementation platform("com.fasterxml.jackson:jackson-bom:2.21.5")
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    // add other jackson modules as needed, versions are managed by the BOM
+}
+```
+
+### Pin to an older version (e.g. Jackson 2.18.x):
+
+```groovy
+dependencies {
+    implementation platform("com.fasterxml.jackson:jackson-bom:2.18.6")
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    // all jackson modules will resolve to 2.18.x
+}
+```
+
+Using the BOM ensures consistent versions across all Jackson modules and prevents accidental version mismatches between `jackson-databind` and `jackson-core`.
