@@ -88,6 +88,9 @@ public final class EnumKeyValueConfigurationBinaryObjectParser {
         }
         
         String[] binaryData = input.trim().split(ESCAPED_SEPARATOR);
+        if (binaryData == null || binaryData.length == 0) {
+            return enumKeyValueConfigurationBinaryObject;
+        }
 
         if (binaryData.length <= 1) {
             //  {text/plain}VGV4dAo=
@@ -161,7 +164,6 @@ public final class EnumKeyValueConfigurationBinaryObjectParser {
             builder.append(Instant.now());
         }
 
-        
         builder.append(EnumKeyValueConfigurationBinaryObjectParser.SEPARATOR);
 
         if (enumKeyValueConfigurationBinaryObject.getMimetype() != null && !enumKeyValueConfigurationBinaryObject.getMimetype().isBlank()) {
